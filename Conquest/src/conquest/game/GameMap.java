@@ -149,7 +149,7 @@ public class GameMap {
 		LinkedList<RegionData> ownedRegions = new LinkedList<RegionData>();
 		
 		for(RegionData region : this.getRegions())
-			if(region.getPlayerName().equals(player.getName()))
+			if(region.getPlayerName().equals(player.getId()))
 				ownedRegions.add(region);
 
 		return ownedRegions;

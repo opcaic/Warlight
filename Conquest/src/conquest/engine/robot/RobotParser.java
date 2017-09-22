@@ -71,7 +71,7 @@ public class RobotParser {
 		
 		String[] split = input.trim().split(" ");
 
-		if(!split[0].equals(player.getName()))
+		if(!split[0].equals(player.getId()))
 		{
 			errorOut("Incorrect player name or move format incorrect", input, player);
 			return null;
@@ -87,7 +87,7 @@ public class RobotParser {
 			catch(Exception e) { errorOut("Number of armies input incorrect", input, player);}
 		
 			if(!(region == null || armies == -1))
-				return new PlaceArmiesMove(player.getName(), region, armies);
+				return new PlaceArmiesMove(player.getId(), region, armies);
 			return null;
 		}
 		else if(split[1].equals("attack/transfer"))
@@ -102,7 +102,7 @@ public class RobotParser {
 			catch(Exception e) { errorOut("Number of armies input incorrect", input, player);}
 
 			if(!(fromRegion == null || toRegion == null || armies == -1))
-				return new AttackTransferMove(player.getName(), fromRegion, toRegion, armies);
+				return new AttackTransferMove(player.getId(), fromRegion, toRegion, armies);
 			return null;
 		}
 

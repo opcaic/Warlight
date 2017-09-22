@@ -51,9 +51,9 @@ public class MoveQueue {
 		}
 		catch(Exception e) { //add AttackTransferMove
 			AttackTransferMove atm = (AttackTransferMove) move;
-			if(player1.getName().equals(move.getPlayerName()))
+			if(player1.getId().equals(move.getPlayerName()))
 				attackTransferMovesP1.add(atm);
-			else if(player2.getName().equals(move.getPlayerName()))
+			else if(player2.getId().equals(move.getPlayerName()))
 				attackTransferMovesP2.add(atm);
 		}
 	}
@@ -92,12 +92,12 @@ public class MoveQueue {
 			}
 			else //it's the other player's turn
 			{
-				return getMove(previousMovePlayer.equals(player2.getName()));
+				return getMove(previousMovePlayer.equals(player2.getId()));
 			}
 		}
 		else //return another move by the same player
 		{
-			return getMove(previousMovePlayer.equals(player1.getName()));
+			return getMove(previousMovePlayer.equals(player1.getId()));
 		}
 	}
 

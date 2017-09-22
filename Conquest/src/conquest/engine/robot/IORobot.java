@@ -53,16 +53,16 @@ public class IORobot implements Robot
 		errorCounter = 0;
 	}
 	
-	public IORobot(String playerName, OutputStream input, boolean inputAutoFlush, InputStream output, InputStream error) throws IOException
+	public IORobot(String playerId, OutputStream input, boolean inputAutoFlush, InputStream output, InputStream error) throws IOException
 	{
-		handler = new Handler(playerName + "-Robot", input, inputAutoFlush, output, error);
+		handler = new Handler(playerId + "-Robot", input, inputAutoFlush, output, error);
 		errorCounter = 0;
 	}
 	
 	@Override
 	public void setup(RobotConfig config) {
 		this.config = config;
-		handler.setGameLog(config.gameLog, config.playerName);
+		handler.setGameLog(config.gameLog, config.playerId);
 	}
 		
 //	@Override
@@ -140,7 +140,13 @@ public class IORobot implements Robot
 	}
 
 	@Override
-	public String getRobotName() {
+	public String getRobotPlayerId() {
+		if (config == null) return "N/A";
+		return config.playerId;
+	}
+
+	@Override
+	public String getRobotPlayerName() {
 		if (config == null) return "N/A";
 		return config.playerName;
 	}

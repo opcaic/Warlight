@@ -37,18 +37,18 @@ public class ProcessRobot implements Robot
 
 	private RobotConfig config;
 	
-	public ProcessRobot(String playerName, String command) throws IOException
+	public ProcessRobot(String playerId, String command) throws IOException
 	{
-		this(playerName, "./", command);
+		this(playerId, "./", command);
 	}
 	
-	public ProcessRobot(String playerName, String dir, String command) throws IOException
+	public ProcessRobot(String playerId, String dir, String command) throws IOException
 	{		
 		childCommand = command;
 		childDir = new File(dir);
 		child = Runtime.getRuntime().exec(childCommand, null, childDir);
-		System.out.println(playerName + " -> " + command);
-		robot = new IORobot(playerName, child.getOutputStream(), false, child.getInputStream(), child.getErrorStream());
+		System.out.println(playerId + " -> " + command);
+		robot = new IORobot(playerId, child.getOutputStream(), false, child.getInputStream(), child.getErrorStream());
 	}
 	
 	@Override
@@ -139,8 +139,13 @@ public class ProcessRobot implements Robot
 	}
 	
 	@Override
-	public String getRobotName() {
-		return robot.getRobotName();
+	public String getRobotPlayerId() {
+		return robot.getRobotPlayerId();
+	}
+	
+	@Override
+	public String getRobotPlayerName() {
+		return robot.getRobotPlayerName();
 	}
 
 }

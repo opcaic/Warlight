@@ -32,17 +32,17 @@ public class ConquestFight {
 		System.out.println("[" + name + "] " + msg);
 	}
 	
-	public void fight(String bot1Id, String bot1Init, String bot2Id, String bot2Init) {		
-		bot1Id = Sanitize.idify(bot1Id);
-		bot2Id = Sanitize.idify(bot2Id);
+	public void fight(String bot1Name, String bot1Init, String bot2Name, String bot2Init) {		
+		bot1Name = Sanitize.idify(bot1Name);
+		bot2Name = Sanitize.idify(bot2Name);
 		
-		String gameId = bot1Id + "-vs-" + bot2Id; 
+		String gameId = bot1Name + "-vs-" + bot2Name; 
 		
 		log(gameId, "FIGHT! GAMES: " + fightConfig.games);
 		
-		fightConfig.config.bot1Id = bot1Id;
+		fightConfig.config.player1Name = bot1Name;
 		fightConfig.config.bot1Init = bot1Init;
-		fightConfig.config.bot2Id = bot2Id;
+		fightConfig.config.player2Name = bot2Name;
 		fightConfig.config.bot2Init = bot2Init;
 		
 		ConquestFightRound[] rounds = ConquestFightRoundGenerator.generateFightRounds(fightConfig.seed, fightConfig.config, fightConfig.games);
@@ -54,14 +54,14 @@ public class ConquestFight {
 		for (int i = 0; i < rounds.length; ++i) {
 			long start = System.currentTimeMillis();
 			
-			gameId = bot1Id + "-vs-" + bot2Id + "-" + i;
+			gameId = bot1Name + "-vs-" + bot2Name + "-" + i;
 			
 			log(gameId, "ROUND " + (i+1) + " / " + rounds.length);
 			
 			// SET REPLAY FILE
 			int roundNumber = 0;
 			while (true) {
-				rounds[i].getConfig().replayLog = new File(replayDirFile, bot1Id + "-vs-" + bot2Id + "-Round-" + roundNumber + ".replay");
+				rounds[i].getConfig().replayLog = new File(replayDirFile, bot1Name + "-vs-" + bot2Name + "-Round-" + roundNumber + ".replay");
 				if (!rounds[i].getConfig().replayLog.exists()) break;
 				++roundNumber;
 			}
@@ -75,7 +75,7 @@ public class ConquestFight {
 			log(gameId, "TIME: " + (System.currentTimeMillis() - start) + "ms");
 		}
 		
-		gameId = bot1Id + "-vs-" + bot2Id; 
+		gameId = bot1Name + "-vs-" + bot2Name; 
 		
 		log(gameId, "FIGHT FINISHED!");
 		
@@ -83,15 +83,15 @@ public class ConquestFight {
 	}
 
 	private void outputResults(ConquestFightRound[] rounds, GameResult[] results) {
-		String bot1Id = rounds[0].getConfig().bot1Id;
-		String bot2Id = rounds[0].getConfig().bot2Id;
+		String bot1Name = rounds[0].getConfig().player1Name;
+		String bot2Name = rounds[0].getConfig().player2Name;
 		
 		String fileName;
 		
-		if (bot1Id.compareTo(bot2Id) < 0) {
-			fileName = bot1Id + "-vs-" + bot2Id + ".csv";
+		if (bot1Name.compareTo(bot2Name) < 0) {
+			fileName = bot1Name + "-vs-" + bot2Name + ".csv";
 		} else {
-			fileName = bot2Id + "-vs-" + bot1Id + ".csv";
+			fileName = bot2Name + "-vs-" + bot1Name + ".csv";
 		}
 		
 		outputResults(new File(resultDirFile, fileName), rounds, results);

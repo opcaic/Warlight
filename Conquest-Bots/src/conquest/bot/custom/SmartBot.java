@@ -389,6 +389,7 @@ public class SmartBot extends GameBot
 		
 		config.bot1Init = "internal:conquest.bot.custom.SmartBot";
 		config.bot2Init = "internal:conquest.bot.custom.AggressiveBot";
+		//config.bot2Init = "human";
 		
 		config.engine.botCommandTimeoutMillis = 24*60*60*1000;
 		

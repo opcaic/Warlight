@@ -239,6 +239,14 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		return Team.NEUTRAL;
 	}
 	
+	public void setContinual(boolean state) {
+		continual = true;		
+	}
+	
+	public void setContinualFrameTime(int millis) {
+		continualTime = millis;
+	}
+	
 	// ==============
 	// MOUSE LISTENER
 	// ==============
@@ -1343,8 +1351,11 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 			info.setHighlight(command);
 		}
 	}
-	
-	
-	
+
+	public void setPlayerNames(String player1Name, String player2Name) {
+		p1.setNameLabel(player1Name);
+		p2.setNameLabel(player2Name);
+	}
+		
 } 
 

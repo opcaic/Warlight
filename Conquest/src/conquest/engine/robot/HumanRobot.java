@@ -15,7 +15,7 @@ public class HumanRobot implements Robot {
 	private int startingArmies;
 	private boolean running = true;;
 	
-	public HumanRobot(String playerName) {
+	public HumanRobot(String playerId) {
 	}
 
 	@Override
@@ -26,7 +26,7 @@ public class HumanRobot implements Robot {
 	@Override
 	public String getPreferredStartingArmies(long timeOut, ArrayList<RegionData> pickableRegions) {
 		if (config.gameLog != null) {
-			System.out.println(config.playerName + "-Human --> getPrefferedStartingArmies()");
+			System.out.println(config.playerId + "-Human --> getPrefferedStartingArmies()");
 		}
 		
 		List<Region> availableRegions = new ArrayList<Region>(pickableRegions.size());
@@ -34,7 +34,7 @@ public class HumanRobot implements Robot {
 			availableRegions.add(data.getRegion());
 		}
 		
-		List<Region> chosen = config.gui.chooseRegionsHuman(config.playerName, availableRegions);
+		List<Region> chosen = config.gui.chooseRegionsHuman(config.playerId, availableRegions);
 		
 		String result = "";
 		
@@ -44,7 +44,7 @@ public class HumanRobot implements Robot {
 		}
 		
 		if (config.gameLog != null) {
-			System.out.println(config.playerName + "-Human <-- " + result);
+			System.out.println(config.playerId + "-Human <-- " + result);
 		}
 		
 		
@@ -54,10 +54,10 @@ public class HumanRobot implements Robot {
 	@Override
 	public String getPlaceArmiesMoves(long timeOut) {
 		if (config.gameLog != null) {
-			System.out.println(config.playerName + "-Human --> getPlaceArmiesMoves()");
+			System.out.println(config.playerId + "-Human --> getPlaceArmiesMoves()");
 		}
 		
-		List<PlaceArmiesMove> commands = config.gui.placeArmiesHuman(config.playerName, config.team, startingArmies);
+		List<PlaceArmiesMove> commands = config.gui.placeArmiesHuman(config.playerId, config.team, startingArmies);
 		
 		String result = "";
 		
@@ -66,7 +66,7 @@ public class HumanRobot implements Robot {
 		}
 		
 		if (config.gameLog != null) {
-			System.out.println(config.playerName + "-Human <-- " + result);
+			System.out.println(config.playerId + "-Human <-- " + result);
 		}
 		
 		return result;
@@ -75,10 +75,10 @@ public class HumanRobot implements Robot {
 	@Override
 	public String getAttackTransferMoves(long timeOut) {
 		if (config.gameLog != null) {
-			System.out.println(config.playerName + "-Human --> getAttackTransferMoves()");
+			System.out.println(config.playerId + "-Human --> getAttackTransferMoves()");
 		}
 		
-		List<AttackTransferMove> commands = config.gui.moveArmiesHuman(config.playerName, config.team);
+		List<AttackTransferMove> commands = config.gui.moveArmiesHuman(config.playerId, config.team);
 		
 		String result = "";
 		
@@ -87,7 +87,7 @@ public class HumanRobot implements Robot {
 		}
 		
 		if (config.gameLog != null) {
-			System.out.println(config.playerName + "-Human <-- " + result);
+			System.out.println(config.playerId + "-Human <-- " + result);
 		}
 		
 		return result;
@@ -116,7 +116,12 @@ public class HumanRobot implements Robot {
 	}
 
 	@Override
-	public String getRobotName() {
+	public String getRobotPlayerId() {
+		if (config == null) return "Human";
+		return config.playerId;
+	}
+	
+	public String getRobotPlayerName() {
 		return "Human";
 	}
 

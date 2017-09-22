@@ -29,6 +29,8 @@ public interface Robot {
 	
 	public static class RobotConfig {
 		
+		public final String playerId;
+		
 		public final String playerName;
 		
 		public final Team team;
@@ -39,8 +41,9 @@ public interface Robot {
 		
 		public final GUI gui;
 
-		public RobotConfig(String playerName, Team team, long timeoutMillis, GameLog gameLog, GUI gui) {
+		public RobotConfig(String playerId, String playerName, Team team, long timeoutMillis, GameLog gameLog, GUI gui) {
 			super();
+			this.playerId = playerId;
 			this.playerName = playerName;
 			this.team = team;
 			this.timeoutMillis = timeoutMillis;
@@ -50,7 +53,9 @@ public interface Robot {
 		
 	}
 	
-	public String getRobotName();
+	public String getRobotPlayerId();
+	
+	public String getRobotPlayerName();
 
 	public void setup(RobotConfig config);
 	

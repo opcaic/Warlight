@@ -30,17 +30,17 @@ public class ConquestFightConsole {
 	
 	private static final String ARG_REVERSE_GAMES_LONG = "reverse-games";
 	
-	private static final char ARG_BOT1_ID_SHORT = 'a';
+	private static final char ARG_BOT1_NAME_SHORT = 'a';
 	
-	private static final String ARG_BOT1_ID_LONG = "bot1-id";
+	private static final String ARG_BOT1_NAME_LONG = "bot1-name";
 	
 	private static final char ARG_BOT1_INIT_SHORT = 'b';
 	
 	private static final String ARG_BOT1_INIT_LONG = "bot1-init";
 	
-	private static final char ARG_BOT2_ID_SHORT = 'c';
+	private static final char ARG_BOT2_NAME_SHORT = 'c';
 	
-	private static final String ARG_BOT2_ID_LONG = "bot2-id";
+	private static final String ARG_BOT2_NAME_LONG = "bot2-name";
 	
 	private static final char ARG_BOT2_INIT_SHORT = 'd';
 	
@@ -76,11 +76,11 @@ public class ConquestFightConsole {
 	
 	private static boolean reverseGames;
 	
-	private static String bot1Id;
+	private static String bot1Name;
 	
 	private static String bot1Init;
 	
-	private static String bot2Id;
+	private static String bot2Name;
 	
 	private static String bot2Init;
 	
@@ -143,11 +143,11 @@ public class ConquestFightConsole {
 		    	
     	
         
-        FlaggedOption opt1 = new FlaggedOption(ARG_BOT1_ID_LONG)
+        FlaggedOption opt1 = new FlaggedOption(ARG_BOT1_NAME_LONG)
 	    	.setStringParser(JSAP.STRING_PARSER)
 	    	.setRequired(false) 
-	    	.setShortFlag(ARG_BOT1_ID_SHORT)
-	    	.setLongFlag(ARG_BOT1_ID_LONG);    
+	    	.setShortFlag(ARG_BOT1_NAME_SHORT)
+	    	.setLongFlag(ARG_BOT1_NAME_LONG);    
 	    opt1.setHelp("Bot 1 ID.");
 	
 	    jsap.registerParameter(opt1);
@@ -161,11 +161,11 @@ public class ConquestFightConsole {
 	
 	    jsap.registerParameter(opt11);
 	    
-	    FlaggedOption opt2 = new FlaggedOption(ARG_BOT2_ID_LONG)
+	    FlaggedOption opt2 = new FlaggedOption(ARG_BOT2_NAME_LONG)
 	    	.setStringParser(JSAP.STRING_PARSER)
 	    	.setRequired(false) 
-	    	.setShortFlag(ARG_BOT2_ID_SHORT)
-	    	.setLongFlag(ARG_BOT2_ID_LONG);    
+	    	.setShortFlag(ARG_BOT2_NAME_SHORT)
+	    	.setLongFlag(ARG_BOT2_NAME_LONG);    
 	    opt2.setHelp("Bot 2 ID.");
 	    
 	    jsap.registerParameter(opt2);
@@ -307,11 +307,11 @@ public class ConquestFightConsole {
 		
 		tableFileName = config.getString(ARG_TABLE_FILE_LONG);
 		
-		bot1Id = config.getString(ARG_BOT1_ID_LONG, null);
+		bot1Name = config.getString(ARG_BOT1_NAME_LONG, null);
 		
 		bot1Init = config.getString(ARG_BOT1_INIT_LONG, null);
 		
-		bot2Id = config.getString(ARG_BOT2_ID_LONG, null);
+		bot2Name = config.getString(ARG_BOT2_NAME_LONG, null);
 		
 		bot2Init = config.getString(ARG_BOT2_INIT_LONG, null);
 		
@@ -365,11 +365,11 @@ public class ConquestFightConsole {
 			fail("Table file exists and is not a file. Parsed as: " + tableFileName + " --> " + tableFile.getAbsolutePath());
 		}
 		
-		if (bot1Id != null && bot2Id != null && bot1Init != null && bot2Init != null) {
+		if (bot1Name != null && bot2Name != null && bot1Init != null && bot2Init != null) {
 			batchFight = false;
 			System.out.println("-- Bot 1 & 2 ids / inits specified, will execute 1v1 fights");
-			System.out.println("---- bot1: " + bot1Id + " / " + bot1Init);
-			System.out.println("---- bot2: " + bot2Id + " / " + bot2Init);
+			System.out.println("---- bot1: " + bot1Name + " / " + bot1Init);
+			System.out.println("---- bot2: " + bot2Name + " / " + bot2Init);
 		} else 
 		if (botIdBatch != null && botsBatchPropertyFileName != null) {
 			batchFight = true;				
@@ -415,10 +415,10 @@ public class ConquestFightConsole {
 		config.games = gamesCount;
 		
 		ConquestFight fight = new ConquestFight(config, tableFile, resultDirFile, replayDirFile);
-		fight.fight(bot1Id, bot1Init, bot2Id, bot2Init);
+		fight.fight(bot1Name, bot1Init, bot2Name, bot2Init);
 		
 		if (reverseGames) {
-			fight.fight(bot2Id, bot2Init, bot1Id, bot1Init);
+			fight.fight(bot2Name, bot2Init, bot1Name, bot1Init);
 		}
 	}
 	
@@ -443,7 +443,7 @@ public class ConquestFightConsole {
 	public static String[] getTestArgs_1v1() {
 		return new String[] {
 				  "-s", "20"     // seed
-				, "-o", "GAME;PLR1;PLR2;x;x;false;false;-1;true;5000;5;100;CONTINUAL_1_1_A60_D70"   // game-config
+				, "-o", "GAME;PLR1;PLR2;x;x;true;true;true;200;-1;true;5000;5;100;CONTINUAL_1_1_A60_D70"   // game-config
 				, "-g", "3"      // games-count
 				, "-r", "true"   // reverse-games
 				, "-a", "AggressiveBot"                              // bot1-id
@@ -457,10 +457,10 @@ public class ConquestFightConsole {
 		
 		// game-config:
 		//		result.gameId = parts[0];                                        // should be always: GAME
-		//		result.playerName1 = parts[1];                                   // should be always: PLR1
-		//		result.playerName2 = parts[2];                                   // should be always: PLR2
-		//		result.bot1Id = parts[3];                                        // will be auto-changed
-		//		result.bot2Id = parts[4];                                        // will be auto-changed
+		//		result.player1Id = parts[1];                                     // should be always: PLR1
+		//		result.player2Id = parts[2];                                     // should be always: PLR2
+		//		result.player1Name = parts[3];                                   // will be auto-changed
+		//		result.player2Name = parts[4];                                   // will be auto-changed
 		//		result.visualize = Boolean.parseBoolean(parts[5]);               // should be always FALSE
 		//		result.forceHumanVisualization = Boolean.parseBoolean(parts[6]); // should be always FALSE
 		// followed by engine config:
@@ -475,10 +475,10 @@ public class ConquestFightConsole {
 	public static String[] getTestArgs_Batch() {
 		return new String[] {
 				  "-s", "20"     // seed
-				, "-o", "GAME;PLR1;PLR2;x;x;false;false;-1;true;5000;5;100;CONTINUAL_1_1_A60_D70"   // game-config
+				, "-o", "GAME;PLR1;PLR2;x;x;false;false;null;null;-1;true;5000;5;100;CONTINUAL_1_1_A60_D70"   // game-config
 				, "-g", "3"      // games-count
 				, "-r", "true"   // reverse-games
-				, "-e", "AggressiveBot"               // bot-id that will perform fights agains all other bots within batch property file
+				, "-e", "AggressiveBot"               // bot-id that will perform fights against all other bots within batch property file
 				, "-f", "batch-fight.properties" 	  // batch property file
 				, "-u", "./results/fights"            // result-dir
 				, "-y", "./results/replays"           // replay-dir

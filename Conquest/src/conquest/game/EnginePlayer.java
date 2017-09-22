@@ -21,13 +21,15 @@ import conquest.engine.Robot;
 
 public class EnginePlayer {
 	
+	private String id;
 	private String name;
 	private Robot bot;
 	private int armiesPerTurn; 
 	private int armiesLeft;    //variable armies that can be added, changes with superRegions fully owned and moves already placed.
 	
-	public EnginePlayer(String name, Robot bot, int startingArmies)
+	public EnginePlayer(String id, String name, Robot bot, int startingArmies)
 	{
+		this.id = id;
 		this.name = name;
 		this.bot = bot;
 		this.armiesPerTurn = startingArmies; //start with 5 armies per turn
@@ -41,7 +43,14 @@ public class EnginePlayer {
 	}
 	
 	/**
-	 * @return The String name of this Player
+	 * @return The String ID of this Player (typically PLR1 or PLR2)
+	 */
+	public String getId() {
+		return id;
+	}
+	
+	/**
+	 * @return Human-readable name of this Player
 	 */
 	public String getName() {
 		return name;

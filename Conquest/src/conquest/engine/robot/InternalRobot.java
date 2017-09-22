@@ -30,7 +30,7 @@ public class InternalRobot implements Robot {
 					hijacked = !hijacked;
 					if (config.gui != null) {
 						config.gui.showNotification(
-							hijacked ? InternalRobot.this.config.playerName + " hijacked!" : InternalRobot.this.config.playerName + " resumed!"
+							hijacked ? InternalRobot.this.config.playerId + " hijacked!" : InternalRobot.this.config.playerId + " resumed!"
 						);
 					}
 				}
@@ -40,7 +40,7 @@ public class InternalRobot implements Robot {
 					hijacked = !hijacked;
 					if (config.gui != null) {
 						config.gui.showNotification(
-							hijacked ? InternalRobot.this.config.playerName + " hijacked!" : InternalRobot.this.config.playerName + " resumed!"
+							hijacked ? InternalRobot.this.config.playerId + " hijacked!" : InternalRobot.this.config.playerId + " resumed!"
 						);
 					}
 				}
@@ -67,18 +67,18 @@ public class InternalRobot implements Robot {
 
 	private String botFQCN;
 	
-	public InternalRobot(String playerName, String botFQCN) throws IOException {
+	public InternalRobot(String playerId, String botFQCN) throws IOException {
 		this.botFQCN = botFQCN;
 		
 		botInput = new InputOutputStream();
 		botOutput = new InputOutputStream();
 		
-		bot = BotParser.runInternal(playerName, botFQCN, botInput.getInputStream(), new PrintStream(botOutput.getOutputStream()), null);
-		System.out.println(playerName + " -> " + botFQCN);
+		bot = BotParser.runInternal(playerId, botFQCN, botInput.getInputStream(), new PrintStream(botOutput.getOutputStream()), null);
+		System.out.println(playerId + " -> " + botFQCN);
 		
-		robot = new IORobot(playerName, botInput.getOutputStream(), true, botOutput.getInputStream(), null);
+		robot = new IORobot(playerId, botInput.getOutputStream(), true, botOutput.getInputStream(), null);
 		
-		humanHijack = new HumanRobot(playerName);
+		humanHijack = new HumanRobot(playerId);
 	}
 	
 	@Override
@@ -176,8 +176,16 @@ public class InternalRobot implements Robot {
 	}
 
 	@Override
-	public String getRobotName() {
+	public String getRobotPlayerId() {
+		if (config == null) return "N/A";
+		return config.playerId;
+	}
+	
+	public String getRobotPlayerName() {
+		if (config == null) return botFQCN.substring(1+botFQCN.lastIndexOf("."));
 		return botFQCN.substring(1+botFQCN.lastIndexOf("."));
 	}
+
+	
 
 }

@@ -249,8 +249,8 @@ public class Engine {
 			} else if(givenP1Regions.contains(p2Region)) { //preferred region for player2 is not given to player1 already
 				i2++;
 			} else if(p1Region != p2Region) {
-				p1Region.setPlayerName(player1.getName());
-				p2Region.setPlayerName(player2.getName());
+				p1Region.setPlayerName(player1.getId());
+				p2Region.setPlayerName(player2.getId());
 				givenP1Regions.add(p1Region);
 				givenP2Regions.add(p2Region);
 				n++; i1++; i2++;
@@ -313,7 +313,7 @@ public class Engine {
 		int armies = plm.getArmies();
 		
 		//check legality
-		if(region.ownedByPlayer(player.getName()))
+		if(region.ownedByPlayer(player.getId()))
 		{
 			if(armies < 1)
 			{
@@ -346,7 +346,7 @@ public class Engine {
 		int armies = atm.getArmies();
 		
 		//check legality
-		if(fromRegion.ownedByPlayer(player.getName()))
+		if(fromRegion.ownedByPlayer(player.getId()))
 		{
 			if(fromRegion.isNeighbor(toRegion))
 			{
@@ -385,13 +385,13 @@ public class Engine {
 			if(map.visibleRegionsForPlayer(player1).contains(move.getRegion()))
 			{
 				player1PlayedGame.add(new MoveResult(move, map.getVisibleMapCopyForPlayer(player1))); //for the game file
-				if(move.getPlayerName().equals(player2.getName()))
+				if(move.getPlayerName().equals(player2.getId()))
 					opponentMovesPlayer1.add(move); //for the opponent_moves output
 			}
 			if(map.visibleRegionsForPlayer(player2).contains(move.getRegion()))
 			{
 				player2PlayedGame.add(new MoveResult(move, map.getVisibleMapCopyForPlayer(player2))); //for the game file
-				if(move.getPlayerName().equals(player1.getName()))
+				if(move.getPlayerName().equals(player1.getId()))
 					opponentMovesPlayer2.add(move); //for the opponent_moves output
 			}
 		}
@@ -428,7 +428,7 @@ public class Engine {
 				RegionData toRegion = move.getToRegion();
 				EnginePlayer player = getPlayer(move.getPlayerName());
 				
-				if(fromRegion.ownedByPlayer(player.getName())) //check if the fromRegion still belongs to this player
+				if(fromRegion.ownedByPlayer(player.getId())) //check if the fromRegion still belongs to this player
 				{
 					if(!usedRegions.get(fromRegion.getId()).contains(toRegion.getId())) //between two regions there can only be attacked/transfered once
 					{
@@ -441,7 +441,7 @@ public class Engine {
 
 							oldFromRegion.setArmies(oldFromRegion.getArmies() - move.getArmies()); //update oldFromRegion so new armies cannot be used yet
 
-							if(toRegion.ownedByPlayer(player.getName())) //transfer
+							if(toRegion.ownedByPlayer(player.getId())) //transfer
 							{
 								if(fromRegion.getArmies() > 1)
 								{
@@ -482,14 +482,14 @@ public class Engine {
 					visibleRegionsPlayer1OldMap.contains(move.getToRegion()))
 			{
 				player1PlayedGame.add(new MoveResult(move, map.getVisibleMapCopyForPlayer(player1))); //for the game file
-				if(move.getPlayerName().equals(player2.getName()))
+				if(move.getPlayerName().equals(player2.getId()))
 					opponentMovesPlayer1.add(move); //for the opponent_moves output
 			}
 			if(visibleRegionsPlayer2Map.contains(move.getFromRegion()) || visibleRegionsPlayer2Map.contains(move.getToRegion()) ||
 					visibleRegionsPlayer2OldMap.contains(move.getToRegion()))
 			{
 				player2PlayedGame.add(new MoveResult(move, map.getVisibleMapCopyForPlayer(player2))); //for the game file
-				if(move.getPlayerName().equals(player1.getName()))
+				if(move.getPlayerName().equals(player1.getId()))
 					opponentMovesPlayer2.add(move); //for the opponent_moves output
 			}
 			
@@ -738,9 +738,9 @@ public class Engine {
 	
 	private EnginePlayer getPlayer(String playerName)
 	{
-		if(player1.getName().equals(playerName))
+		if(player1.getId().equals(playerName))
 			return player1;
-		else if(player2.getName().equals(playerName))
+		else if(player2.getId().equals(playerName))
 			return player2;
 		else
 			return null;

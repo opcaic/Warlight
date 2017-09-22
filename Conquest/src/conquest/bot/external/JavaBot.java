@@ -20,7 +20,9 @@ public class JavaBot {
 
 	private String botFQCN;
 	private File logFile;
-
+	private FileBotLog log; 
+	
+	
 	public JavaBot(String botFQCN) {
 		this(botFQCN, null);
 	}
@@ -35,7 +37,7 @@ public class JavaBot {
 	public void run() {
 		BotParser parser = new BotParser(constructBot());
 		if (logFile != null) {
-			FileBotLog log = parser.setLogFile(logFile);
+			log = parser.setLogFile(logFile);
 		}
 		parser.start();
 		

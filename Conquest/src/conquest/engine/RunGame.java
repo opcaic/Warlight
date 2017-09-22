@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
 
+import conquest.bot.external.JavaBot;
 import conquest.engine.Engine.EngineConfig;
 import conquest.engine.Robot.RobotConfig;
 import conquest.engine.replay.FileGameLog;
@@ -52,16 +53,34 @@ public class RunGame
 		
 		public String gameId = "GAME";
 		
-		public String playerName1 = "PLR1";
-		public String playerName2 = "PLR2";
+		/**
+		 * Used by ENGINE as PLAYER IDENTIFIER of the player 1
+		 * BETTER NOT TO ALTER AT ALL...
+		 */
+		public String playerId1 = "PLR1";
+		/**
+		 * Used by ENGINE as PLAYER IDENTIFIER of the player 2
+		 * BETTER NOT TO ALTER AT ALL...
+		 */
+		public String playerId2 = "PLR2";
 		
-		public String bot1Id = "Bot1";
-		public String bot2Id = "Bot2";
+		/**
+		 * Human-readable name of player 1 to display during visualization or to report into CSV.
+		 */
+		public String player1Name = "Bot1";
+		/**
+		 * Human-readable name of player 2 to display during visualization or to report into CSV.
+		 */
+		public String player2Name = "Bot2";
 		
 		public String bot1Init;
 		public String bot2Init;
 		
 		public boolean visualize = true;
+		
+		public Boolean visualizeContinual = null;
+		
+		public Integer visualizeContinualFrameTimeMillis = null;
 		
 		/**
 		 * Optimize region circle positions for human controls.
@@ -73,7 +92,7 @@ public class RunGame
 		public EngineConfig engine = new EngineConfig();
 		
 		public String asString() {
-			return gameId + ";" + playerName1 + ";" + playerName2 + ";" + bot1Id + ";" + bot2Id + ";" + visualize + ";" + forceHumanVisualization + ";" + engine.asString();
+			return gameId + ";" + playerId1 + ";" + playerId2 + ";" + player1Name + ";" + player2Name + ";" + visualize + ";" + forceHumanVisualization + ";" + visualizeContinual + ";" + visualizeContinualFrameTimeMillis + ";" + engine.asString();
 		}
 		
 		@Override
@@ -88,11 +107,11 @@ public class RunGame
 		}
 		
 		public String getCSVHeader() {
-			return "ID;Bot1;Bot2;" + engine.getCSVHeader();
+			return "ID;PlayerName1;PlayerName2;" + engine.getCSVHeader();
 		}
 		
 		public String getCSV() {
-			return gameId + ";" + bot1Id + ";" + bot2Id + ";" + engine.getCSV();
+			return gameId + ";" + player1Name + ";" + player2Name + ";" + engine.getCSV();
 		}
 		
 		public static Config fromString(String line) {
@@ -102,15 +121,17 @@ public class RunGame
 			Config result = new Config();
 
 			result.gameId = parts[0];
-			result.playerName1 = parts[1];
-			result.playerName2 = parts[2];
-			result.bot1Id = parts[3];
-			result.bot2Id = parts[4];
+			result.playerId1 = parts[1];
+			result.playerId2 = parts[2];
+			result.player1Name = parts[3];
+			result.player2Name = parts[4];
 			result.visualize = Boolean.parseBoolean(parts[5]);
 			result.forceHumanVisualization = Boolean.parseBoolean(parts[6]);
+			result.visualizeContinual = (parts[7].toLowerCase().equals("null") ? null : Boolean.parseBoolean(parts[7]));
+			result.visualizeContinualFrameTimeMillis = (parts[8].toLowerCase().equals("null") ? null : Integer.parseInt(parts[8]));
 			
 			int engineConfigStart = 0;
-			for (int i = 0; i < 7; ++i) {
+			for (int i = 0; i < 9; ++i) {
 				engineConfigStart = line.indexOf(";", engineConfigStart);
 				++engineConfigStart;
 			}
@@ -139,40 +160,40 @@ public class RunGame
 		 */
 		public int round;
 
-		public String getWinnerName() {
-			if (winner == null) return "NONE";
-			switch (winner) {
-			case NEUTRAL: return "NONE";
-			case PLAYER_1: return config == null ? "Player1" : config.playerName1;
-			case PLAYER_2: return config == null ? "Player2" : config.playerName2;
-			}
-			return null;
-		}
-		
 		public String getWinnerId() {
 			if (winner == null) return "NONE";
 			switch (winner) {
 			case NEUTRAL: return "NONE";
-			case PLAYER_1: return config == null ? "Bot1" : config.bot1Id;
-			case PLAYER_2: return config == null ? "Bot2" : config.bot2Id;
+			case PLAYER_1: return config == null ? "Player1" : config.playerId1;
+			case PLAYER_2: return config == null ? "Player2" : config.playerId2;
+			}
+			return null;
+		}
+		
+		public String getWinnerName() {
+			if (winner == null) return "NONE";
+			switch (winner) {
+			case NEUTRAL: return "NONE";
+			case PLAYER_1: return config == null ? "Bot1" : config.player1Name;
+			case PLAYER_2: return config == null ? "Bot2" : config.player2Name;
 			}
 			return null;
 		}
 
 		public String asString() {
-			return getWinnerName() + ";" + player1Regions + ";" + player1Armies + ";" + player2Regions + ";" + player2Armies + ";" + round;
+			return getWinnerId() + ";" + player1Regions + ";" + player1Armies + ";" + player2Regions + ";" + player2Armies + ";" + round;
 		}
 		
 		public String getHumanString() {
-			return "Winner: " + getWinnerName() + "[" + getWinnerId() + "] in round " + round + "\nPlayer1: " + player1Regions + " regions / " + player1Armies + " armies\nPlayer2: " + player2Regions + " regions / " + player2Armies + " armies";
+			return "Winner: " + getWinnerId() + "[" + getWinnerName() + "] in round " + round + "\nPlayer1: " + player1Regions + " regions / " + player1Armies + " armies\nPlayer2: " + player2Regions + " regions / " + player2Armies + " armies";
 		}
 		
 		public String getCSVHeader() {
-			return "winnerId;winner;winnerName;player1Regions;player1Armies;player2Regions;player2Armies;round;" + config.getCSVHeader();
+			return "winnerName;winner;winnerId;player1Regions;player1Armies;player2Regions;player2Armies;round;" + config.getCSVHeader();
 		}
 		
 		public String getCSV() {
-			return getWinnerId() + ";" + (winner == null || winner == Team.NEUTRAL ? "NONE" : winner) + ";" + getWinnerName() + ";" + player1Regions + ";" + player1Armies + ";" + player2Regions + ";" + player2Armies + ";" + round + ";" + config.getCSV();
+			return getWinnerName() + ";" + (winner == null || winner == Team.NEUTRAL ? "NONE" : winner) + ";" + getWinnerId() + ";" + player1Regions + ";" + player1Armies + ";" + player2Regions + ";" + player2Armies + ";" + round + ";" + config.getCSV();
 		}
 		
 	}
@@ -206,8 +227,8 @@ public class RunGame
 			robot1 = new IORobot(replay);
 			robot2 = new IORobot(replay);
 					
-			player1 = new EnginePlayer(config.playerName1, robot1, config.engine.startingArmies);
-			player2 = new EnginePlayer(config.playerName2, robot2, config.engine.startingArmies);
+			player1 = new EnginePlayer(config.playerId1, config.player1Name, robot1, config.engine.startingArmies);
+			player2 = new EnginePlayer(config.playerId2, config.player2Name, robot2, config.engine.startingArmies);
 			
 			return go(null, player1, player2, robot1, robot2);
 		} catch (Exception e) {
@@ -229,11 +250,11 @@ public class RunGame
 			Robot robot1, robot2;
 			
 			//setup the bots: bot1, bot2
-			robot1 = setupRobot(config.playerName1, config.bot1Init);
-			robot2 = setupRobot(config.playerName2, config.bot2Init);
+			robot1 = setupRobot(config.playerId1, config.bot1Init);
+			robot2 = setupRobot(config.playerId2, config.bot2Init);
 					
-			player1 = new EnginePlayer(config.playerName1, robot1, config.engine.startingArmies);
-			player2 = new EnginePlayer(config.playerName2, robot2, config.engine.startingArmies);
+			player1 = new EnginePlayer(config.playerId1, config.player1Name, robot1, config.engine.startingArmies);
+			player2 = new EnginePlayer(config.playerId2, config.player2Name, robot2, config.engine.startingArmies);
 						
 			return go(log, player1, player2, robot1, robot2);
 		} catch (Exception e) {
@@ -255,7 +276,13 @@ public class RunGame
 			if (config.forceHumanVisualization) {
 				gui.positions = gui.positionsHuman;
 			}
-			gui = new GUI(config.playerName1, config.playerName2, robot1.getRobotName(), robot2.getRobotName());
+			gui = new GUI(config.playerId1, config.playerId2, robot1.getRobotPlayerId(), robot2.getRobotPlayerId());
+			if (config.visualizeContinual != null) {
+				gui.setContinual(config.visualizeContinual);
+			}
+			if (config.visualizeContinualFrameTimeMillis != null) {
+				gui.setContinualFrameTime(config.visualizeContinualFrameTimeMillis);
+			}
 		}
 		
 		//start the engine
@@ -266,17 +293,21 @@ public class RunGame
 		}
 		
 		// setup robots
-		RobotConfig robot1Cfg = new RobotConfig(player1.getName(), Team.PLAYER_1, config.engine.botCommandTimeoutMillis, log, gui);
-		RobotConfig robot2Cfg = new RobotConfig(player2.getName(), Team.PLAYER_2, config.engine.botCommandTimeoutMillis, log, gui);
-		
+		RobotConfig robot1Cfg = new RobotConfig(player1.getId(), player1.getName(), Team.PLAYER_1, config.engine.botCommandTimeoutMillis, log, gui);
+		RobotConfig robot2Cfg = new RobotConfig(player2.getId(), player2.getName(), Team.PLAYER_2, config.engine.botCommandTimeoutMillis, log, gui);
+				
 		robot1.setup(robot1Cfg);
 		robot2.setup(robot2Cfg);
+		
+		if (gui != null) {
+			gui.setPlayerNames(player1.getBot().getRobotPlayerName(), player2.getBot().getRobotPlayerName());
+		}		
 				
 		//send the bots the info they need to start
-		robot1.writeInfo("settings your_bot " + player1.getName());
-		robot1.writeInfo("settings opponent_bot " + player2.getName());
-		robot2.writeInfo("settings your_bot " + player2.getName());
-		robot2.writeInfo("settings opponent_bot " + player1.getName());
+		robot1.writeInfo("settings your_bot " + player1.getId());
+		robot1.writeInfo("settings opponent_bot " + player2.getId());
+		robot2.writeInfo("settings your_bot " + player2.getId());
+		robot2.writeInfo("settings opponent_bot " + player1.getId());
 		sendSetupMapInfo(player1.getBot(), initMap);
 		sendSetupMapInfo(player2.getBot(), initMap);
 		this.engine.distributeStartingRegions(); //decide the player's starting regions
@@ -305,29 +336,29 @@ public class RunGame
 		return result;
 	}
 
-	private Robot setupRobot(String playerName, String botInit) throws IOException {
+	private Robot setupRobot(String playerId, String botInit) throws IOException {
 		if (botInit.startsWith("dir;process:")) {
 			String cmd = botInit.substring(12);
 			int semicolon = cmd.indexOf(";");
 			if (semicolon < 0) throw new RuntimeException("Invalid bot torrent (does not contain ';' separating directory and commmend): " + botInit);
 			String dir = cmd.substring(0, semicolon);
 			String process = cmd.substring(semicolon+1);			
-			return new ProcessRobot(playerName, dir, process);
+			return new ProcessRobot(playerId, dir, process);
 		}
 		if (botInit.startsWith("process:")) {
 			String cmd = botInit.substring(8);
-			return new ProcessRobot(playerName, cmd);
+			return new ProcessRobot(playerId, cmd);
 		}
 		if (botInit.startsWith("internal:")) {
 			String botFQCN = botInit.substring(9);
-			return new InternalRobot(playerName, botFQCN);
+			return new InternalRobot(playerId, botFQCN);
 		}
 		if (botInit.startsWith("human")) {
 			config.visualize = true;
 			config.forceHumanVisualization = true;
-			return new HumanRobot(playerName);
+			return new HumanRobot(playerId);
 		}
-		throw new RuntimeException("Invalid init string for player '" + playerName + "', must start either with 'process:' or 'internal:' or 'human', passed value was: " + botInit);
+		throw new RuntimeException("Invalid init string for player '" + playerId + "', must start either with 'process:' or 'internal:' or 'human', passed value was: " + botInit);
 	}
 
 	//aanpassen en een QPlayer class maken? met eigen finish
@@ -347,7 +378,6 @@ public class RunGame
 		return this.saveGame(map, bot1, bot2);        
 	}
 
-	//tijdelijk handmatig invoeren
 	private GameMap makeInitMap()
 	{
 		GameMap map = new GameMap();
@@ -617,21 +647,21 @@ public class RunGame
 		result.config = config;
 		
 		for (RegionData region : map.regions) {
-			if (region.ownedByPlayer(config.playerName1)) {
+			if (region.ownedByPlayer(config.playerId1)) {
 				++result.player1Regions;
 				result.player1Armies += region.getArmies();
 			}
-			if (region.ownedByPlayer(config.playerName2)) {
+			if (region.ownedByPlayer(config.playerId2)) {
 				++result.player2Regions;
 				result.player2Armies += region.getArmies();
 			}
 		}
 		
 		if (engine.winningPlayer() != null) {
-			if (config.playerName1.equals(engine.winningPlayer().getName())) {
+			if (config.playerId1.equals(engine.winningPlayer().getId())) {
 				result.winner = Team.PLAYER_1;
 			} else
-			if (config.playerName2.equals(engine.winningPlayer().getName())) {
+			if (config.playerId2.equals(engine.winningPlayer().getId())) {
 				result.winner = Team.PLAYER_2;
 			}
 		} else {
