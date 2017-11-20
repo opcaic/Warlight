@@ -42,8 +42,8 @@ public class ConquestBot extends GameBot
 	
 	public ConquestBot() {
 		// TODO: run {@link FightSimulation} first! 
-		aRes = FightAttackersResults.loadFromFile(new File("FightSimulation-Attackers-A200-D200.obj"));
-		dRes = FightDefendersResults.loadFromFile(new File("FightSimulation-Defenders-A200-D200.obj"));
+		aRes = FightAttackersResults.loadFromFile(new File("../Conquest-Bots/FightSimulation-Attackers-A200-D200.obj"));
+		dRes = FightDefendersResults.loadFromFile(new File("../Conquest-Bots/FightSimulation-Defenders-A200-D200.obj"));
 		System.err.println("---==[ AGGRESSIVE BOT INITIALIZED ]==---");
 	}
 	
