@@ -4,7 +4,7 @@ import conquest.game.Player;
 import conquest.game.world.Region;
 
 /**
- * Some player has (SUCCESSFULLY) attacked region 'to', the attack originated within region 'from'.
+ * Some player has (SUCCESSFULLY) attacked region 'to', the attack originated from region 'from'.
  * 
  * @author Jimmy
  */
@@ -17,12 +17,23 @@ public class ConquerCommandCompact implements ICommandCompact {
 	public int attackersArmies;
 	public int defendersArmies;
 	public int attackersCasaulties;
+	// defenders were killed all
 	
 	public ConquerCommandCompact(Region from, Region to, Player attacker, Player defender, int attackersArmies, int defendersArmies, int attackersCasaulties) {
 		this.from = from;		
 		this.to = to;
 		this.attacker = attacker;
 		this.defender = defender;		 
+		this.attackersArmies = attackersArmies;
+		this.defendersArmies = defendersArmies;
+		this.attackersCasaulties = attackersCasaulties;
+	}
+	
+	public ConquerCommandCompact(GameStateCompact gameState, Region from, Region to, int attackersArmies, int defendersArmies, int attackersCasaulties) {
+		this.from = from;		
+		this.to = to;
+		this.attacker = gameState.ownedBy(from);
+		this.defender = gameState.ownedBy(to);		 
 		this.attackersArmies = attackersArmies;
 		this.defendersArmies = defendersArmies;
 		this.attackersCasaulties = attackersCasaulties;

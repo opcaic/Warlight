@@ -8,6 +8,7 @@ import java.util.List;
 
 import conquest.bot.BotParser;
 import conquest.bot.custom.AggressiveBot;
+import conquest.bot.custom.SmartBot;
 import conquest.bot.fight.FightSimulation;
 import conquest.bot.fight.FightSimulation.FightAttackersResults;
 import conquest.bot.fight.FightSimulation.FightDefendersResults;
@@ -130,7 +131,7 @@ public class ConquestBot extends GameBot
 			result.add(new PlaceCommand(mine.get(index).region, 3));
 			armiesLeft -= 3;
 			++index;
-			if (index >= mine.size()) index = 0;
+			index %= mine.size();
 		}
 		
 		return result;
@@ -258,7 +259,8 @@ public class ConquestBot extends GameBot
 		
 		config.bot1Init = "internal:conquest.bot.playground.ConquestBot";
 		//config.bot1Init = "dir;process:../Conquest-Bots;java -cp ./bin;../Conquest/bin conquest.bot.external.JavaBot conquest.bot.playground.ConquestBot ./ConquestBot.log";
-		config.bot2Init = "internal:conquest.bot.BotStarter";
+		//config.bot2Init = "internal:conquest.bot.BotStarter";
+		config.bot2Init = "internal:conquest.bot.custom.SmartBot";
 		//config.bot2Init = "human";
 		
 		config.engine.botCommandTimeoutMillis = 24*60*60*1000;

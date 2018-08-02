@@ -1,7 +1,5 @@
 package conquest.bot.state.compact;
 
-import conquest.game.Player;
-
 public interface ICommandCompact {
 	
 	/**

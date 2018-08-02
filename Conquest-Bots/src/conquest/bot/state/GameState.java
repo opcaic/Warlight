@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Set;
 
 import conquest.bot.BotState;
-import conquest.bot.state.GameState.RegionState;
 import conquest.bot.state.compact.GameStateCompact;
 import conquest.game.Player;
 import conquest.game.RegionData;
@@ -14,7 +13,7 @@ import conquest.game.world.Continent;
 import conquest.game.world.Region;
 import conquest.utils.HashMapInt;
 
-public class GameState {
+public class GameState implements Cloneable {
 	
 	public static class RegionState {
 		
@@ -42,6 +41,23 @@ public class GameState {
 			this.region = region;
 			armies = 0;
 		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			if (obj == null) return false;
+			if (obj == this) return true;
+			if (!(obj instanceof RegionState)) return false;
+			RegionState other = (RegionState)obj;
+			
+			if (region != other.region) return false;
+			if (owner.player != other.owner.player) return false;
+			if (armies != other.armies) return false;
+			
+			// neighbours should be the same...
+		
+			return true;
+		}
+		
 				
 		/**
 		 * Is {@link #region} owned by 'player'?
@@ -50,6 +66,14 @@ public class GameState {
 		 */
 		public boolean owned(Player player) {
 			return owner != null && owner.player == player;
+		}
+		
+		/**
+		 * Is {@link #region} owned by me ({@link Player#ME}) ?
+		 * @return
+		 */
+		public boolean isMine() {
+			return owned(Player.ME);
 		}
 		
 		@Override
@@ -83,14 +107,41 @@ public class GameState {
 		
 		/**
 		 * How many regions particular {@link Player} controls within this continent.
+		 * 
+		 * Indexed by {@link Player#id}.
+		 * 
+		 * 1-based! [0] is 0 and does not have any meaning!
 		 */
-		public HashMapInt<Player> owned;
+		public int[] owned;
 		
 		public ContinentState(Continent continent) {
 			this.continent = continent;
 			owner = Player.NEUTRAL;
-			owned = new HashMapInt<Player>();
+			owned = new int[4];
+			for (int i = 0; i < 4; ++i) owned[i] = 0;
 			regions = new HashMap<Region, RegionState>();
+		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			if (obj == null) return false;
+			if (obj == this) return true;
+			if (!(obj instanceof ContinentState)) return false;
+			ContinentState other = (ContinentState)obj;
+			
+			if (continent != other.continent) return false;
+			if (owner != other.owner) return false;
+			
+			for (Player player : Player.values()) {
+				if (owned[player.id] != other.owned[player.id]) return false;
+			}
+			if (other.regions == null || regions.size() != other.regions.size()) return false;
+			for (Region region : regions.keySet()) {
+				if (!other.regions.containsKey(region)) return false;
+				if (!regions.get(region).equals(other.regions.get(region))) return false;
+			}
+		
+			return true;
 		}
 				
 		/**
@@ -117,16 +168,16 @@ public class GameState {
 		 * @return
 		 */
 		public int regionsOwnedBy(Player player) {
-			return owned.get(player);
+			return owned[player.id];
 		}
 		
 		@Override
 		public String toString() {
 			return (continent == null ? "ContinentState" : continent.name())
 					  + "[" + (owner == null ? "null" : owner.name()) 
-					  + "|ME=" + (owned == null ? "N/A" : owned.get(Player.ME))
-					  + "|OPP=" + (owned == null ? "N/A" : owned.get(Player.OPPONENT)) 
-					  + "|NEU=" + (owned == null ? "N/A" : owned.get(Player.NEUTRAL))
+					  + "|ME=" + (owned == null ? "N/A" : owned[Player.ME.id])
+					  + "|OPP=" + (owned == null ? "N/A" : owned[Player.OPPONENT.id]) 
+					  + "|NEU=" + (owned == null ? "N/A" : owned[Player.NEUTRAL.id])
 					  + "]";
 		}
 
@@ -136,11 +187,11 @@ public class GameState {
 		protected void swapPlayer() {
 			owner = Player.swapPlayer(owner);
 			
-			int newOppOwned = owned.get(Player.ME);
-			int newMeOwned  = owned.get(Player.OPPONENT);
+			int newOppOwned = owned[Player.ME.id];
+			int newMeOwned  = owned[Player.OPPONENT.id];
 			
-			owned.put(Player.OPPONENT, newOppOwned);
-			owned.put(Player.ME, newMeOwned);
+			owned[Player.OPPONENT.id] = newOppOwned;
+			owned[Player.ME.id] = newMeOwned;
 		}
 		
 	}
@@ -178,6 +229,28 @@ public class GameState {
 			continents = new HashMap<Continent, ContinentState>();
 			totalArmies = 0;
 			placeArmies = (player == Player.NEUTRAL ? 0 : 5);
+		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			if (obj == null) return false;
+			if (obj == this) return true;
+			if (!(obj instanceof PlayerState)) return false;
+			PlayerState other = (PlayerState)obj;
+			
+			if (player != other.player) return false;
+			
+			if (other.regions == null || regions.size() != other.regions.size()) return false;
+			for (Region region : regions.keySet()) {
+				if (!regions.get(region).equals(other.regions.get(region))) return false;
+			}
+			
+			if (other.continents == null || continents.size() != other.continents.size()) return false;
+			for (Continent continent : continents.keySet()) {
+				if (!continents.get(continent).equals(other.continents.get(continent))) return false;
+			}
+		
+			return true;
 		}
 		
 		/**
@@ -242,12 +315,15 @@ public class GameState {
 	
 	/**
 	 * Player state can be found under index 'Player.id'.
+	 * 
+	 * Player indices as 1-based! [0] is null!
+	 * 
 	 * @return
 	 */
 	public PlayerState[] players;
 	
 	/**
-	 * Mine state.
+	 * My state.
 	 */
 	public PlayerState me;
 	
@@ -256,12 +332,59 @@ public class GameState {
 	 */
 	public PlayerState opp;
 	
+	public GameState(GameState state) {
+		reset(state);
+	}
+	
 	public GameState(BotState state) {
 		reset(state);		
 	}
 	
 	public GameState(GameStateCompact gameStateCompact) {
 		reset(gameStateCompact);
+	}
+	
+	@Override
+	public GameState clone() {
+		return new GameState(this);
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) return false;
+		if (obj == this) return true;
+		if (!(obj instanceof GameState)) return false;
+		GameState other = (GameState)obj;
+		
+		if (!me.equals(other.me)) {
+			System.out.println("NOT EQUALS: " + me + " vs. " + other.me);
+			return false;
+		}
+		if (!opp.equals(other.opp)) {
+			System.out.println("NOT EQUALS: " + opp + " vs. " + other.opp);
+			return false;
+		}
+		
+		for (int i = 1; i < regions.length; ++i) {
+			if (other.regions[i] == null || !regions[i].equals(other.regions[i])) {
+				System.out.println("NOT EQUALS: " + regions[i] + " vs. " + other.regions[i]);
+				return false;
+			}
+		}
+		for (int i = 1; i < continents.length; ++i) {
+			if (other.continents[i] == null || !continents[i].equals(other.continents[i])) {
+				System.out.println("NOT EQUALS: " + continents[i] + " vs. " + other.continents[i]);
+				return false;
+			}
+		}
+		for (int i = 1; i < players.length; ++i) {
+			if (other.players[i] == null || !players[i].equals(other.players[i])) {
+				System.out.println("NOT EQUALS: " + players[i] + " vs. " + other.players[i]);
+				return false;
+			}
+		}
+	
+		return true;
 	}
 
 	/**
@@ -316,7 +439,7 @@ public class GameState {
 			// CONTINENT
 			ContinentState continentState = continent(regionState.region);
 			continentState.regions.put(regionState.region, regionState);
-			continentState.owned.inc(gameStateCompact.ownedBy(region));
+			continentState.owned[regionState.owner.player.id] += 1;
 			
 			// PLAYER STATE
 			PlayerState playerState = regionState.owner;
@@ -327,15 +450,22 @@ public class GameState {
 		// UPDATE CONTINENT OWNERSHIPS & PLACE ARMIES
 		for (Continent continent : Continent.values()) {
 			ContinentState continentState = continent(continent);
+			boolean isNeutral = true;
 			for (Player player : Player.values()) {
-				if (continentState.owned.get(player) == continentState.regions.size()) {
+				if (continentState.owned[player.id] == continentState.regions.size()) {
 					continentState.owner = player;
 					PlayerState playerState = player(player);
 					playerState.continents.put(continent, continentState);		
 					if (player != Player.NEUTRAL) {
 						playerState.placeArmies += continent.reward;
 					}
+					isNeutral = player == Player.NEUTRAL;
+					break;
 				}
+			}
+			if (isNeutral) {
+				continentState.owner = Player.NEUTRAL;
+				player(Player.NEUTRAL).continents.put(continent, continentState);
 			}
 		}
 	}
@@ -358,7 +488,7 @@ public class GameState {
 			// CONTINENT
 			ContinentState continentState = continent(regionState.region);
 			continentState.regions.put(regionState.region, regionState);
-			continentState.owned.inc(regionState.owner.player);
+			continentState.owned[regionState.owner.player.id] += 1;
 			
 			// PLAYER STATE
 			PlayerState playerState = regionState.owner;
@@ -369,15 +499,70 @@ public class GameState {
 		// UPDATE CONTINENT OWNERSHIPS & PLACE ARMIES
 		for (Continent continent : Continent.values()) {
 			ContinentState continentState = continent(continent);
+			boolean isNeutral = true;
 			for (Player player : Player.values()) {
-				if (continentState.owned.get(player) == continentState.regions.size()) {
+				if (continentState.owned[player.id] == continentState.regions.size()) {
 					continentState.owner = player;
 					PlayerState playerState = player(player);
 					playerState.continents.put(continent, continentState);		
 					if (player != Player.NEUTRAL) {
 						playerState.placeArmies += continent.reward;
 					}
+					isNeutral = player == Player.NEUTRAL;
+					break;
 				}
+			}
+			if (isNeutral) {
+				continentState.owner = Player.NEUTRAL;
+				player(Player.NEUTRAL).continents.put(continent, continentState);
+			}
+		}
+	}
+	
+	/**
+	 * Fully (re)creates the state out of the {@link GameState}, throwing out all existing objects it has.
+	 * @param gameState
+	 */
+	private void reset(GameState gameState) {
+		reset();
+
+		// FILL IN STATES
+		for (Region region : Region.values()) {
+			// REGION
+			RegionState regionState = region(region);
+			regionState.armies = gameState.region(region).armies;
+			regionState.owner = player(gameState.region(region).owner.player);
+			
+			// CONTINENT
+			ContinentState continentState = continent(regionState.region);
+			continentState.regions.put(regionState.region, regionState);
+			continentState.owned[regionState.owner.player.id] += 1;
+			
+			// PLAYER STATE
+			PlayerState playerState = regionState.owner;
+			playerState.regions.put(regionState.region, regionState);
+			playerState.totalArmies += regionState.armies;
+		}
+		
+		// UPDATE CONTINENT OWNERSHIPS & PLACE ARMIES
+		for (Continent continent : Continent.values()) {
+			ContinentState continentState = continent(continent);
+			boolean isNeutral = true;
+			for (Player player : Player.values()) {
+				if (continentState.owned[player.id] == continentState.regions.size()) {
+					continentState.owner = player;
+					PlayerState playerState = player(player);
+					playerState.continents.put(continent, continentState);		
+					if (player != Player.NEUTRAL) {
+						playerState.placeArmies += continent.reward;
+					}
+					isNeutral = player == Player.NEUTRAL;
+					break;
+				}
+			}
+			if (isNeutral) {
+				continentState.owner = Player.NEUTRAL;
+				player(Player.NEUTRAL).continents.put(continent, continentState);
 			}
 		}
 	}
@@ -413,8 +598,8 @@ public class GameState {
 				// OWNER CHANGED
 				regionOwnershipChanged.add(regionState.region.continent);
 				
-				continentState.owned.dec(regionState.owner.player);
-				continentState.owned.inc(newOwner);
+				continentState.owned[regionState.owner.player.id] -= 1;
+				continentState.owned[newOwner.id] += 1;
 				
 				oldOwnerState.regions.remove(regionState.region);
 				newOwnerState.regions.put(regionState.region, regionState);
@@ -439,16 +624,18 @@ public class GameState {
 	
 	protected void updateContinentOwnership(ContinentState continentState) {
 		Player newOwner = Player.NEUTRAL;
-		for (Player player : Player.values()) {
-			if (continentState.owned.get(player) == continentState.regions.size()) {
-				newOwner = player;
-			}
+		
+		if (continentState.owned[Player.ME.id] == continentState.regions.size()) {
+			newOwner = Player.ME;
+		} else
+		if (continentState.owned[Player.OPPONENT.id] == continentState.regions.size()) {
+			newOwner = Player.OPPONENT;
 		}
 		
 		PlayerState newOwnerState = player(newOwner);
 		
 		if (continentState.owner != newOwner) {
-			// OWNER HAS CHANGED!
+			// CONTINENT OWNER HAS CHANGED!
 			PlayerState oldOwnerState = player(continentState.owner);
 			
 			oldOwnerState.continents.remove(continentState.continent);
@@ -456,10 +643,7 @@ public class GameState {
 			
 			if (oldOwnerState.player != Player.NEUTRAL) oldOwnerState.placeArmies -= continentState.continent.reward;
 			if (newOwnerState.player != Player.NEUTRAL) newOwnerState.placeArmies += continentState.continent.reward;					
-			
-			continentState.owned.dec(oldOwnerState.player);
-			continentState.owned.inc(newOwnerState.player);
-			
+						
 			continentState.owner = newOwnerState.player;
 		}
 	}
@@ -496,22 +680,30 @@ public class GameState {
 		RegionState from = region(cmd.from);
 		RegionState to = region(cmd.to);
 		
-		from.armies            -= cmd.armies;
-		from.owner.totalArmies -= cmd.armies;
+		if (from.owner.player != to.owner.player) {
+			throw new RuntimeException("Cannot apply " + cmd + " as regions have different owners " + from.region + "->" + from.owner.player + " and " + to.region + "->" + to.owner.player + "!");
+		}
 		
-		to.armies            += cmd.armies;
-		to.owner.totalArmies += cmd.armies;
+		if (cmd.armies >= from.armies) cmd.armies = from.armies-1;
+		
+		if (cmd.armies < 1) return;
+		
+		from.armies            -= cmd.armies;
+		to.armies            += cmd.armies;		
 	}
 	
 	public void revert(MoveCommand cmd) {
 		RegionState from = region(cmd.from);
 		RegionState to = region(cmd.to);
 		
-		from.armies            += cmd.armies;
-		from.owner.totalArmies += cmd.armies;
+		if (from.owner.player != to.owner.player) {
+			throw new RuntimeException("Cannot revert " + cmd + " as regions have different owners " + from.region + "->" + from.owner.player + " and " + to.region + "->" + to.owner.player + "!");
+		}
 		
-		to.armies            -= cmd.armies;
-		to.owner.totalArmies -= cmd.armies;
+		if (cmd.armies < 1) return;
+		
+		from.armies += cmd.armies;		
+		to.armies   -= cmd.armies;
 	}
 	
 	public void apply(AttackCommand cmd) {		
@@ -521,23 +713,30 @@ public class GameState {
 		PlayerState attacker = regionFrom.owner;
 		PlayerState defender = player(cmd.toOwner);
 		
-		if (attacker == defender) {
-			// MOVE INSTEAD!
-			apply(new MoveCommand(cmd.from, cmd.to, cmd.armies));
-			return;
-		}
-		
 		if (regionFrom.armies <= cmd.armies) cmd.armies = regionFrom.armies-1;
 		
 		if (cmd.armies < 1) return;
 		
+		if (attacker == defender) {
+			// MOVE INSTEAD!
+			cmd.movedInstead = new MoveCommand(cmd.from, cmd.to, cmd.armies);
+			apply(cmd.movedInstead);
+			return;
+		} else {
+			cmd.movedInstead = null; // just to be sure... may be someone is reusing those instances...
+		}
+				
 		if (cmd.attackersCasaulties < 0)               cmd.attackersCasaulties = 0;
 		if (cmd.defendersCasaulties < 0)               cmd.defendersCasaulties = 0;
 		if (cmd.attackersCasaulties > cmd.armies)      cmd.attackersCasaulties = cmd.armies;
 		if (cmd.defendersCasaulties > regionTo.armies) cmd.defendersCasaulties = regionTo.armies;
 		
+		cmd.defendersArmies = regionTo.armies;
+		
 		if (cmd.defendersCasaulties < regionTo.armies) {
 			// defenders won
+			cmd.attackersCasaulties = cmd.armies;
+			
 			regionFrom.armies -= cmd.attackersCasaulties;
 			regionTo.armies -= cmd.defendersCasaulties;
 			
@@ -547,7 +746,7 @@ public class GameState {
 		} else
 		if (cmd.defendersCasaulties >= regionTo.armies && cmd.armies == cmd.attackersCasaulties) {
 			// defenders are granted 1 army
-			regionFrom.armies -= cmd.armies;
+			regionFrom.armies -= cmd.attackersCasaulties;
 			regionTo.armies = 1;
 			
 			// update total armies
@@ -555,9 +754,10 @@ public class GameState {
 			defender.totalArmies -= cmd.defendersCasaulties;
 			defender.totalArmies += 1; // extra one army
 			
-			cmd.defendersCasaulties -= 1; // we have to lower this number for future REVERT to be correct because of "extra one army granted"
+			cmd.defendersExtraOneArmy = 1; // mark that defenders have been granted one army
 		} else {
 			// attackers won
+			cmd.defendersCasaulties = regionTo.armies;
 			
 			// update armies in regions
 			regionFrom.armies -= cmd.armies;
@@ -574,13 +774,20 @@ public class GameState {
 			
 			// update continent state
 			ContinentState continent = continent(regionTo.region.continent);
-			continent.owned.inc(attacker.player);
-			continent.owned.dec(defender.player);			
+			continent.owned[attacker.player.id] += 1;
+			continent.owned[defender.player.id] -= 1;			
 			updateContinentOwnership(continent);
 		}		
 	}
 	
 	public void revert(AttackCommand cmd) {		
+		if (cmd.movedInstead != null) {
+			revert(cmd.movedInstead);
+			return;
+		}		
+		
+		if (cmd.armies < 1) return;
+		
 		RegionState regionFrom = region(cmd.from);
 		RegionState regionTo   = region(cmd.to);
 
@@ -589,14 +796,14 @@ public class GameState {
 
 		// REVERT ARMIES
 		regionFrom.armies += cmd.armies;		
-		regionTo.armies   -= cmd.armies - cmd.attackersCasaulties - cmd.defendersCasaulties;
+		regionTo.armies   -= cmd.armies - cmd.attackersCasaulties - cmd.defendersCasaulties + cmd.defendersExtraOneArmy;
 		
 		// REVERT PLAYER TOTAL ARMIES
 		attacker.totalArmies += cmd.attackersCasaulties;
-		defender.totalArmies += cmd.defendersCasaulties;
+		defender.totalArmies += cmd.defendersCasaulties - cmd.defendersExtraOneArmy;
 		
 		// REVERT OWNER
-		if (cmd.attackersCasaulties < cmd.armies) {
+		if (cmd.defendersCasaulties >= cmd.defendersArmies && cmd.defendersExtraOneArmy == 0) {
 			// ATTACKERS WON		
 			
 			// REVERT REGION OWNERSHIP
@@ -606,8 +813,8 @@ public class GameState {
 			
 			// REVERT CONTINENT STATE
 			ContinentState continent = continent(regionTo.region.continent);
-			continent.owned.dec(attacker.player);
-			continent.owned.inc(defender.player);			
+			continent.owned[attacker.player.id] -= 1;
+			continent.owned[defender.player.id] += 1;			
 			updateContinentOwnership(continent);
 		}		
 	}

@@ -87,8 +87,7 @@ public class SmartBot extends GameBot
 	}
 	
 	public int getPrefferedContinentPriority(Continent continent) {
-		switch (continent) {
-		
+		switch (continent) {		
 		case South_America: return 1;
 		case Africa:        return 2;
 		case Australia:     return 3;

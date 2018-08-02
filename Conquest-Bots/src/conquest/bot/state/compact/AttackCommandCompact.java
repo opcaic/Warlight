@@ -1,6 +1,6 @@
 package conquest.bot.state.compact;
 
-import conquest.game.Player;
+import conquest.bot.state.GameState.RegionState;
 import conquest.game.world.Region;
 
 /**
@@ -13,6 +13,7 @@ public class AttackCommandCompact implements ICommandCompact {
 	public Region from;	
 	public Region to;	
 	public int armies;	
+	// attackers were killed all
 	public int defendersCasaulties;
 	
 	public AttackCommandCompact(Region from, Region to, int armies, int defendersCasaulties) {
