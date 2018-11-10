@@ -446,8 +446,8 @@ public class ConquestFightConsole {
 				, "-o", "GAME;PLR1;PLR2;x;x;false;false;false;200;-1;true;5000;5;100;CONTINUAL_1_1_A60_D70"   // game-config
 				, "-g", "3"      // games-count
 				, "-r", "false"   // reverse-games
-				, "-a", "ConquestBot"                              // bot1-id
-				, "-b", "internal:conquest.bot.playground.ConquestBot" // bot1-init
+				, "-a", "MyBot"                              // bot1-id
+				, "-b", "internal:conquest.bot.playground.MyBot" // bot1-init
 				, "-c", "AggressiveBot"                                 // bot2-id
 				, "-d", "internal:conquest.bot.custom.AggressiveBot"           // bot2-init
 				, "-u", "./results/fights"              // result-dir
@@ -493,7 +493,7 @@ public class ConquestFightConsole {
 		// -----------
 		// FOR TESTING
 		// -----------
-		args = getTestArgs_1v1();		
+		//args = getTestArgs_1v1();		
 		//args = getTestArgs_Batch();
 		
 		// --------------
