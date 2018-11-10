@@ -443,13 +443,13 @@ public class ConquestFightConsole {
 	public static String[] getTestArgs_1v1() {
 		return new String[] {
 				  "-s", "20"     // seed
-				, "-o", "GAME;PLR1;PLR2;x;x;true;true;true;200;-1;true;5000;5;100;CONTINUAL_1_1_A60_D70"   // game-config
+				, "-o", "GAME;PLR1;PLR2;x;x;false;false;false;200;-1;true;5000;5;100;CONTINUAL_1_1_A60_D70"   // game-config
 				, "-g", "3"      // games-count
-				, "-r", "true"   // reverse-games
-				, "-a", "AggressiveBot"                              // bot1-id
-				, "-b", "dir;process:../Conquest-Bots;java -cp ./bin;../Conquest/bin conquest.bot.external.JavaBot conquest.bot.custom.AggressiveBot" // bot1-init
-				, "-c", "BotStarter"                                 // bot2-id
-				, "-d", "internal:conquest.bot.BotStarter"           // bot2-init
+				, "-r", "false"   // reverse-games
+				, "-a", "ConquestBot"                              // bot1-id
+				, "-b", "internal:conquest.bot.playground.ConquestBot" // bot1-init
+				, "-c", "AggressiveBot"                                 // bot2-id
+				, "-d", "internal:conquest.bot.custom.AggressiveBot"           // bot2-init
 				, "-u", "./results/fights"              // result-dir
 				, "-y", "./results/replays"           // replay-dir
 				, "-t", "./results/all-results.csv"   // single results file
@@ -463,6 +463,9 @@ public class ConquestFightConsole {
 		//		result.player2Name = parts[4];                                   // will be auto-changed
 		//		result.visualize = Boolean.parseBoolean(parts[5]);               // should be always FALSE
 		//		result.forceHumanVisualization = Boolean.parseBoolean(parts[6]); // should be always FALSE
+		//      result.visualizeContinual = (parts[7].toLowerCase().equals("null") ? null : Boolean.parseBoolean(parts[7]));
+		//      result.visualizeContinualFrameTimeMillis = (parts[8].toLowerCase().equals("null") ? null : Integer.parseInt(parts[8]));
+		
 		// followed by engine config:
 		//		result.seed = Integer.parseInt(parts[0]);                        // will be auto-changed according to master seed above
 		//		result.fullyObservableGame = Boolean.parseBoolean(parts[1]);
@@ -490,7 +493,7 @@ public class ConquestFightConsole {
 		// -----------
 		// FOR TESTING
 		// -----------
-		//args = getTestArgs_1v1();		
+		args = getTestArgs_1v1();		
 		//args = getTestArgs_Batch();
 		
 		// --------------
