@@ -159,7 +159,7 @@ public class Engine {
 	public void playRound()
 	{
 		if (gui != null) {
-			gui.updateRoundNumber(roundNr);
+			gui.newRound(roundNr);
 			gui.updateRegions(map.regions);
 		}
 		

@@ -389,8 +389,13 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		p2.setText("[" + plr2Regions + " / " + plr2Armies + " / +" + plr2Income + "]");
 	}
 	
-	public void updateRoundNumber(int roundNum) {
+	public void newRound(int roundNum) {
 		roundNumTxt.setText("Round: " + Integer.toString(roundNum));
+		actionTxt.setText("NEW ROUND");
+		nextRound = false;
+
+		//Wait for user to request next round
+		waitForClick();		
 	}
 	
 	public void updateAfterRound(GameMap map) { //called by Engine.playRound()
@@ -404,14 +409,7 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 			this.regions[id-1].setTeam(getTeam(region.getPlayerName()));
 		}
 
-		actionTxt.setText("NEW ROUND");
-		
-		nextRound = false;
-		
 		updateStats();
-		
-		//Wait for user to request next round
-		waitForClick();
 	}
 
 	List<RegionData> pickableRegions = null;
