@@ -372,7 +372,9 @@ public class FightSimulation {
 			loseSum = loseSum + states[0][i];
 			
 			double attackersDied = attackersMax;
-			double defendersDied = defendersMax - i;
+			
+			// defenders get extra army if both armies are wiped out
+			double defendersDied = defendersMax - (i == 0 ? 1 : i);    
 			
 			expectedAttackersDeaths = expectedAttackersDeaths + states[0][i] * attackersDied;
 			expectedDefendersDeaths = expectedDefendersDeaths + states[0][i] * defendersDied;
