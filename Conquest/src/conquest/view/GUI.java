@@ -184,7 +184,7 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		int boxWidth = 200;
 		
 		//Current round number
-		roundNumTxt = new JLabel("Round #: --", JLabel.CENTER);
+		roundNumTxt = new JLabel("Round: --", JLabel.CENTER);
 		roundNumTxt.setBounds(WIDTH / 2 - boxWidth / 2, 20, boxWidth, 15);
 		roundNumTxt.setBackground(Color.gray);
 		roundNumTxt.setOpaque(true);
@@ -389,11 +389,12 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		p2.setText("[" + plr2Regions + " / " + plr2Armies + " / +" + plr2Income + "]");
 	}
 	
-	public void updateAfterRound(int roundNum, GameMap map) { //called by Engine.playRound()
+	public void updateRoundNumber(int roundNum) {
+		roundNumTxt.setText("Round: " + Integer.toString(roundNum));
+	}
+	
+	public void updateAfterRound(GameMap map) { //called by Engine.playRound()
 		this.requestFocusInWindow();
-		
-		//Update round number
-		roundNumTxt.setText("Round #: " + Integer.toString(roundNum));
 		
 		//Update regions info
 		for(RegionData region : map.regions) {

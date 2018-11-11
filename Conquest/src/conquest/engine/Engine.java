@@ -159,6 +159,7 @@ public class Engine {
 	public void playRound()
 	{
 		if (gui != null) {
+			gui.updateRoundNumber(roundNr);
 			gui.updateRegions(map.regions);
 		}
 		
@@ -180,7 +181,7 @@ public class Engine {
 		executeAttackTransfer();
 		
 		if (gui != null) {
-			gui.updateAfterRound(roundNr, map);
+			gui.updateAfterRound(map);
 		}
 		
 		moveQueue.clear();
