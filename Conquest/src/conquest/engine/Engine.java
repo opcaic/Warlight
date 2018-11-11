@@ -166,6 +166,9 @@ public class Engine {
 		getMoves(player2.getBot().getPlaceArmiesMoves(timeoutMillis), player2);
 		
 		executePlaceArmies();
+
+		sendUpdateMapInfo(player1);
+		sendUpdateMapInfo(player2);
 		
 		getMoves(player1.getBot().getAttackTransferMoves(timeoutMillis), player1);
 		getMoves(player2.getBot().getAttackTransferMoves(timeoutMillis), player2);
