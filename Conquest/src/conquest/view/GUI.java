@@ -143,8 +143,8 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 	private boolean continual = false;
 	private int continualTime = 800;
 	
-	private String playerName1;
-	private String playerName2;
+	private String playerName1, botName1;
+	private String playerName2, botName2;
 	
 	private RegionInfo p1;
 	private RegionInfo p2;	
@@ -181,22 +181,22 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		labelForImage.setIcon(icon);
 		mainLayer.add(labelForImage, JLayeredPane.DEFAULT_LAYER);
 
+		int boxWidth = 200;
+		
 		//Current round number
 		roundNumTxt = new JLabel("Round #: --", JLabel.CENTER);
-		roundNumTxt.setBounds(20, 20, 150, 15);
+		roundNumTxt.setBounds(WIDTH / 2 - boxWidth / 2, 20, boxWidth, 15);
 		roundNumTxt.setBackground(Color.gray);
 		roundNumTxt.setOpaque(true);
 		roundNumTxt.setForeground(Color.WHITE);
 		mainLayer.add(roundNumTxt, JLayeredPane.DRAG_LAYER);
 		
 		actionTxt = new JLabel("ACTION", JLabel.CENTER);
-		actionTxt.setBounds(20, 40, 150, 15);
+		actionTxt.setBounds(WIDTH / 2 - boxWidth / 2, 35, boxWidth, 15);
 		actionTxt.setBackground(Color.gray);
 		actionTxt.setOpaque(true);
 		actionTxt.setForeground(Color.WHITE);
-		actionTxt.setSize(150, 15);
-		actionTxt.setPreferredSize(actionTxt.getSize());
-		actionTxt.setLocation(20, 35);
+			actionTxt.setPreferredSize(actionTxt.getSize());
 		mainLayer.add(actionTxt, JLayeredPane.DRAG_LAYER);
 				
 		this.regions = new RegionInfo[42];
@@ -531,10 +531,18 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		actionTxt.setText("---");
 	}
 
+	String botName(String playerName) {
+		if (playerName.equals(playerName1))
+			return botName1;
+		if (playerName.equals(playerName2))
+			return botName2;
+		throw new Error("unknown name");
+	}
+	
 	public void attack(AttackTransferMove move) {
 		this.requestFocusInWindow();
 		
-		actionTxt.setText("ATTACK BY " + move.getPlayerName());
+		actionTxt.setText("ATTACK BY " + botName(move.getPlayerName()));
 		
 		RegionInfo fromRegion = this.regions[move.getFromRegion().getId() - 1];
 		RegionInfo toRegion = this.regions[move.getToRegion().getId() - 1];
@@ -1353,7 +1361,10 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 	}
 
 	public void setPlayerNames(String player1Name, String player2Name) {
+		botName1 = player1Name;
 		p1.setNameLabel(player1Name);
+		
+		botName2 = player2Name;
 		p2.setNameLabel(player2Name);
 	}
 		
