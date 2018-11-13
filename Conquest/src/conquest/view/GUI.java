@@ -151,6 +151,8 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 	
 	private JLayeredPane mainLayer;
 	
+	public boolean showIds = false;
+	
 	public GUI(String playerEngineName1, String playerEngineName2, String playerName1, String playerName2)
 	{
 		System.out.println("GUI: Click to advance to next round.");
@@ -202,21 +204,21 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		this.regions = new RegionInfo[42];
 		
 		for (int idx = 0; idx < 42; idx++) {
-			this.regions[idx] = new RegionInfo();
+			this.regions[idx] = new RegionInfo(this);
 			this.regions[idx].setLocation(positions[idx][0] - 50, positions[idx][1]);
 			this.regions[idx].setRegion(Region.forId(idx+1));			
 			mainLayer.add(this.regions[idx], JLayeredPane.PALETTE_LAYER);
 		}
 		
 		//Legend
-		p1 = new RegionInfo();
+		p1 = new RegionInfo(this);
 		p1.setLocation(45,50);
 		p1.setTeam(Team.PLAYER_1);
 		p1.setNameLabel(playerName1);
 		p1.setText(playerEngineName1);
 		mainLayer.add(p1, JLayeredPane.PALETTE_LAYER);
 		
-		p2 = new RegionInfo();
+		p2 = new RegionInfo(this);
 		p2.setLocation(45,85);
 		p2.setTeam(Team.PLAYER_2);
 		p2.setNameLabel(playerName2);
@@ -310,6 +312,14 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		case 'c':
 			continual = !continual;
 			showNotification( continual ? "Continual run enabled" : "Continual run disabled");
+			break;
+		case 'i':
+			showIds = !showIds;
+			for (RegionInfo i : regions)
+				i.drawName();
+			break;
+		case ' ':
+			clicked = true;
 			break;
 		case '+':
 			continualTime += 50;

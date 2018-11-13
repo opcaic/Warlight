@@ -15,6 +15,7 @@ public class RegionInfo extends JPanel {
 	public static final int[] HIGHLIGHT_RING_COLOR_RGB = new int[] { 255, 255, 255 };
 	public static final float[] HIGHLIGHT_RING_COLOR_HSB = Color.RGBtoHSB(HIGHLIGHT_RING_COLOR_RGB[0], HIGHLIGHT_RING_COLOR_RGB[1], HIGHLIGHT_RING_COLOR_RGB[2], null);
 	
+	private GUI gui;
 	private int diam;
 	//private Color circleColor;
 	private JLabel txt;
@@ -27,13 +28,8 @@ public class RegionInfo extends JPanel {
 
 	public int armiesPlus = 0;
 	
-	public RegionInfo(Team team, int diam) {
-		init(diam, team);
-	}
-	public RegionInfo(Team team) {
-		init(30, team);
-	}
-	public RegionInfo() {
+	public RegionInfo(GUI gui) {
+		this.gui = gui;
 		init(30, Team.NEUTRAL);
 	}
 	
@@ -98,9 +94,13 @@ public class RegionInfo extends JPanel {
 		this.repaint();
 	}
 	
+	public void drawName() {
+		this.name.setText(gui.showIds ? region.id + ":" + region.mapName : region.mapName);
+	}
+	
     public void setRegion(Region region) {
 		this.region = region;
-		this.name.setText(region.id + ":" + region.mapName);
+		drawName();
 		this.revalidate();
 		this.repaint();
 	}
