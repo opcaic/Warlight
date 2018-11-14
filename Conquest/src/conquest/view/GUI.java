@@ -1,7 +1,6 @@
 package conquest.view;
 
-import java.awt.Button;
-import java.awt.Color;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -14,11 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JLayeredPane;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
 import conquest.game.GameMap;
 import conquest.game.RegionData;
@@ -28,8 +23,6 @@ import conquest.game.move.PlaceArmiesMove;
 import conquest.game.world.Continent;
 import conquest.game.world.Region;
 import conquest.view.TriButton.ClickListener;
-
-
 
 public class GUI extends JFrame implements MouseListener, KeyListener
 {
@@ -147,7 +140,9 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 	private String playerName2, botName2;
 	
 	private RegionInfo p1;
-	private RegionInfo p2;	
+	private RegionInfo p2;
+	
+	private Arrow arrow;
 	
 	private JLayeredPane mainLayer;
 	
@@ -162,7 +157,7 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		this.playerName2 = playerEngineName2;
 		
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		this.setTitle("Interactive Map");
+		this.setTitle("Warlight");
 		this.addMouseListener(this);
 		this.addKeyListener(this);
 		
@@ -226,6 +221,10 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		mainLayer.add(p2, JLayeredPane.PALETTE_LAYER);
 		
 		notification = new GUINotif(mainLayer, 1015, 45, 200, 50);		
+		
+		arrow = new Arrow();
+		arrow.setBounds(0, 0, WIDTH, HEIGHT);
+		mainLayer.add(arrow, JLayeredPane.PALETTE_LAYER);
 		
 		//Finish
         this.pack();
@@ -512,18 +511,24 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		this.requestFocusInWindow();
 		
 		actionTxt.setText("TRANSFER BY " + move.getPlayerName());
+		Team player = getTeam(move.getPlayerName());
 		
 		RegionInfo fromRegion = this.regions[move.getFromRegion().getId() - 1];
 		RegionInfo toRegion = this.regions[move.getToRegion().getId() - 1];
 		int armies = move.getArmies();
 		
 		fromRegion.armiesPlus = -armies;
-		fromRegion.setText(fromRegion.getArmies() + " - " + armies);
 		fromRegion.setHighlight(true);
 		
 		toRegion.armiesPlus = armies;
-		toRegion.setText(toRegion.getArmies() + " + " + armies);
 		toRegion.setHighlight(true);
+		
+		int[] fromPos = positions[move.getFromRegion().getId() - 1];
+		int[] toPos = positions[move.getToRegion().getId() - 1];
+		arrow.setFromTo(fromPos[0], fromPos[1] + 20, toPos[0], toPos[1] + 20);
+		arrow.setColor(TeamView.getColor(player));
+		arrow.setNumber(armies);
+		arrow.setVisible(true);
 		
 		waitForClick();
 		
@@ -536,6 +541,8 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		toRegion.setArmies(toRegion.getArmies() + toRegion.armiesPlus);
 		toRegion.setText(String.valueOf(toRegion.getArmies()));
 		toRegion.armiesPlus = 0;
+		
+		arrow.setVisible(false);
 		
 		actionTxt.setText("---");
 	}
@@ -552,34 +559,50 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		this.requestFocusInWindow();
 		
 		actionTxt.setText("ATTACK BY " + botName(move.getPlayerName()));
+		Team attacker = getTeam(move.getPlayerName());
 		
 		RegionInfo fromRegion = this.regions[move.getFromRegion().getId() - 1];
 		RegionInfo toRegion = this.regions[move.getToRegion().getId() - 1];
 		int armies = move.getArmies();
 		
 		fromRegion.armiesPlus = -armies;
-		fromRegion.setText(fromRegion.getArmies() + " > " + armies);
 		fromRegion.setHighlight(true);
 		
 		toRegion.armiesPlus = armies;
-		toRegion.setText(toRegion.getArmies() + " < " + armies);
 		toRegion.setHighlight(true);
+		
+		int[] fromPos = positions[move.getFromRegion().getId() - 1];
+		int[] toPos = positions[move.getToRegion().getId() - 1];
+		arrow.setFromTo(fromPos[0], fromPos[1] + 20, toPos[0], toPos[1] + 20);
+		arrow.setColor(TeamView.getColor(attacker));
+		arrow.setNumber(armies);
+		arrow.setVisible(true);
 		
 		waitForClick();		
 	}
 
+	static Color withSaturation(Color c, float sat) {
+		float[] hsb = Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), null);
+		return new Color(Color.HSBtoRGB(hsb[0], sat, hsb[2]));
+	}
+	
 	public void attackResult(RegionData fromRegionData, RegionData toRegionData, int attackersDestroyed, int defendersDestroyed) {
 		this.requestFocusInWindow();
 		
 		RegionInfo fromRegion = this.regions[fromRegionData.getId() - 1];
 		RegionInfo toRegion = this.regions[toRegionData.getId() - 1];
+		Team attacker = getTeam(fromRegionData.getPlayerName());
+		
+		boolean success;
 		
 		if (fromRegionData.getPlayerName().equals(toRegionData.getPlayerName())) {
+			success = true;
 			actionTxt.setText("SUCCESS [A:" + (attackersDestroyed > 0 ? "-" : "") + attackersDestroyed + " | D:" + (defendersDestroyed > 0 ? "-" : "") + defendersDestroyed + "]");
 			fromRegion.setArmies(fromRegion.getArmies() + fromRegion.armiesPlus);
 			toRegion.setTeam(getTeam(toRegionData.getPlayerName()));
 			toRegion.setArmies((-fromRegion.armiesPlus) - attackersDestroyed);
 		} else {
+			success = false;
 			actionTxt.setText("FAILURE [A:" + (attackersDestroyed > 0 ? "-" : "") + attackersDestroyed + " | D:" + (defendersDestroyed > 0 ? "-" : "") + defendersDestroyed + "]");
 			fromRegion.setArmies(fromRegion.getArmies() - attackersDestroyed);
 			toRegion.setArmies(toRegion.getArmies() - defendersDestroyed);
@@ -594,11 +617,15 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		
 		fromRegion.setHighlight(true);
 		toRegion.setHighlight(true);
+		Color c = TeamView.getColor(attacker);
+		arrow.setColor(withSaturation(c, success ? 0.5f : 0.2f));
+		arrow.setNumber(0);
 		
 		waitForClick();		
 		
 		fromRegion.setHighlight(false);
 		toRegion.setHighlight(false);
+		arrow.setVisible(false);
 		
 		actionTxt.setText("---");	
 		
