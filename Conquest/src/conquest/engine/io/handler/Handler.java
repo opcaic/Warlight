@@ -36,7 +36,10 @@ public class Handler implements IHandler {
 
 	private String logPlayerName;
 	
-	public Handler(String handlerName, OutputStream input, boolean inputAutoFlush, InputStream output, InputStream error) throws IOException
+	boolean logToConsole;
+	
+	public Handler(String handlerName, OutputStream input, boolean inputAutoFlush,
+			       InputStream output, InputStream error) throws IOException
 	{
 		name = handlerName;
 		
@@ -57,9 +60,10 @@ public class Handler implements IHandler {
 		}
 	}
 	
-	public void setGameLog(GameLog gameLog, String playerName) {
+	public void setGameLog(GameLog gameLog, String playerName, boolean logToConsole) {
 		this.log = gameLog;
 		this.logPlayerName = playerName;
+		this.logToConsole = logToConsole;
 	}
 	
 	public void stop()
@@ -92,7 +96,8 @@ public class Handler implements IHandler {
 		if (log != null) {
 			log.logBotToEngine(logPlayerName, line);
 		}
-		System.out.println(name + " <-- " + line);
+		if (logToConsole)
+			System.out.println(name + " <-- " + line);
 		return line;
 	}
 	
@@ -103,7 +108,8 @@ public class Handler implements IHandler {
 			if (log != null) {
 				log.logEngineToBot(logPlayerName, line);
 			}
-			System.out.println(name + " --> " + line);
+			if (logToConsole)
+				System.out.println(name + " --> " + line);
 			in.writeLine(line.trim());			
 			return true;
 		} 

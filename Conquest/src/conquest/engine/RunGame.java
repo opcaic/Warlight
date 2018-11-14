@@ -82,6 +82,8 @@ public class RunGame
 		
 		public Integer visualizeContinualFrameTimeMillis = null;
 		
+		public boolean logToConsole = true;
+		
 		/**
 		 * Optimize region circle positions for human controls.
 		 */
@@ -92,7 +94,9 @@ public class RunGame
 		public EngineConfig engine = new EngineConfig();
 		
 		public String asString() {
-			return gameId + ";" + playerId1 + ";" + playerId2 + ";" + player1Name + ";" + player2Name + ";" + visualize + ";" + forceHumanVisualization + ";" + visualizeContinual + ";" + visualizeContinualFrameTimeMillis + ";" + engine.asString();
+			return gameId + ";" + playerId1 + ";" + playerId2 + ";" + player1Name + ";" + player2Name + ";" +
+		           visualize + ";" + forceHumanVisualization + ";" +
+				   visualizeContinual + ";" + visualizeContinualFrameTimeMillis + ";" + logToConsole + ";" + engine.asString();
 		}
 		
 		@Override
@@ -129,9 +133,10 @@ public class RunGame
 			result.forceHumanVisualization = Boolean.parseBoolean(parts[6]);
 			result.visualizeContinual = (parts[7].toLowerCase().equals("null") ? null : Boolean.parseBoolean(parts[7]));
 			result.visualizeContinualFrameTimeMillis = (parts[8].toLowerCase().equals("null") ? null : Integer.parseInt(parts[8]));
+			result.logToConsole = Boolean.parseBoolean(parts[9]);
 			
 			int engineConfigStart = 0;
-			for (int i = 0; i < 9; ++i) {
+			for (int i = 0; i < 10; ++i) {
 				engineConfigStart = line.indexOf(";", engineConfigStart);
 				++engineConfigStart;
 			}
@@ -178,6 +183,14 @@ public class RunGame
 			case PLAYER_2: return config == null ? "Bot2" : config.player2Name;
 			}
 			return null;
+		}
+		
+		public int getWinnerRegions() {
+			return winner == Team.PLAYER_1 ? player1Regions : player2Regions;
+		}
+		
+		public int getWinnerArmies() {
+			return winner == Team.PLAYER_1 ? player1Armies : player2Armies;
 		}
 
 		public String asString() {
@@ -293,8 +306,13 @@ public class RunGame
 		}
 		
 		// setup robots
-		RobotConfig robot1Cfg = new RobotConfig(player1.getId(), player1.getName(), Team.PLAYER_1, config.engine.botCommandTimeoutMillis, log, gui);
-		RobotConfig robot2Cfg = new RobotConfig(player2.getId(), player2.getName(), Team.PLAYER_2, config.engine.botCommandTimeoutMillis, log, gui);
+		RobotConfig robot1Cfg =
+			new RobotConfig(player1.getId(), player1.getName(), Team.PLAYER_1,
+				            config.engine.botCommandTimeoutMillis, log, config.logToConsole, gui);
+		
+		RobotConfig robot2Cfg =
+			new RobotConfig(player2.getId(), player2.getName(), Team.PLAYER_2,
+					        config.engine.botCommandTimeoutMillis, log, config.logToConsole, gui);
 				
 		robot1.setup(robot1Cfg);
 		robot2.setup(robot2Cfg);

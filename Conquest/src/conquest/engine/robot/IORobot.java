@@ -62,7 +62,7 @@ public class IORobot implements Robot
 	@Override
 	public void setup(RobotConfig config) {
 		this.config = config;
-		handler.setGameLog(config.gameLog, config.playerId);
+		handler.setGameLog(config.gameLog, config.playerId, config.logToConsole);
 	}
 		
 //	@Override

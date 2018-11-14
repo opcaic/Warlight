@@ -4,7 +4,7 @@ import conquest.engine.replay.GameLog;
 
 public interface IHandler {
 
-	public void setGameLog(GameLog log, String playerName);
+	public void setGameLog(GameLog log, String playerName, boolean logToConsole);
 	
 	public boolean isRunning();
 	public void stop();

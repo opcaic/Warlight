@@ -97,6 +97,22 @@ public class ConquestFight {
 		outputResults(new File(resultDirFile, fileName), rounds, results);
 		
 		outputResults(tableFile, rounds, results);
+		
+		int victories1 = 0, victories2 = 0;
+		for (int i = 0 ; i < results.length ; ++i) {
+			GameResult r = results[i];
+			System.out.format("game %d: %s won in %d rounds (%d regions, %d armies)\n",
+					i + 1, r.getWinnerName(), r.round, r.getWinnerRegions(),r.getWinnerArmies());
+		    switch (r.winner) {
+		    case PLAYER_1: victories1 += 1; break;
+		    case PLAYER_2: victories2 += 1; break;
+		    default: break;
+		    }
+		}
+		
+		System.out.format("total victories: %s = %d (%.1f%%), %s = %d (%.1f%%)\n",
+			bot1Name, victories1, 100.0 * victories1 / results.length, 
+			bot2Name, victories2, 100.0 * victories2 / results.length);
 	}
 
 	
