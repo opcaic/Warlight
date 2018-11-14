@@ -1,6 +1,7 @@
 package conquest.view;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 
 import javax.swing.BoxLayout;
@@ -48,6 +49,7 @@ public class RegionInfo extends JPanel {
         this.name.setPreferredSize(this.name.getSize());
 //        this.name.setBounds(200, 400, diam, diam);
         this.name.setOpaque(false);
+        this.name.setFont(new Font("default", 0, 12));
         this.name.setAlignmentX(0.5f);
         this.name.setForeground(Color.BLACK);
         this.add(this.name);
@@ -58,6 +60,7 @@ public class RegionInfo extends JPanel {
         this.txt.setPreferredSize(this.txt.getSize());
 //        this.txt.setBounds(200, 400, diam, diam);
         this.txt.setOpaque(false);
+        this.txt.setFont(new Font("default", 0, 12));
         this.txt.setAlignmentX(0.5f);
         this.txt.setForeground(Color.BLACK);
         this.add(this.txt);        

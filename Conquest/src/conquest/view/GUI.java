@@ -134,7 +134,7 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 	private boolean rightClick = false;
 	private boolean nextRound = false;
 	private boolean continual = false;
-	private int continualTime = 800;
+	private int continualTime = 1000;
 	
 	private String playerName1, botName1;
 	private String playerName2, botName2;
@@ -321,12 +321,12 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 			clicked = true;
 			break;
 		case '+':
-			continualTime += 50;
+			continualTime += 100;
 			continualTime = Math.min(continualTime, 3000);
 			showNotification("Action visualized for: " + continualTime + " ms");
 			break;
 		case '-':
-			continualTime -= 50;
+			continualTime -= 100;
 			continualTime = Math.max(continualTime, 200);
 			showNotification("Action visualized for: " + continualTime + " ms");
 			break;
@@ -510,7 +510,7 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 	public void transfer(AttackTransferMove move) {
 		this.requestFocusInWindow();
 		
-		actionTxt.setText("TRANSFER BY " + move.getPlayerName());
+		actionTxt.setText("TRANSFER BY " + botName(move.getPlayerName()));
 		Team player = getTeam(move.getPlayerName());
 		
 		RegionInfo fromRegion = this.regions[move.getFromRegion().getId() - 1];
