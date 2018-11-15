@@ -6,12 +6,12 @@ import conquest.game.Team;
 
 public class TeamView {
 
-	public static final int[] PLAYER_1_COLOR_RGB = new int[] { 255, 160, 160 };	
-	public static final int[] PLAYER_2_COLOR_RGB = new int[] { 160, 160, 255 };
+	public static final int[] PLAYER_1_COLOR_RGB = new int[] { 160, 160, 255 };
+	public static final int[] PLAYER_2_COLOR_RGB = new int[] { 255, 160, 160 };	
 	public static final int[] NEUTRAL_COLOR_RGB = new int[] { 240, 240, 240 };
 	
-	public static final int[] PLAYER_1_HIGHLIGHT_COLOR_RGB = new int[] { 255, 180, 180 };
-	public static final int[] PLAYER_2_HIGHLIGHT_COLOR_RGB = new int[] { 180, 180, 255 };
+	public static final int[] PLAYER_1_HIGHLIGHT_COLOR_RGB = new int[] { 180, 180, 255 };
+	public static final int[] PLAYER_2_HIGHLIGHT_COLOR_RGB = new int[] { 255, 180, 180 };
 	public static final int[] NEUTRAL_HIGHLIGHT_COLOR_RGB = new int[] { 245, 245, 245 };
 	
 	public static final float[] PLAYER_1_COLOR_HSB = Color.RGBtoHSB(PLAYER_1_COLOR_RGB[0], PLAYER_1_COLOR_RGB[1], PLAYER_1_COLOR_RGB[2], null);
