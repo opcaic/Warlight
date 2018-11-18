@@ -92,6 +92,8 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 	private RegionInfo p1;
 	private RegionInfo p2;
 	
+	public Team[] continentOwner = new Team[Continent.LAST_ID + 1];
+	
 	private Arrow mainArrow;
 	
 	private JLayeredPane mainLayer;
@@ -121,7 +123,7 @@ public class GUI extends JFrame implements MouseListener, KeyListener
         this.add(mainLayer);
 
         //Map image
-		JLabel labelForImage = new JLabel();
+		JLabel labelForImage = new MapView(this);
 		labelForImage.setBounds(0, 0, WIDTH, HEIGHT);
 		URL iconURL = this.getClass().getResource(RESOURCE_IMAGE_FILE);
 		ImageIcon icon = new ImageIcon(iconURL);
@@ -174,7 +176,7 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		
 		mainArrow = new Arrow(0, 0, WIDTH, HEIGHT);
 		mainLayer.add(mainArrow, JLayeredPane.PALETTE_LAYER);
-		
+				
 		//Finish
         this.pack();
         this.setSize(WIDTH, HEIGHT);
@@ -346,12 +348,19 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 				}
 				if (!plr1 && !plr2) break;
 			}
-			if (plr1) plr1Income += continent.reward;
-			if (plr2) plr2Income += continent.reward;
+			if (plr1) {
+				plr1Income += continent.reward;
+				continentOwner[continent.id] = Team.PLAYER_1;
+			} else if (plr2) {
+				plr2Income += continent.reward;
+				continentOwner[continent.id] = Team.PLAYER_2;
+			} else
+				continentOwner[continent.id] = null;
 		}
 		
 		p1.setText("[" + plr1Regions + " / " + plr1Armies + " / +" + plr1Income + "]");
 		p2.setText("[" + plr2Regions + " / " + plr2Armies + " / +" + plr2Income + "]");
+		repaint();
 	}
 	
 	public void newRound(int roundNum) {
@@ -588,6 +597,8 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		Color c = TeamView.getColor(attacker);
 		mainArrow.setColor(withSaturation(c, success ? 0.5f : 0.2f));
 		mainArrow.setNumber(0);
+
+		updateStats();
 		
 		waitForClick();		
 		
@@ -596,8 +607,6 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		mainArrow.setVisible(false);
 		
 		actionTxt.setText("---");	
-		
-		updateStats();
 	}
 	
 	// --------------
