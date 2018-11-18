@@ -29,7 +29,7 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 	private static final int WIDTH = 1239;
 	private static final int HEIGHT = 664;
 	
-	public static int[][] positionsAIvsAI = new int[][]{
+	public static int[][] positions = new int[][]{
 		{95, 150},  //1.  Alaska
 		{209, 160}, //2.  Northwest Territory
 		{441, 96},  //3.  Greenland
@@ -73,54 +73,6 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		{983,484},  //41. Western Australia
 		{1055,500}, //42. Eastern Australia
 	};
-	
-	//Position of each region's info (team color & number of armies)
-	public static final int[][] positionsHuman = new int[][]{
-				{95, 150},  //1.  Alaska
-				{209, 143}, //2.  Northwest Territory
-				{441, 96},  //3.  Greenland
-				{190, 202}, //4.  Alberta
-				{257, 203}, //5.  Ontario
-				{355, 203}, //6.  Quebec
-				{214, 263}, //7.  Western United States
-				{295,273},  //8.  Eastern United States
-				{255,333},  //9.  Central America
-				{350,373},  //10. Venezuela
-				{344,445},  //11. Peru
-				{425,434},  //12. Brazil
-				{374,511},  //13. Argentina
-				{520,135},  //14. Iceland
-				{538,195},  //15. Great Britain
-				{627,130},  //16. Scandinavia
-				{719,195},  //17. Ukraine
-				{560,255},  //18. Western Europe
-				{628,196},  //19. Northern Europe
-				{650,255},  //20. Southern Europe
-				{576,339},  //21. North Africa
-				{654,316},  //22. Egypt
-				{740,375},  //23. East Africa
-				{654,408},  //24. Congo
-				{657,478},  //25. South Africa
-				{736,465},  //26. Madagascar
-				{800,178},  //27. Ural
-				{865,116},  //28. Siberia
-				{972,110},  //29. Yakutsk
-				{1080,150}, //30. Kamchatka
-				{942,175},  //31. Irkutsk
-				{798,242},  //32. Kazakhstan
-				{895,279},  //33. China
-				{975,250},  //34. Mongolia
-				{1057,279}, //35. Japan
-				{730,295},  //36. Middle East
-				{815,316},  //37. India
-				{908,348},  //38. Siam
-				{930,412},  //39. Indonesia
-				{1035,422}, //40. New Guinea
-				{971,484},  //41. Western Australia
-				{1055,500}, //42. Eastern Australia
-			};
-	
-	public static int[][] positions = positionsAIvsAI;
 	
 	private GUINotif notification;
 	

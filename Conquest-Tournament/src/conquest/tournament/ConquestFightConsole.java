@@ -441,7 +441,7 @@ public class ConquestFightConsole {
 	public static String[] getTestArgs_1v1() {
 		return new String[] {
 				  "-s", "20"     // seed
-				, "-o", "GAME;PLR1;PLR2;x;x;false;false;false;200;false;-1;true;5000;5;100;CONTINUAL_1_1_A60_D70"   // game-config
+				, "-o", "GAME;PLR1;PLR2;x;x;false;false;200;false;-1;true;5000;5;100;CONTINUAL_1_1_A60_D70"   // game-config
 				, "-g", "10"      // games-count
 				, "-r", "false"   // reverse-games
 				, "-a", "MyBot"                              // bot1-id
@@ -460,11 +460,10 @@ public class ConquestFightConsole {
 		//		result.player1Name = parts[3];                                   // will be auto-changed
 		//		result.player2Name = parts[4];                                   // will be auto-changed
 		//		result.visualize = Boolean.parseBoolean(parts[5]);               // should be always FALSE
-		//		result.forceHumanVisualization = Boolean.parseBoolean(parts[6]); // should be always FALSE
-		//      result.visualizeContinual = (parts[7].toLowerCase().equals("null") ? null : Boolean.parseBoolean(parts[7]));
-		//      result.visualizeContinualFrameTimeMillis = (parts[8].toLowerCase().equals("null") ? null : Integer.parseInt(parts[8]));
-		//      result.logToConsole = Boolean.parseBoolean(parts[9]);
-		
+		//      result.visualizeContinual = (parts[6].toLowerCase().equals("null") ? null : Boolean.parseBoolean(parts[6]));
+		//      result.visualizeContinualFrameTimeMillis = (parts[7].toLowerCase().equals("null") ? null : Integer.parseInt(parts[7]));
+		//      result.logToConsole = Boolean.parseBoolean(parts[8]);
+
 		// followed by engine config:
 		//		result.seed = Integer.parseInt(parts[0]);                        // will be auto-changed according to master seed above
 		//		result.fullyObservableGame = Boolean.parseBoolean(parts[1]);
@@ -477,7 +476,7 @@ public class ConquestFightConsole {
 	public static String[] getTestArgs_Batch() {
 		return new String[] {
 				  "-s", "20"     // seed
-				, "-o", "GAME;PLR1;PLR2;x;x;false;false;null;null;false;-1;true;5000;5;100;CONTINUAL_1_1_A60_D70"   // game-config
+				, "-o", "GAME;PLR1;PLR2;x;x;false;null;null;false;-1;true;5000;5;100;CONTINUAL_1_1_A60_D70"   // game-config
 				, "-g", "3"      // games-count
 				, "-r", "true"   // reverse-games
 				, "-e", "AggressiveBot"               // bot-id that will perform fights against all other bots within batch property file

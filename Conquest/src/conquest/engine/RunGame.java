@@ -84,19 +84,14 @@ public class RunGame
 		
 		public boolean logToConsole = true;
 		
-		/**
-		 * Optimize region circle positions for human controls.
-		 */
-		public boolean forceHumanVisualization = false;
-		
 		public File replayLog = null;
 		
 		public EngineConfig engine = new EngineConfig();
 		
 		public String asString() {
 			return gameId + ";" + playerId1 + ";" + playerId2 + ";" + player1Name + ";" + player2Name + ";" +
-		           visualize + ";" + forceHumanVisualization + ";" +
-				   visualizeContinual + ";" + visualizeContinualFrameTimeMillis + ";" + logToConsole + ";" + engine.asString();
+		           visualize + ";" + visualizeContinual + ";" + visualizeContinualFrameTimeMillis + ";" +
+				   logToConsole + ";" + engine.asString();
 		}
 		
 		@Override
@@ -130,13 +125,12 @@ public class RunGame
 			result.player1Name = parts[3];
 			result.player2Name = parts[4];
 			result.visualize = Boolean.parseBoolean(parts[5]);
-			result.forceHumanVisualization = Boolean.parseBoolean(parts[6]);
-			result.visualizeContinual = (parts[7].toLowerCase().equals("null") ? null : Boolean.parseBoolean(parts[7]));
-			result.visualizeContinualFrameTimeMillis = (parts[8].toLowerCase().equals("null") ? null : Integer.parseInt(parts[8]));
-			result.logToConsole = Boolean.parseBoolean(parts[9]);
+			result.visualizeContinual = (parts[6].toLowerCase().equals("null") ? null : Boolean.parseBoolean(parts[6]));
+			result.visualizeContinualFrameTimeMillis = (parts[7].toLowerCase().equals("null") ? null : Integer.parseInt(parts[7]));
+			result.logToConsole = Boolean.parseBoolean(parts[8]);
 			
 			int engineConfigStart = 0;
-			for (int i = 0; i < 10; ++i) {
+			for (int i = 0; i < 9; ++i) {
 				engineConfigStart = line.indexOf(";", engineConfigStart);
 				++engineConfigStart;
 			}
@@ -286,9 +280,6 @@ public class RunGame
 		// setup GUI
 		GUI gui = null;
 		if (config.visualize) {
-			if (config.forceHumanVisualization) {
-				gui.positions = gui.positionsHuman;
-			}
 			gui = new GUI(config.playerId1, config.playerId2, robot1.getRobotPlayerId(), robot2.getRobotPlayerId());
 			if (config.visualizeContinual != null) {
 				gui.setContinual(config.visualizeContinual);
@@ -373,7 +364,6 @@ public class RunGame
 		}
 		if (botInit.startsWith("human")) {
 			config.visualize = true;
-			config.forceHumanVisualization = true;
 			return new HumanRobot(playerId);
 		}
 		throw new RuntimeException("Invalid init string for player '" + playerId + "', must start either with 'process:' or 'internal:' or 'human', passed value was: " + botInit);
@@ -709,9 +699,6 @@ public class RunGame
 		
 		// visualize the map, if turned off, the simulation would run headless 
 		config.visualize = true;
-		
-		// if false, not all human controls would be accessible (when hijacking bots via 'H' or 'J')
-		config.forceHumanVisualization = true;   
 		
 		config.replayLog = new File("./replay.log");
 		

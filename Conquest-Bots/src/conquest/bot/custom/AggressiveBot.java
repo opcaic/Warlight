@@ -7,9 +7,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import conquest.bot.BotParser;
-import conquest.bot.BotStarter;
-import conquest.bot.BotState;
-import conquest.bot.external.JavaBot;
 import conquest.bot.fight.FightSimulation.FightAttackersResults;
 import conquest.bot.fight.FightSimulation.FightDefendersResults;
 import conquest.bot.map.RegionBFS;
@@ -27,8 +24,6 @@ import conquest.engine.RunGame;
 import conquest.engine.RunGame.Config;
 import conquest.engine.RunGame.GameResult;
 import conquest.game.Player;
-import conquest.game.RegionData;
-import conquest.game.move.AttackTransferMove;
 import conquest.game.world.Continent;
 import conquest.game.world.Region;
 import conquest.utils.Util;
@@ -62,8 +57,8 @@ public class AggressiveBot extends GameBot
 		Collections.sort(choosable, new Comparator<Region>() {
 			@Override
 			public int compare(Region o1, Region o2) {
-				int priority1 = getPrefferedContinentPriority(o1.continent);
-				int priority2 = getPrefferedContinentPriority(o2.continent);				
+				int priority1 = getPreferredContinentPriority(o1.continent);
+				int priority2 = getPreferredContinentPriority(o2.continent);				
 				return priority1 - priority2;
 			}
 		});
@@ -80,7 +75,7 @@ public class AggressiveBot extends GameBot
 		return result;
 	}
 	
-	public int getPrefferedContinentPriority(Continent continent) {
+	public int getPreferredContinentPriority(Continent continent) {
 		switch (continent) {
 		case Australia:     return 1;
 		case South_America: return 2;
@@ -257,8 +252,8 @@ public class AggressiveBot extends GameBot
 		
 		config.bot1Init = "internal:conquest.bot.custom.AggressiveBot";
 		//config.bot1Init = "dir;process:../Conquest-Bots;java -cp ./bin;../Conquest/bin conquest.bot.external.JavaBot conquest.bot.custom.AggressiveBot ./AggressiveBot.log";
-		config.bot2Init = "internal:conquest.bot.BotStarter";
-		//config.bot2Init = "human";
+		//config.bot2Init = "internal:conquest.bot.BotStarter";
+		config.bot2Init = "human";
 		
 		config.engine.botCommandTimeoutMillis = 24*60*60*1000;
 		//config.engine.botCommandTimeoutMillis = 20 * 1000;
@@ -268,7 +263,6 @@ public class AggressiveBot extends GameBot
 		config.engine.fight = FightMode.CONTINUAL_1_1_A60_D70;
 		
 		config.visualize = true;
-		config.forceHumanVisualization = true; // prepare for hijacking bot controls
 		
 		config.replayLog = new File("./replay.log");
 		

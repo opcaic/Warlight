@@ -4,12 +4,14 @@ import java.io.File;
 import java.util.*;
 
 import conquest.bot.BotParser;
+import conquest.bot.fight.FightSimulation.FightAttackersResults;
 import conquest.bot.state.*;
 import conquest.bot.state.GameState.RegionState;
 import conquest.engine.Engine.FightMode;
 import conquest.engine.RunGame;
 import conquest.engine.RunGame.Config;
 import conquest.game.world.Region;
+import conquest.utils.Util;
 import conquest.view.GUI;
 
 /**
@@ -18,10 +20,17 @@ public class MyBot extends GameBot
 {
 	Random rand = new Random();
 	
+	FightAttackersResults attackResults;
+	
+	public MyBot() {
+		attackResults = FightAttackersResults.loadFromFile(Util.file(
+				"../Conquest-Bots/FightSimulation-Attackers-A200-D200.obj"));
+	}
+	
 	@Override
 	public void setGUI(GUI gui) {
 	}
-	
+		
 	// Code your bot here.
 	
 	//
@@ -94,7 +103,6 @@ public class MyBot extends GameBot
 		config.engine.fight = FightMode.CONTINUAL_1_1_A60_D70;
 		
 		config.visualize = true;
-		config.forceHumanVisualization = true; // prepare for hijacking bot controls
 		
 		config.replayLog = new File("./replay.log");
 		

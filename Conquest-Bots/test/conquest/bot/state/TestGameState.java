@@ -22,7 +22,6 @@ public class TestGameState {
 		config.engine.fight = FightMode.CONTINUAL_1_1_A60_D70;
 		
 		config.visualize = true;
-		config.forceHumanVisualization = true; // prepare for hijacking bot controls
 		
 		config.replayLog = new File("./replay.log");
 		
