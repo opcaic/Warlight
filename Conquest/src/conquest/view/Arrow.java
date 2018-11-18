@@ -13,8 +13,9 @@ class Arrow extends JPanel {
 	
 	Polygon arrowHead;
 	
-	public Arrow() {
+	public Arrow(int from_x, int from_y, int to_x, int to_y) {
 		setOpaque(false);
+		setBounds(from_x, from_y, to_x, to_y);
 		
 		arrowHead = new Polygon();  
 		arrowHead.addPoint( 0, 6);

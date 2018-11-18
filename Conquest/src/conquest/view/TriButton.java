@@ -2,6 +2,7 @@ package conquest.view;
 
 import java.awt.Button;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -107,11 +108,14 @@ public class TriButton {
 		
 		this.host = host;
 		
+        Font font = new Font("default", 0, 11);
+		
 		Button button;
 		
 		button = new Button("" + change1);
 		button.setForeground(Color.WHITE);
 		button.setBackground(Color.BLACK);
+		button.setFont(font);
 		button.setSize(20, 20);
 		button.setLocation(x - 30, y + 10);
 		
@@ -120,6 +124,7 @@ public class TriButton {
 		button = new Button("" + change2);
 		button.setForeground(Color.WHITE);
 		button.setBackground(Color.BLACK);
+		button.setFont(font);
 		button.setSize(20, 20);
 		button.setLocation(x - 10, y + 10);
 		
@@ -128,6 +133,7 @@ public class TriButton {
 		button = new Button("" + change3);
 		button.setForeground(Color.WHITE);
 		button.setBackground(Color.BLACK);
+		button.setFont(font);
 		button.setSize(20, 20);
 		button.setLocation(x + 10, y + 10);
 		
@@ -137,9 +143,9 @@ public class TriButton {
 		button2.setVisible(visible);
 		button3.setVisible(visible);
 				
-		host.add(button1, JLayeredPane.PALETTE_LAYER);
-		host.add(button2, JLayeredPane.PALETTE_LAYER);
-		host.add(button3, JLayeredPane.PALETTE_LAYER);
+		host.add(button1, JLayeredPane.MODAL_LAYER);
+		host.add(button2, JLayeredPane.MODAL_LAYER);
+		host.add(button3, JLayeredPane.MODAL_LAYER);
 		
 		button1.addMouseListener(listener1);
 		button2.addMouseListener(listener2);

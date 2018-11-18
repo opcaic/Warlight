@@ -3,6 +3,8 @@ package conquest.view;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
@@ -11,23 +13,21 @@ import javax.swing.JPanel;
 import conquest.game.Team;
 import conquest.game.world.Region;
 
-public class RegionInfo extends JPanel {
-	
-	public static final int[] HIGHLIGHT_RING_COLOR_RGB = new int[] { 255, 255, 255 };
-	public static final float[] HIGHLIGHT_RING_COLOR_HSB = Color.RGBtoHSB(HIGHLIGHT_RING_COLOR_RGB[0], HIGHLIGHT_RING_COLOR_RGB[1], HIGHLIGHT_RING_COLOR_RGB[2], null);
-	
+public class RegionInfo extends JPanel implements MouseListener {
 	private GUI gui;
 	private int diam;
-	//private Color circleColor;
 	private JLabel txt;
 	private JLabel name;
 	private Region region;
 	private int armies = 0;
 	private Team team;
-	private boolean highlight = false;
-	private boolean selected = false;
+	private Color highlight;
 
 	public int armiesPlus = 0;
+	
+	public static final Color
+		Gray = new Color(180, 180, 180),
+		Green = new Color(70, 189, 123);
 	
 	public RegionInfo(GUI gui) {
 		this.gui = gui;
@@ -47,7 +47,6 @@ public class RegionInfo extends JPanel {
         this.name = new JLabel("PLR", JLabel.CENTER);
         this.name.setSize(100, 15);
         this.name.setPreferredSize(this.name.getSize());
-//        this.name.setBounds(200, 400, diam, diam);
         this.name.setOpaque(false);
         this.name.setFont(new Font("default", 0, 12));
         this.name.setAlignmentX(0.5f);
@@ -58,7 +57,6 @@ public class RegionInfo extends JPanel {
         this.txt = new JLabel("2", JLabel.CENTER);
         this.txt.setSize(100, 15);
         this.txt.setPreferredSize(this.txt.getSize());
-//        this.txt.setBounds(200, 400, diam, diam);
         this.txt.setOpaque(false);
         this.txt.setFont(new Font("default", 0, 12));
         this.txt.setAlignmentX(0.5f);
@@ -67,6 +65,8 @@ public class RegionInfo extends JPanel {
         
         //Circle
         this.diam = diam;
+        
+        addMouseListener(this);
 	}
 	
 	public void setNameLabel(String s) {
@@ -78,11 +78,17 @@ public class RegionInfo extends JPanel {
 		this.revalidate();
 		this.repaint();
 	}
+	
+	public void setHighlight(Color c) {
+		if (this.highlight != c) {
+			this.highlight = c;
+			this.revalidate();
+			this.repaint();
+		}
+	}
 		
-	public void setHighlight(boolean state) {		
-		this.highlight = state;
-		this.revalidate();
-		this.repaint();
+	public void setHighlight(boolean state) {
+		setHighlight(state ? Color.WHITE : null);
 	}
 	
 	public void setTeam(Team team) {
@@ -108,6 +114,10 @@ public class RegionInfo extends JPanel {
 		this.repaint();
 	}
     
+    public Region getRegion() {
+    	return region;
+    }
+    
     public int getArmies() {
 		return armies;
 	}
@@ -120,28 +130,38 @@ public class RegionInfo extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        //g.getClipBounds().width
-//        g.setColor(Color.BLACK);
-//        g.drawString("44", 0, 0);
-        
         int width = this.getBounds().width; 
         
-        if (highlight) {
-        	g.setColor(Color.getHSBColor(HIGHLIGHT_RING_COLOR_HSB[0], HIGHLIGHT_RING_COLOR_HSB[1], HIGHLIGHT_RING_COLOR_HSB[2]));
-        	g.fillOval(width/2 - diam/2 - 4, 0, this.diam + 8, this.diam + 8);
-        }
-        
-        if (highlight) {
+        if (highlight != null) {
+        	int thickness = 3;
+        	
+        	g.setColor(highlight);
+        	g.fillOval(width/2 - diam/2 - thickness, 4 - thickness, this.diam + thickness * 2, this.diam + thickness * 2);
         	g.setColor(TeamView.getHighlightColor(team));        	
-        } else {
+        } else
         	g.setColor(TeamView.getColor(team));
-        }
-        g.fillOval(width/2 - diam/2, 4, this.diam, this.diam);
-        
+    	g.fillOval(width/2 - diam/2, 4, this.diam, this.diam);
     }
 	
 	public Team getTeam() {
 		return team;
 	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		gui.regionClicked(this, e.getButton() == MouseEvent.BUTTON1);
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) { }
+
+	@Override
+	public void mouseReleased(MouseEvent e) { }
+
+	@Override
+	public void mouseEntered(MouseEvent e) { }
+
+	@Override
+	public void mouseExited(MouseEvent e) {	}
     
 }
