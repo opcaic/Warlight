@@ -171,12 +171,12 @@ public class Engine {
 		sendUpdateMapInfo(player1);
 		sendUpdateMapInfo(player2);
 		
-		getMoves(player1.getBot().getAttackTransferMoves(timeoutMillis), player1);
-		getMoves(player2.getBot().getAttackTransferMoves(timeoutMillis), player2);
-		
 		if (gui != null) {
 			gui.placeArmies(map.regions, lastPlaceArmies);
 		}
+		
+		getMoves(player1.getBot().getAttackTransferMoves(timeoutMillis), player1);
+		getMoves(player2.getBot().getAttackTransferMoves(timeoutMillis), player2);
 		
 		executeAttackTransfer();
 		
