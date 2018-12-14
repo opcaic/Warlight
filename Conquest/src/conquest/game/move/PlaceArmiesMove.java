@@ -28,7 +28,6 @@ public class PlaceArmiesMove extends Move {
 	private RegionData region;
 	private int armies;
 	
-	//geen misbruik maken van playerName aub, alleen je eigen botnaam invullen
 	public PlaceArmiesMove(String playerName, RegionData region, int armies)
 	{
 		super.setPlayerName(playerName);

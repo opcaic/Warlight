@@ -144,7 +144,7 @@ public class GameMap {
 	}
 	
 	//return all regions owned by given player
-	public LinkedList<RegionData> ownedRegionsByPlayer(EnginePlayer player)
+	public LinkedList<RegionData> ownedRegionsByPlayer(PlayerInfo player)
 	{
 		LinkedList<RegionData> ownedRegions = new LinkedList<RegionData>();
 		
@@ -157,7 +157,7 @@ public class GameMap {
 	
 	//fog of war
 	//return all regions visible to given player
-	public LinkedList<RegionData> visibleRegionsForPlayer(EnginePlayer player)
+	public LinkedList<RegionData> visibleRegionsForPlayer(PlayerInfo player)
 	{
 		LinkedList<RegionData> visibleRegions = new LinkedList<RegionData>();
 		LinkedList<RegionData> ownedRegions = ownedRegionsByPlayer(player);
@@ -172,7 +172,7 @@ public class GameMap {
 		return visibleRegions;
 	}
 	
-	public GameMap getVisibleMapCopyForPlayer(EnginePlayer player) {
+	public GameMap getVisibleMapCopyForPlayer(PlayerInfo player) {
 		GameMap visibleMap = getMapCopy();
 		LinkedList<RegionData> visibleRegions = visibleRegionsForPlayer(player);
 		

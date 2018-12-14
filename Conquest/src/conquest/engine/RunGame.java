@@ -36,11 +36,7 @@ import conquest.engine.robot.HumanRobot;
 import conquest.engine.robot.IORobot;
 import conquest.engine.robot.InternalRobot;
 import conquest.engine.robot.ProcessRobot;
-import conquest.game.ContinentData;
-import conquest.game.GameMap;
-import conquest.game.EnginePlayer;
-import conquest.game.RegionData;
-import conquest.game.Team;
+import conquest.game.*;
 import conquest.game.move.MoveResult;
 import conquest.game.world.Continent;
 import conquest.game.world.Region;
@@ -207,12 +203,10 @@ public class RunGame
 	
 	Config config;
 	
-	LinkedList<MoveResult> fullPlayedGame;
-	LinkedList<MoveResult> player1PlayedGame;
-	LinkedList<MoveResult> player2PlayedGame;
 	int gameIndex = 1;
 
 	Engine engine;
+	ConquestGame game;
 	
 	public RunGame(Config config)
 	{
@@ -227,15 +221,15 @@ public class RunGame
 			
 			this.config.engine = replay.getConfig().engine;
 			
-			EnginePlayer player1, player2;
+			PlayerInfo player1, player2;
 			Robot robot1, robot2;
 			
 			//setup the bots: bot1, bot2
 			robot1 = new IORobot(replay);
 			robot2 = new IORobot(replay);
 					
-			player1 = new EnginePlayer(config.playerId1, config.player1Name, robot1, config.engine.startingArmies);
-			player2 = new EnginePlayer(config.playerId2, config.player2Name, robot2, config.engine.startingArmies);
+			player1 = new PlayerInfo(config.playerId1, config.player1Name, config.engine.startingArmies);
+			player2 = new PlayerInfo(config.playerId2, config.player2Name, config.engine.startingArmies);
 			
 			return go(null, player1, player2, robot1, robot2);
 		} catch (Exception e) {
@@ -253,15 +247,15 @@ public class RunGame
 			
 			System.out.println("starting game " + config.gameId);
 			
-			EnginePlayer player1, player2;
+			PlayerInfo player1, player2;
 			Robot robot1, robot2;
 			
 			//setup the bots: bot1, bot2
 			robot1 = setupRobot(config.playerId1, config.bot1Init);
 			robot2 = setupRobot(config.playerId2, config.bot2Init);
 					
-			player1 = new EnginePlayer(config.playerId1, config.player1Name, robot1, config.engine.startingArmies);
-			player2 = new EnginePlayer(config.playerId2, config.player2Name, robot2, config.engine.startingArmies);
+			player1 = new PlayerInfo(config.playerId1, config.player1Name, config.engine.startingArmies);
+			player2 = new PlayerInfo(config.playerId2, config.player2Name, config.engine.startingArmies);
 						
 			return go(log, player1, player2, robot1, robot2);
 		} catch (Exception e) {
@@ -269,7 +263,7 @@ public class RunGame
 		}
 	}
 
-	private GameResult go(GameLog log, EnginePlayer player1, EnginePlayer player2, Robot robot1, Robot robot2) throws InterruptedException {
+	private GameResult go(GameLog log, PlayerInfo player1, PlayerInfo player2, Robot robot1, Robot robot2) throws InterruptedException {
 		
 		//setup the map
 		GameMap initMap, map;
@@ -290,7 +284,8 @@ public class RunGame
 		}
 		
 		//start the engine
-		this.engine = new Engine(map, player1, player2, gui, config.engine);
+		this.engine = new Engine(map, player1, player2, robot1, robot2, gui, config.engine);
+		game = engine.game;
 		
 		if (log != null) {
 			log.start(config);
@@ -309,7 +304,7 @@ public class RunGame
 		robot2.setup(robot2Cfg);
 		
 		if (gui != null) {
-			gui.setPlayerNames(player1.getBot().getRobotPlayerName(), player2.getBot().getRobotPlayerName());
+			gui.setPlayerNames(robot1.getRobotPlayerName(), robot2.getRobotPlayerName());
 		}		
 				
 		//send the bots the info they need to start
@@ -317,24 +312,19 @@ public class RunGame
 		robot1.writeInfo("settings opponent_bot " + player2.getId());
 		robot2.writeInfo("settings your_bot " + player2.getId());
 		robot2.writeInfo("settings opponent_bot " + player1.getId());
-		sendSetupMapInfo(player1.getBot(), initMap);
-		sendSetupMapInfo(player2.getBot(), initMap);
+		sendSetupMapInfo(robot1, initMap);
+		sendSetupMapInfo(robot2, initMap);
 		this.engine.distributeStartingRegions(); //decide the player's starting regions
-		this.engine.recalculateStartingArmies(); //calculate how much armies the players get at the start of the round (depending on owned SuperRegions)
 		this.engine.sendAllInfo();
 		
 		//play the game
-		while(this.engine.winningPlayer() == null && this.engine.getRoundNr() <= config.engine.maxGameRounds)
+		while(this.game.winningPlayer() == null && this.game.getRoundNr() <= config.engine.maxGameRounds)
 		{
 			if (log != null) {
-				log.logComment("Engine", "Round " + this.engine.getRoundNr());
+				log.logComment("Engine", "Round " + this.game.getRoundNr());
 			}
 			this.engine.playRound();
 		}
-
-		fullPlayedGame = this.engine.getFullPlayedGame();
-		player1PlayedGame = this.engine.getPlayer1PlayedGame();
-		player2PlayedGame = this.engine.getPlayer2PlayedGame();
 
 		GameResult result = finish(map, robot1, robot2);
 		
@@ -665,18 +655,18 @@ public class RunGame
 			}
 		}
 		
-		if (engine.winningPlayer() != null) {
-			if (config.playerId1.equals(engine.winningPlayer().getId())) {
+		if (game.winningPlayer() != null) {
+			if (config.playerId1.equals(game.winningPlayer().getId())) {
 				result.winner = Team.PLAYER_1;
 			} else
-			if (config.playerId2.equals(engine.winningPlayer().getId())) {
+			if (config.playerId2.equals(game.winningPlayer().getId())) {
 				result.winner = Team.PLAYER_2;
 			}
 		} else {
 			result.winner = null;
 		}
 		
-		result.round = engine.getRoundNr()-1;
+		result.round = game.getRoundNr()-1;
 		
 		System.out.println(result.getHumanString());
 		
