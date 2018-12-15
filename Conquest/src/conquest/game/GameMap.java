@@ -17,23 +17,23 @@
 
 package conquest.game;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 import conquest.game.world.Continent;
 import conquest.game.world.Region;
 
 public class GameMap {
 	
-	public LinkedList<RegionData> regions;
-	public LinkedList<ContinentData> continents;
+	public ArrayList<RegionData> regions;
+	public ArrayList<ContinentData> continents;
 	
 	public GameMap()
 	{
-		this.regions = new LinkedList<RegionData>();
-		this.continents = new LinkedList<ContinentData>();
+		this.regions = new ArrayList<RegionData>();
+		this.continents = new ArrayList<ContinentData>();
 	}
 	
-	public GameMap(LinkedList<RegionData> regions, LinkedList<ContinentData> continents)
+	public GameMap(ArrayList<RegionData> regions, ArrayList<ContinentData> continents)
 	{
 		this.regions = regions;
 		this.continents = continents;
@@ -97,14 +97,14 @@ public class GameMap {
 	/**
 	 * @return : the list of all Regions in this map
 	 */
-	public LinkedList<RegionData> getRegions() {
+	public ArrayList<RegionData> getRegions() {
 		return regions;
 	}
 	
 	/**
 	 * @return : the list of all Continents in this map
 	 */
-	public LinkedList<ContinentData> getContinents() {
+	public ArrayList<ContinentData> getContinents() {
 		return continents;
 	}
 	
@@ -145,9 +145,9 @@ public class GameMap {
 	}
 	
 	//return all regions owned by given player
-	public LinkedList<RegionData> ownedRegionsByPlayer(PlayerInfo player)
+	public ArrayList<RegionData> ownedRegionsByPlayer(PlayerInfo player)
 	{
-		LinkedList<RegionData> ownedRegions = new LinkedList<RegionData>();
+		ArrayList<RegionData> ownedRegions = new ArrayList<RegionData>();
 		
 		for(RegionData region : this.getRegions())
 			if(region.getPlayerName().equals(player.getId()))
@@ -158,10 +158,10 @@ public class GameMap {
 	
 	//fog of war
 	//return all regions visible to given player
-	public LinkedList<RegionData> visibleRegionsForPlayer(PlayerInfo player)
+	public ArrayList<RegionData> visibleRegionsForPlayer(PlayerInfo player)
 	{
-		LinkedList<RegionData> visibleRegions = new LinkedList<RegionData>();
-		LinkedList<RegionData> ownedRegions = ownedRegionsByPlayer(player);
+		ArrayList<RegionData> visibleRegions = new ArrayList<RegionData>();
+		ArrayList<RegionData> ownedRegions = ownedRegionsByPlayer(player);
 		
 		visibleRegions.addAll(ownedRegions);
 		
@@ -171,22 +171,6 @@ public class GameMap {
 					visibleRegions.add(neighbor);
 
 		return visibleRegions;
-	}
-	
-	public GameMap getVisibleMapCopyForPlayer(PlayerInfo player) {
-		GameMap visibleMap = getMapCopy();
-		LinkedList<RegionData> visibleRegions = visibleRegionsForPlayer(player);
-		
-		for(RegionData region : regions)
-		{
-			if(!visibleRegions.contains(region)){
-				RegionData unknownRegion = visibleMap.getRegion(region.getId());
-				unknownRegion.setPlayerName("unknown");
-				unknownRegion.setArmies(0);
-			}
-		}
-		
-		return visibleMap;		
 	}
 	
 }

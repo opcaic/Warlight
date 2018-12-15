@@ -16,7 +16,7 @@
 //    file that was distributed with this source code.
 package conquest.game;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 import conquest.game.world.Continent;
 import conquest.game.world.Region;
@@ -26,7 +26,7 @@ public class RegionData {
 	
 	private Region region;
 	private int id;
-	private LinkedList<RegionData> neighbors;
+	private ArrayList<RegionData> neighbors;
 	private ContinentData continent;
 	private int armies;
 	private String playerName;
@@ -36,7 +36,7 @@ public class RegionData {
 		this.region = region;
 		this.id = id;
 		this.continent = superRegion;
-		this.neighbors = new LinkedList<RegionData>();
+		this.neighbors = new ArrayList<RegionData>();
 		this.playerName = "unknown";
 		this.armies = 0;
 		if (superRegion != null) {
@@ -49,7 +49,7 @@ public class RegionData {
 		this.region = region;
 		this.id = id;
 		this.continent = superRegion;
-		this.neighbors = new LinkedList<RegionData>();
+		this.neighbors = new ArrayList<RegionData>();
 		this.playerName = playerName;
 		this.armies = armies;
 		
@@ -107,7 +107,7 @@ public class RegionData {
 	/**
 	 * @return A list of this Region's neighboring Regions
 	 */
-	public LinkedList<RegionData> getNeighbors() {
+	public ArrayList<RegionData> getNeighbors() {
 		return neighbors;
 	}
 

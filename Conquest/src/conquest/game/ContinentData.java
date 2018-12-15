@@ -16,7 +16,7 @@
 //    file that was distributed with this source code.
 
 package conquest.game;
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 import conquest.game.world.Continent;
 
@@ -25,14 +25,14 @@ public class ContinentData {
 	private Continent continent;
 	private int id;
 	private int armiesReward;
-	private LinkedList<RegionData> subRegions;
+	private ArrayList<RegionData> subRegions;
 	
 	public ContinentData(Continent continent, int id, int armiesReward)
 	{
 		this.continent = continent;
 		this.id = id;
 		this.armiesReward = armiesReward;
-		subRegions = new LinkedList<RegionData>();
+		subRegions = new ArrayList<RegionData>();
 	}
 	
 	public void addSubRegion(RegionData subRegion)
@@ -46,7 +46,7 @@ public class ContinentData {
 	 */
 	public String ownedByPlayer()
 	{
-		String playerName = subRegions.getFirst().getPlayerName();
+		String playerName = subRegions.get(0).getPlayerName();
 		for(RegionData region : subRegions)
 		{
 			if (!playerName.equals(region.getPlayerName()))
@@ -72,7 +72,7 @@ public class ContinentData {
 	/**
 	 * @return A list with the Regions that are part of this SuperRegion
 	 */
-	public LinkedList<RegionData> getSubRegions() {
+	public ArrayList<RegionData> getSubRegions() {
 		return subRegions;
 	}
 

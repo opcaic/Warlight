@@ -446,7 +446,7 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		updateStats();
 	}
 	
-	public void placeArmies(LinkedList<RegionData> regions, List<PlaceArmiesMove> placeArmiesMoves) {
+	public void placeArmies(ArrayList<RegionData> regions, List<PlaceArmiesMove> placeArmiesMoves) {
 		this.requestFocusInWindow();
 		
 		actionTxt.setText("ARMIES PLACED");

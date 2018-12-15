@@ -18,7 +18,6 @@
 package conquest.bot;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 import conquest.game.RegionData;
 import conquest.game.move.AttackTransferMove;
@@ -67,7 +66,7 @@ public class BotStarter implements Bot
 		String myName = state.getMyPlayerName();
 		int armies = 2;
 		int armiesLeft = state.getStartingArmies();
-		LinkedList<RegionData> visibleRegions = state.getMap().getRegions();
+		ArrayList<RegionData> visibleRegions = state.getMap().getRegions();
 		
 		while(armiesLeft > 0)
 		{

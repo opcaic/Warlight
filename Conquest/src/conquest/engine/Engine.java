@@ -274,7 +274,7 @@ public class Engine {
 	//inform the player about how his visible map looks now
 	private void sendUpdateMapInfo(PlayerInfo player, Robot bot)
 	{
-		LinkedList<RegionData> visibleRegions;
+		ArrayList<RegionData> visibleRegions;
 		if (fullyObservableGame) {
 			visibleRegions = map.regions;
 		} else {
