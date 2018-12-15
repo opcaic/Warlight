@@ -71,9 +71,7 @@ public class RegionData {
 	 */
 	public boolean isNeighbor(RegionData region)
 	{
-		if(neighbors.contains(region))
-			return true;
-		return false;
+		return neighbors.contains(region);
 	}
 
 	/**
@@ -82,9 +80,7 @@ public class RegionData {
 	 */
 	public boolean ownedByPlayer(String playerName)
 	{
-		if(playerName.equals(this.playerName))
-			return true;
-		return false;
+		return playerName.equals(this.playerName);
 	}
 	
 	/**
@@ -143,6 +139,17 @@ public class RegionData {
 	public Continent getContinent() {
 		return region.continent;
 	}
+	
+    public boolean isVisible(PlayerInfo player) {
+        if (ownedByPlayer(player.getId()))
+            return true;
+        
+        for (RegionData s : getNeighbors())
+            if (s.ownedByPlayer(player.getId()))
+                return true;
+        
+        return false;
+    }
 	
 	@Override
 	public String toString() {

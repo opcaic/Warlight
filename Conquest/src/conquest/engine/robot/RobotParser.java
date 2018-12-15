@@ -114,56 +114,23 @@ public class RobotParser {
 	private RegionData parseRegion(String regionId, String input, PlayerInfo player)
 	{
 		int id = -1;
-		RegionData region;
 		
 		try { id = Integer.parseInt(regionId); }
-		catch(Exception e) { errorOut("Region id input incorrect", input, player); return null;}
+		catch(NumberFormatException e) { errorOut("Region id input incorrect", input, player); return null;}
 		
-		region = map.getRegion(id);
-		
-		return region;
+		return map.getRegion(id);
 	}
 	
 	public ArrayList<RegionData> parsePreferredStartingRegions(String input, ArrayList<RegionData> pickableRegions, PlayerInfo player)
 	{
 		ArrayList<RegionData> preferredStartingRegions = new ArrayList<RegionData>();
 
-		try {
-			int nrOfPreferredStartingRegions = 6;
-			String[] split = input.split(" ");
-			
-			for(int i=0; i<nrOfPreferredStartingRegions; i++)
-			{
-				try {
-					RegionData r = parseRegion(split[i], input, player);
-					
-					if(pickableRegions.contains(r))
-					{
-						if(!preferredStartingRegions.contains(r))
-							preferredStartingRegions.add(r);
-						else
-						{
-							errorOut("preferred starting regions: Same region appears more than once", input, player);
-							return null;
-						}
-					}
-					else
-					{
-						errorOut("preferred starting regions: Chosen region is not in the given pickable regions list", input, player);
-						return null;
-					}
-				}
-				catch(Exception e) { //player has not returned enough preferred regions
-					errorOut("preferred starting regions: Player did not return enough preferred starting regions", input, player);
-					return null;
-				}
-			}
-			return preferredStartingRegions;
+		for (String s : input.split(" ")) {
+			RegionData r = parseRegion(s, input, player);
+			if (r != null)
+			    preferredStartingRegions.add(r);
 		}
-		catch(Exception e) {
-			//player.getBot().addToDump("Preferred starting regions input is null");
-			return null;
-		}
+		return preferredStartingRegions;
 	}
 
 	private void errorOut(String error, String input, PlayerInfo player)

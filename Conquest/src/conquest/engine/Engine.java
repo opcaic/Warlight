@@ -27,8 +27,6 @@ import conquest.engine.robot.RobotParser;
 import conquest.game.*;
 import conquest.game.move.AttackTransferMove;
 import conquest.game.move.Move;
-import conquest.game.move.MoveQueue;
-import conquest.game.move.MoveResult;
 import conquest.game.move.PlaceArmiesMove;
 import conquest.view.GUI;
 
@@ -112,8 +110,7 @@ public class Engine {
 	private Robot robot2;
 	private GameMap map;
 	private RobotParser parser;
-	private LinkedList<Move> opponentMovesPlayer1;
-	private LinkedList<Move> opponentMovesPlayer2;
+	private LinkedList<Move> opponentMoves;
 	private GUI gui;
 	
 	private long timeoutMillis;
@@ -146,6 +143,30 @@ public class Engine {
 		parser = new RobotParser(map);
 	}
 	
+    private List<PlaceArmiesMove> placeArmiesMoves(String input, PlayerInfo player) {
+        ArrayList<PlaceArmiesMove> moves = new ArrayList<PlaceArmiesMove>();
+        
+        for (Move move : parser.parseMoves(input, player))
+            if (move instanceof PlaceArmiesMove)
+                moves.add((PlaceArmiesMove) move);
+            else
+                System.err.println("INVALID MOVE: " + move);
+        
+        return moves;
+    }
+
+    private List<AttackTransferMove> attackTransferMoves(String input, PlayerInfo player) {
+        ArrayList<AttackTransferMove> moves = new ArrayList<AttackTransferMove>();
+        
+        for (Move move : parser.parseMoves(input, player))
+            if (move instanceof AttackTransferMove)
+                moves.add((AttackTransferMove) move);
+            else
+                System.err.println("INVALID MOVE: " + move);
+        
+        return moves;
+    }
+
 	public void playRound()
 	{
 		if (gui != null) {
@@ -153,22 +174,35 @@ public class Engine {
 			gui.updateRegions(map.regions);
 		}
 		
-		getMoves(robot1.getPlaceArmiesMoves(timeoutMillis), player1);
-		getMoves(robot2.getPlaceArmiesMoves(timeoutMillis), player2);
+		List<PlaceArmiesMove> placeMoves1 =
+		    placeArmiesMoves(robot1.getPlaceArmiesMoves(timeoutMillis), player1);
 		
-		game.executePlaceArmies(opponentMovesPlayer1, opponentMovesPlayer2);
+        List<PlaceArmiesMove> placeMoves2 =
+            placeArmiesMoves(robot2.getPlaceArmiesMoves(timeoutMillis), player2);
+		
+		game.placeArmies(placeMoves1, placeMoves2, opponentMoves);
 
 		sendUpdateMapInfo(player1, robot1);
 		sendUpdateMapInfo(player2, robot2);
 		
 		if (gui != null) {
-			gui.placeArmies(map.regions, game.lastPlaceArmies);
+	        List<PlaceArmiesMove> legalMoves = new ArrayList<PlaceArmiesMove>();
+
+	        for (PlaceArmiesMove move : placeMoves1)
+	            if (move.getIllegalMove().equals(""))
+	                legalMoves.add(move);
+            
+	        for (PlaceArmiesMove move : placeMoves2)
+                if (move.getIllegalMove().equals(""))
+                    legalMoves.add(move);
+	        
+			gui.placeArmies(map.regions, legalMoves);
 		}
 		
-		getMoves(robot1.getAttackTransferMoves(timeoutMillis), player1);
-		getMoves(robot2.getAttackTransferMoves(timeoutMillis), player2);
+		List<AttackTransferMove> moves1 = attackTransferMoves(robot1.getAttackTransferMoves(timeoutMillis), player1);
+        List<AttackTransferMove> moves2 = attackTransferMoves(robot2.getAttackTransferMoves(timeoutMillis), player2);
 		
-		game.executeAttackTransfer(opponentMovesPlayer1, opponentMovesPlayer2);
+		game.attackTransfer(moves1, moves2, opponentMoves);
 		
 		if (gui != null) {
 			gui.updateAfterRound(map);
@@ -188,22 +222,19 @@ public class Engine {
 		}
 		
 		//get the preferred starting regions from the players
-		ArrayList<RegionData> p1Regions = parser.parsePreferredStartingRegions(
+		List<RegionData> p1Regions = parser.parsePreferredStartingRegions(
 		        robot1.getPreferredStartingArmies(timeoutMillis, pickableRegions), pickableRegions, player1);
-		ArrayList<RegionData> p2Regions = parser.parsePreferredStartingRegions(
+		List<RegionData> p2Regions = parser.parsePreferredStartingRegions(
 		        robot2.getPreferredStartingArmies(timeoutMillis, pickableRegions), pickableRegions, player2);
 		
 		//if the bot did not correctly return his starting regions, get some random ones
-		if(p1Regions == null) {
-			p1Regions = new ArrayList<RegionData>();
+		if(game.validateStartingRegions(p1Regions) != null) {
+			p1Regions = getRandomStartingRegions(pickableRegions);
 		}
-		if(p2Regions == null) {
-			p2Regions = new ArrayList<RegionData>();
+		if(game.validateStartingRegions(p2Regions) != null) {
+		    p2Regions = getRandomStartingRegions(pickableRegions);
 		}
 
-		p1Regions.addAll(getRandomStartingRegions(pickableRegions));
-		p2Regions.addAll(getRandomStartingRegions(pickableRegions));
-		
 		game.distributeRegions(p1Regions, p2Regions);
 		
 		if (gui != null) {
@@ -215,30 +246,9 @@ public class Engine {
 	{
 		List<RegionData> startingRegions = new ArrayList<RegionData>(pickableRegions);
 		Collections.shuffle(startingRegions);
-
-		startingRegions = startingRegions.subList(0,6);
-		return startingRegions;
+		return startingRegions.subList(0,6);
 	}
 	
-	private void getMoves(String movesInput, PlayerInfo player)
-	{
-		ArrayList<Move> moves = parser.parseMoves(movesInput, player);
-		
-		for(Move move : moves)
-		{
-			if (move instanceof PlaceArmiesMove) {
-				PlaceArmiesMove plm = (PlaceArmiesMove) move;
-				game.queuePlaceArmies(plm);
-			} else
-			if (move instanceof AttackTransferMove) {
-				AttackTransferMove atm = (AttackTransferMove) move;
-				game.queueAttackTransfer(atm);
-			} else {
-				System.err.println("INVALID MOVE: " + move);
-			}
-		}
-	}
-
 	public void sendAllInfo()
 	{
 		sendStartingArmiesInfo(player1, robot1);
@@ -246,9 +256,8 @@ public class Engine {
 		sendUpdateMapInfo(player1, robot1);
 		sendUpdateMapInfo(player2, robot2);
 		sendOpponentMovesInfo(player1, robot1);
-		opponentMovesPlayer1.clear();
 		sendOpponentMovesInfo(player2, robot2);
-		opponentMovesPlayer2.clear();
+		opponentMoves.clear();
 	}
 		
 	//inform the player about how much armies he can place at the start next round
@@ -286,27 +295,20 @@ public class Engine {
 	private void sendOpponentMovesInfo(PlayerInfo player, Robot bot)
 	{
 		String opponentMovesString = "opponent_moves ";
-		LinkedList<Move> opponentMoves = new LinkedList<Move>();
-
-		if(player == player1)
-			opponentMoves = opponentMovesPlayer1;
-		else if(player == player2)
-			opponentMoves = opponentMovesPlayer2;
 
 		for(Move move : opponentMoves)
-		{
-			if(move.getIllegalMove().equals(""))
+		    if (!move.getPlayerName().equals(player.getId()) &&  // move was by other player
+			    move.getIllegalMove().equals(""))
 			{
-				try {
+				if (move instanceof PlaceArmiesMove) {
 					PlaceArmiesMove plm = (PlaceArmiesMove) move;
 					opponentMovesString = opponentMovesString.concat(plm.getString() + " ");
 				}
-				catch(Exception e) {
+				else {
 					AttackTransferMove atm = (AttackTransferMove) move;
 					opponentMovesString = opponentMovesString.concat(atm.getString() + " ");					
 				}
 			}
-		}
 		
 		opponentMovesString = opponentMovesString.substring(0, opponentMovesString.length()-1);
 

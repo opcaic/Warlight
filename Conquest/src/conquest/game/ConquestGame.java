@@ -4,20 +4,18 @@ import java.util.*;
 
 import conquest.game.move.AttackTransferMove;
 import conquest.game.move.Move;
-import conquest.game.move.MoveQueue;
 import conquest.game.move.PlaceArmiesMove;
+import conquest.game.world.Region;
 import conquest.view.GUI;
 
 public class ConquestGame {
     GameConfig config;
     GameMap map;
     PlayerInfo player1, player2;
-    int roundNr;
+    int round;
     public ArrayList<RegionData> pickableRegions;
     Random random;
-    private MoveQueue moveQueue;
-    public List<PlaceArmiesMove> lastPlaceArmies;
-    private GUI gui;
+    GUI gui;
     
     static final int nrOfStartingRegions = 3;
     
@@ -27,38 +25,58 @@ public class ConquestGame {
         this.player1 = player1;
         this.player2 = player2;
         this.random = random;
-        roundNr = 1;
+        round = 1;
         this.gui = gui;
 
         initStartingRegions();
     }
 
     public int getRoundNr() {
-        return roundNr;
+        return round;
     }
     
     public void newRound() {
-        roundNr++;
+        round++;
     }
     
     public PlayerInfo getPlayer(String playerName)
     {
         if(player1.getId().equals(playerName))
             return player1;
-        else if(player2.getId().equals(playerName))
+        if(player2.getId().equals(playerName))
             return player2;
-        else
-            return null;
+        return null;
+    }
+    
+    public PlayerInfo otherPlayer(String playerName) {
+        if(player1.getId().equals(playerName))
+            return player2;
+        if(player2.getId().equals(playerName))
+            return player1;
+        return null;
     }
     
     public PlayerInfo winningPlayer()
     {
         if(map.ownedRegionsByPlayer(player1).isEmpty())
             return player2;
-        else if(map.ownedRegionsByPlayer(player2).isEmpty())
+        if(map.ownedRegionsByPlayer(player2).isEmpty())
             return player1;
-        else
-            return null;
+        return null;
+    }
+    
+    //calculate how many armies each player is able to place on the map for the next round
+    public void recalculateStartingArmies()
+    {
+        player1.setArmiesLeft(player1.getArmiesPerTurn());
+        player2.setArmiesLeft(player2.getArmiesPerTurn());
+        
+        for(ContinentData superRegion : map.getContinents())
+        {
+            PlayerInfo player = getPlayer(superRegion.ownedByPlayer());
+            if(player != null)
+                player.setArmiesLeft(player.getArmiesLeft() + superRegion.getArmiesReward());
+        }
     }
     
     void initStartingRegions() {
@@ -84,21 +102,41 @@ public class ConquestGame {
         }
     }
     
-    public void distributeRegions(ArrayList<RegionData> p1Regions, ArrayList<RegionData> p2Regions) {
+    public String validateStartingRegions(List<RegionData> regions) {
+        if (regions.size() < nrOfStartingRegions * 2)
+            return "not return enough preferred starting regions";
+        
+        for (int i = 0 ; i < regions.size() ; ++i) {
+            RegionData r = regions.get(i);
+            if (!pickableRegions.contains(r))
+                return "chosen region is not in the given pickable regions list";
+            
+            for (int j = i + 1 ; j < regions.size() ; ++j)
+                if (r == regions.get(j))
+                    return "same starting region appears more than once";
+        }
+        
+        return null;
+    }
+    
+    public void distributeRegions(List<RegionData> p1Regions, List<RegionData> p2Regions) {
+        String s = validateStartingRegions(p1Regions);
+        if (s != null) throw new Error(s);
+        s = validateStartingRegions(p2Regions);
+        if (s != null) throw new Error(s);
+        
         ArrayList<RegionData> givenP1Regions = new ArrayList<RegionData>();
         ArrayList<RegionData> givenP2Regions = new ArrayList<RegionData>();
 
-        int i1, i2, n;
-        i1 = 0; i2 = 0;
-        n = 0;
+        int i1 = 0, i2 = 0, n = 0;
 
         while(n < nrOfStartingRegions) {
             RegionData p1Region = p1Regions.get(i1);
             RegionData p2Region = p2Regions.get(i2);
             
-            if(givenP2Regions.contains(p1Region)) {//preferred region for player1 is not given to player2 already
+            if(givenP2Regions.contains(p1Region)) {//preferred region for player1 is given to player2 already
                 i1++;
-            } else if(givenP1Regions.contains(p2Region)) { //preferred region for player2 is not given to player1 already
+            } else if(givenP1Regions.contains(p2Region)) {
                 i2++;
             } else if(p1Region != p2Region) {
                 p1Region.setPlayerName(player1.getId());
@@ -107,8 +145,7 @@ public class ConquestGame {
                 givenP2Regions.add(p2Region);
                 n++; i1++; i2++;
             } else { //random player gets the region if same preference
-                double rand = random.nextDouble();
-                if(rand < 0.5) {
+                if(random.nextBoolean()) {
                     i1++;
                 } else {
                     i2++;
@@ -119,99 +156,45 @@ public class ConquestGame {
         recalculateStartingArmies();
     }
     
-    //calculate how many armies each player is able to place on the map for the next round
-    public void recalculateStartingArmies()
-    {
-        player1.setArmiesLeft(player1.getArmiesPerTurn());
-        player2.setArmiesLeft(player2.getArmiesPerTurn());
-        
-        for(ContinentData superRegion : map.getContinents())
-        {
-            PlayerInfo player = getPlayer(superRegion.ownedByPlayer());
-            if(player != null)
-                player.setArmiesLeft(player.getArmiesLeft() + superRegion.getArmiesReward());
-        }
-    }
-    
-    public void queuePlaceArmies(PlaceArmiesMove plm)
-    {
-        RegionData region = plm.getRegion();
-        PlayerInfo player = getPlayer(plm.getPlayerName());
-        int armies = plm.getArmies();
-        
-        //check legality
-        if(region.ownedByPlayer(player.getId()))
-        {
-            if(armies < 1)
-            {
-                plm.setIllegalMove(" place-armies " + "cannot place less than 1 army");
-            }
-            else
-            {
-                if(armies > player.getArmiesLeft()) //player wants to place more armies than he has left
-                    plm.setArmies(player.getArmiesLeft()); //place all armies he has left
-                if(player.getArmiesLeft() <= 0)
-                    plm.setIllegalMove(" place-armies " + "no armies left to place");
-                
-                player.setArmiesLeft(player.getArmiesLeft() - plm.getArmies());
-            }
-        }
-        else
-            plm.setIllegalMove(plm.getRegion().getId() + " place-armies " + " not owned");
-
-        moveQueue.addMove(plm);
-    }
-    
-    public void executePlaceArmies(LinkedList<Move> opponentMovesPlayer1,
-                                   LinkedList<Move> opponentMovesPlayer2)
+    void placeArmies(List<PlaceArmiesMove> moves, LinkedList<Move> opponentMoves)
     {       
-        List<PlaceArmiesMove> legalMoves = new ArrayList<PlaceArmiesMove>();
-        
-        for(PlaceArmiesMove move : moveQueue.placeArmiesMoves)
+        for(PlaceArmiesMove move : moves)
         {
-            if(move.getIllegalMove().equals("")) {
-                move.getRegion().setArmies(move.getRegion().getArmies() + move.getArmies());
-                legalMoves.add(move);
-            }
+            RegionData region = move.getRegion();
+            PlayerInfo player = getPlayer(move.getPlayerName());
+            int armies = move.getArmies();
             
-            if(map.visibleRegionsForPlayer(player1).contains(move.getRegion()))
-            {
-                if(move.getPlayerName().equals(player2.getId()))
-                    opponentMovesPlayer1.add(move); //for the opponent_moves output
+            if (!region.ownedByPlayer(player.getId()))
+                move.setIllegalMove(move.getRegion().getId() + " not owned");
+            else if (armies < 1)
+                move.setIllegalMove("cannot place less than 1 army");
+            else if (player.getArmiesLeft() <= 0)
+                move.setIllegalMove("no armies left to place");
+            else {
+                if(armies > player.getArmiesLeft()) //player wants to place more armies than he has left
+                    move.setArmies(player.getArmiesLeft()); //place all armies he has left
+                
+                player.setArmiesLeft(player.getArmiesLeft() - move.getArmies());
+                move.getRegion().setArmies(move.getRegion().getArmies() + move.getArmies());
+
+                if(map.visibleRegionsForPlayer(player1).contains(move.getRegion()))
+                {
+                    if(move.getPlayerName().equals(player2.getId()))
+                        opponentMoves.add(move); //for the opponent_moves output
+                }
+                if(map.visibleRegionsForPlayer(player2).contains(move.getRegion()))
+                {
+                    if(move.getPlayerName().equals(player1.getId()))
+                        opponentMoves.add(move); //for the opponent_moves output
+                }
             }
-            if(map.visibleRegionsForPlayer(player2).contains(move.getRegion()))
-            {
-                if(move.getPlayerName().equals(player1.getId()))
-                    opponentMovesPlayer2.add(move); //for the opponent_moves output
-            }
-        }
-        
-        if (gui != null) {
-            lastPlaceArmies = legalMoves;
         }
     }
     
-    public void queueAttackTransfer(AttackTransferMove atm)
-    {
-        RegionData fromRegion = atm.getFromRegion();
-        RegionData toRegion = atm.getToRegion();
-        PlayerInfo player = getPlayer(atm.getPlayerName());
-        int armies = atm.getArmies();
-        
-        //check legality
-        if(fromRegion.ownedByPlayer(player.getId()))
-        {
-            if(fromRegion.isNeighbor(toRegion))
-            {
-                if(armies < 1)
-                    atm.setIllegalMove(" attack/transfer " + "cannot use less than 1 army");
-            }
-            else
-                atm.setIllegalMove(atm.getToRegion().getId() + " attack/transfer " + "not a neighbor");
-        }
-        else
-            atm.setIllegalMove(atm.getFromRegion().getId() + " attack/transfer " + "not owned");
-        moveQueue.addMove(atm);
+    public void placeArmies(List<PlaceArmiesMove> moves1, List<PlaceArmiesMove> moves2,
+                            LinkedList<Move> opponentMoves) {
+        placeArmies(moves1, opponentMoves);
+        placeArmies(moves2, opponentMoves);
     }
     
     public static enum FightSide {
@@ -252,10 +235,9 @@ public class ConquestGame {
                 winner = FightSide.DEFENDER;
             }
         }
-        
     }
 
-    public static FightResult doOriginalAttack(Random random, int attackingArmies, int defendingArmies, double defenderDestroyedChance, double attackerDestroyedChance) {
+    static FightResult doOriginalAttack(Random random, int attackingArmies, int defendingArmies, double defenderDestroyedChance, double attackerDestroyedChance) {
         FightResult result = new FightResult();
         
         for(int t=1; t<=attackingArmies; t++) //calculate how much defending armies are destroyed
@@ -274,7 +256,7 @@ public class ConquestGame {
         return result;
     }
     
-    public static FightResult doContinualAttack(Random random,
+    static FightResult doContinualAttack(Random random,
             int attackingArmies, int defendingArmies,
             double defenderDestroyedChance, double attackerDestroyedChance) {
         
@@ -294,11 +276,15 @@ public class ConquestGame {
         return result;
     }
 
-    public static FightResult doAttack_ORIGINAL_A60_D70(Random random, int attackingArmies, int defendingArmies) {
+    static FightResult doAttack_ORIGINAL_A60_D70(
+            Random random, int attackingArmies, int defendingArmies) {
+        
         return doOriginalAttack(random, attackingArmies, defendingArmies, 0.6, 0.7);
     }
     
-    public static FightResult doAttack_CONTINUAL_1_1_A60_D70(Random random, int attackingArmies, int defendingArmies) {
+    static FightResult doAttack_CONTINUAL_1_1_A60_D70(
+            Random random, int attackingArmies, int defendingArmies) {
+        
         return doContinualAttack(random, attackingArmies, defendingArmies, 0.6, 0.7);
     }
     
@@ -323,8 +309,12 @@ public class ConquestGame {
         FightResult result = null;
         
         switch (config.fight) {
-        case ORIGINAL_A60_D70:      result = doAttack_ORIGINAL_A60_D70(     random, attackingArmies, defendingArmies); break;
-        case CONTINUAL_1_1_A60_D70: result = doAttack_CONTINUAL_1_1_A60_D70(random, attackingArmies, defendingArmies); break;
+        case ORIGINAL_A60_D70:
+            result = doAttack_ORIGINAL_A60_D70(random, attackingArmies, defendingArmies);
+            break;
+        case CONTINUAL_1_1_A60_D70:
+            result = doAttack_CONTINUAL_1_1_A60_D70(random, attackingArmies, defendingArmies);
+            break;
         }
         
         switch (result.winner) {
@@ -346,119 +336,95 @@ public class ConquestGame {
         }
     }
 
-    public void executeAttackTransfer(LinkedList<Move> opponentMovesPlayer1,
-                                            LinkedList<Move> opponentMovesPlayer2)
-    {    
-        LinkedList<RegionData> visibleRegionsPlayer1Map = map.visibleRegionsForPlayer(player1);
-        LinkedList<RegionData> visibleRegionsPlayer2Map = map.visibleRegionsForPlayer(player2);
-        LinkedList<RegionData> visibleRegionsPlayer1OldMap = visibleRegionsPlayer1Map;
-        LinkedList<RegionData> visibleRegionsPlayer2OldMap = visibleRegionsPlayer2Map;
-        ArrayList<ArrayList<Integer>> usedRegions = new ArrayList<ArrayList<Integer>>();
-        for(int i = 0; i<=42; i++) {
-            usedRegions.add(new ArrayList<Integer>());
-        }
-        GameMap oldMap = map.getMapCopy();
+    void validateAttackTransfers(PlayerInfo player, List<AttackTransferMove> moves)
+    {
+        int[] totalFrom = new int[Region.LAST_ID + 1];
+        
+        for (int i = 0 ; i < moves.size() ; ++i) {
+            AttackTransferMove move = moves.get(i);
+            RegionData fromRegion = move.getFromRegion();
+            RegionData toRegion = move.getToRegion();
 
-        int moveNr = 1;
-        Boolean previousMoveWasIllegal = false;
-        String previousMovePlayer = "";
-        while(moveQueue.hasNextAttackTransferMove())
-        {   
-            AttackTransferMove move = moveQueue.getNextAttackTransferMove(
-                    moveNr, previousMovePlayer, previousMoveWasIllegal);
+            if (!move.getPlayerName().equals(player.getId()))
+                move.setIllegalMove("move by wrong player");
+            else if (!fromRegion.ownedByPlayer(player.getId()))
+                move.setIllegalMove(fromRegion.getId() + " attack/transfer not owned");
+            else if (!fromRegion.isNeighbor(toRegion))
+                move.setIllegalMove(toRegion.getId() + " attack/transfer not a neighbor");
+            else if (move.getArmies() < 1)
+                move.setIllegalMove("attack/transfer cannot use less than 1 army");
+            else if (totalFrom[fromRegion.getId()] + move.getArmies() >= fromRegion.getArmies())
+                move.setIllegalMove(fromRegion.getId() +
+                        " attack/transfer has used all available armies");
+            else
+                for (int j = 0 ; j < i ; ++j) {
+                    AttackTransferMove n = moves.get(j);
+                    if (n.getFromRegion() == fromRegion && n.getToRegion() == toRegion) {
+                        move.setIllegalMove(fromRegion.getId() +
+                                " attack/transfer has already attacked/transfered to this region");
+                        break;
+                    }
+                }
+        }
+    }
+    
+    public void attackTransfer(List<AttackTransferMove> moves1, List<AttackTransferMove> moves2,
+                               List<Move> opponentMoves) {
+        validateAttackTransfers(player1, moves1);
+        validateAttackTransfers(player2, moves2);
+        List<List<AttackTransferMove>> moves = List.of(moves1, moves2);
+        
+        int count = 0;
+        int turn = random.nextInt(2);   // current player to move (0 or 1)
+        int[] index = new int[2];
+        
+        while(index[0] < moves.get(0).size() || index[1] < moves.get(1).size())
+        {
+            if (index[turn] >= moves.get(turn).size())  // out of moves
+                turn = 1 - turn;
+            AttackTransferMove move = moves.get(turn).get(index[turn]++);
             
             if(move.getIllegalMove().equals("")) //the move is legal
             {
                 RegionData fromRegion = move.getFromRegion();
-                RegionData oldFromRegion = oldMap.getRegion(move.getFromRegion().getId());
                 RegionData toRegion = move.getToRegion();
                 PlayerInfo player = getPlayer(move.getPlayerName());
                 
-                //check if the fromRegion still belongs to this player
-                if(fromRegion.ownedByPlayer(player.getId())) 
-                {
-                    //between two regions there can only be attacked/transfered once
-                    if(!usedRegions.get(fromRegion.getId()).contains(toRegion.getId())) 
-                    {
-                        if(oldFromRegion.getArmies() > 1) //there are still armies that can be used
-                        {
-                            //not enough armies on fromRegion at the start of the round?
-                            if(oldFromRegion.getArmies() < fromRegion.getArmies() &&
-                                    oldFromRegion.getArmies() - 1 < move.getArmies()) 
-                                move.setArmies(oldFromRegion.getArmies() - 1); //move the maximal number.
-                            else //not enough armies on fromRegion currently?
-                                if(oldFromRegion.getArmies() >= fromRegion.getArmies() &&
-                                       fromRegion.getArmies() - 1 < move.getArmies()) 
-                                    move.setArmies(fromRegion.getArmies() - 1); //move the maximal number.
-
-                            //update oldFromRegion so new armies cannot be used yet
-                            oldFromRegion.setArmies(oldFromRegion.getArmies() - move.getArmies()); 
-
-                            if(toRegion.ownedByPlayer(player.getId())) //transfer
-                            {
-                                if(fromRegion.getArmies() > 1)
-                                {
-                                    if (gui != null) {
-                                        gui.transfer(move);
-                                    }
-                                    fromRegion.setArmies(fromRegion.getArmies() - move.getArmies());
-                                    toRegion.setArmies(toRegion.getArmies() + move.getArmies());
-                                    usedRegions.get(fromRegion.getId()).add(toRegion.getId());
-                                }
-                                else
-                                    move.setIllegalMove(move.getFromRegion().getId() + " transfer only has 1 army");
-                            }
-                            else //attack
-                            {
-                                if (gui != null) {
-                                    gui.attack(move);
-                                }
-                                doAttack(move);
-                                usedRegions.get(fromRegion.getId()).add(toRegion.getId());
-                            }
-                        }
-                        else
-                            move.setIllegalMove(move.getFromRegion().getId() +
-                                    " attack/transfer has used all available armies");
-                    }
-                    else
-                        move.setIllegalMove(move.getFromRegion().getId() +
-                                " attack/transfer has already attacked/transfered to this region");
-                }
-                else
+                if (!fromRegion.ownedByPlayer(player.getId()))
                     move.setIllegalMove(move.getFromRegion().getId() + " attack/transfer was taken this round");
-            }
+                else if (fromRegion.getArmies() <= 1)
+                    move.setIllegalMove(move.getFromRegion().getId() + " attack/transfer only has 1 army");
+                else {
+                    move.setArmies(Math.min(move.getArmies(), fromRegion.getArmies() - 1));
 
-            visibleRegionsPlayer1Map = map.visibleRegionsForPlayer(player1);
-            visibleRegionsPlayer2Map = map.visibleRegionsForPlayer(player2);
-            
-            if(visibleRegionsPlayer1Map.contains(move.getFromRegion()) || visibleRegionsPlayer1Map.contains(move.getToRegion()) ||
-                    visibleRegionsPlayer1OldMap.contains(move.getToRegion()))
-            {
-                if(move.getPlayerName().equals(player2.getId()))
-                    opponentMovesPlayer1.add(move); //for the opponent_moves output
+                    PlayerInfo other = otherPlayer(move.getPlayerName());
+                    if (move.getFromRegion().isVisible(other) || move.getToRegion().isVisible(other))
+                        opponentMoves.add(move);
+                   
+                    if(toRegion.ownedByPlayer(player.getId())) //transfer
+                    {
+                        if (gui != null) {
+                            gui.transfer(move);
+                        }
+                        fromRegion.setArmies(fromRegion.getArmies() - move.getArmies());
+                        toRegion.setArmies(toRegion.getArmies() + move.getArmies());
+                    }
+                    else //attack
+                    {
+                        if (gui != null) {
+                            gui.attack(move);
+                        }
+                        doAttack(move);
+                    }
+                    
+                    ++count;
+                    if (index[1 - turn] < moves.get(1 - turn).size())  // other player still has moves
+                        if (count % 2 == 0)
+                            turn = random.nextInt(2);
+                        else
+                            turn = 1 - turn;
+                }
             }
-            if(visibleRegionsPlayer2Map.contains(move.getFromRegion()) || visibleRegionsPlayer2Map.contains(move.getToRegion()) ||
-                    visibleRegionsPlayer2OldMap.contains(move.getToRegion()))
-            {
-                if(move.getPlayerName().equals(player1.getId()))
-                    opponentMovesPlayer2.add(move); //for the opponent_moves output
-            }
-            
-            visibleRegionsPlayer1OldMap = visibleRegionsPlayer1Map;
-            visibleRegionsPlayer2OldMap = visibleRegionsPlayer2Map;
-
-            //set some stuff to know what next move to get
-            if(move.getIllegalMove().equals("")) {
-                previousMoveWasIllegal = false;
-                moveNr++;
-            }
-            else {
-                previousMoveWasIllegal = true;
-            }
-            previousMovePlayer = move.getPlayerName();
-            
         }
-        moveQueue.clear();
     }
 }

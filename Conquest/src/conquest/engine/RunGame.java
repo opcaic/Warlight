@@ -382,14 +382,6 @@ public class RunGame
 		
 		// INIT SUPER REGIONS
 
-//		ORIGINAL CODE		
-//		SuperRegion northAmerica = new SuperRegion(1, 5);
-//		SuperRegion southAmerica = new SuperRegion(2, 2);
-//		SuperRegion europe       = new SuperRegion(3, 5);
-//		SuperRegion afrika       = new SuperRegion(4, 3);
-//		SuperRegion azia         = new SuperRegion(5, 7);
-//		SuperRegion australia    = new SuperRegion(6, 2);
-		
 		Map<Continent, ContinentData> continents = new TreeMap<Continent, ContinentData>(new Comparator<Continent>() {
 			@Override
 			public int compare(Continent o1, Continent o2) {
@@ -403,55 +395,6 @@ public class RunGame
 		}
 		
 		// INIT REGIONS
-
-//		ORIGINAL CODE
-//		Region region1 = new Region(1, northAmerica);
-//		Region region2 = new Region(2, northAmerica);
-//		Region region3 = new Region(3, northAmerica);
-//		Region region4 = new Region(4, northAmerica);
-//		Region region5 = new Region(5, northAmerica);
-//		Region region6 = new Region(6, northAmerica);
-//		Region region7 = new Region(7, northAmerica);
-//		Region region8 = new Region(8, northAmerica);
-//		Region region9 = new Region(9, northAmerica);
-//		
-//		Region region10 = new Region(10, southAmerica);
-//		Region region11 = new Region(11, southAmerica);
-//		Region region12 = new Region(12, southAmerica);
-//		Region region13 = new Region(13, southAmerica);
-//		
-//		Region region14 = new Region(14, europe);
-//		Region region15 = new Region(15, europe);
-//		Region region16 = new Region(16, europe);
-//		Region region17 = new Region(17, europe);
-//		Region region18 = new Region(18, europe);
-//		Region region19 = new Region(19, europe);
-//		Region region20 = new Region(20, europe);
-//		
-//		Region region21 = new Region(21, afrika);
-//		Region region22 = new Region(22, afrika);
-//		Region region23 = new Region(23, afrika);
-//		Region region24 = new Region(24, afrika);
-//		Region region25 = new Region(25, afrika);
-//		Region region26 = new Region(26, afrika);
-//		
-//		Region region27 = new Region(27, azia);
-//		Region region28 = new Region(28, azia);
-//		Region region29 = new Region(29, azia);
-//		Region region30 = new Region(30, azia);
-//		Region region31 = new Region(31, azia);
-//		Region region32 = new Region(32, azia);
-//		Region region33 = new Region(33, azia);
-//		Region region34 = new Region(34, azia);
-//		Region region35 = new Region(35, azia);
-//		Region region36 = new Region(36, azia);
-//		Region region37 = new Region(37, azia);
-//		Region region38 = new Region(38, azia);
-//		
-//		Region region39 = new Region(39, australia);
-//		Region region40 = new Region(40, australia);
-//		Region region41 = new Region(41, australia);
-//		Region region42 = new Region(42, australia);
 		
 		Map<Region, RegionData> regions = new TreeMap<Region, RegionData>(new Comparator<Region>() {
 			@Override
@@ -467,46 +410,6 @@ public class RunGame
 		
 		// INIT NEIGHBOURS
 		
-//		ORIGINAL CODE
-//		region1.addNeighbor(region2);  region1.addNeighbor(region4);  region1.addNeighbor(region30);
-//		region2.addNeighbor(region4);  region2.addNeighbor(region3);  region2.addNeighbor(region5);
-//		region3.addNeighbor(region5);  region3.addNeighbor(region6);  region3.addNeighbor(region14);
-//		region4.addNeighbor(region5);  region4.addNeighbor(region7);
-//		region5.addNeighbor(region6);  region5.addNeighbor(region7);  region5.addNeighbor(region8);  
-//		region6.addNeighbor(region8);
-//		region7.addNeighbor(region8);  region7.addNeighbor(region9);
-//		region8.addNeighbor(region9);
-//		region9.addNeighbor(region10);
-//		region10.addNeighbor(region11);region10.addNeighbor(region12);
-//		region11.addNeighbor(region12);region11.addNeighbor(region13);
-//		region12.addNeighbor(region13);region12.addNeighbor(region21);
-//		region14.addNeighbor(region15);region14.addNeighbor(region16);
-//		region15.addNeighbor(region16);region15.addNeighbor(region18);
-//		region15.addNeighbor(region19);region16.addNeighbor(region17);
-//		region17.addNeighbor(region19);region17.addNeighbor(region20);region17.addNeighbor(region27);region17.addNeighbor(region32);region17.addNeighbor(region36);
-//		region18.addNeighbor(region19);region18.addNeighbor(region20);region18.addNeighbor(region21);
-//		region19.addNeighbor(region20);
-//		region20.addNeighbor(region21);region20.addNeighbor(region22);region20.addNeighbor(region36);
-//		region21.addNeighbor(region22);region21.addNeighbor(region23);region21.addNeighbor(region24);
-//		region22.addNeighbor(region23);region22.addNeighbor(region36);
-//		region23.addNeighbor(region24);region23.addNeighbor(region25);region23.addNeighbor(region26);region23.addNeighbor(region36);
-//		region24.addNeighbor(region25);
-//		region25.addNeighbor(region26);
-//		region27.addNeighbor(region28);region27.addNeighbor(region32);region27.addNeighbor(region33);		
-//		region28.addNeighbor(region29);region28.addNeighbor(region31);region28.addNeighbor(region33);region28.addNeighbor(region34);
-//		region29.addNeighbor(region30);region29.addNeighbor(region31);
-//		region30.addNeighbor(region31);region30.addNeighbor(region34);region30.addNeighbor(region35);
-//		region31.addNeighbor(region34);
-//		region32.addNeighbor(region33);region32.addNeighbor(region36);region32.addNeighbor(region37);
-//		region33.addNeighbor(region34);region33.addNeighbor(region37);region33.addNeighbor(region38);
-//		region34.addNeighbor(region35);
-//		region36.addNeighbor(region37);
-//		region37.addNeighbor(region38);
-//		region38.addNeighbor(region39);
-//		region39.addNeighbor(region40);region39.addNeighbor(region41);
-//		region40.addNeighbor(region41);region40.addNeighbor(region42);
-//		region41.addNeighbor(region42);
-		
 		for (Region regionName : Region.values()) {
 			RegionData region = regions.get(regionName);
 			for (Region neighbour : regionName.getForwardNeighbours()) {
@@ -516,36 +419,12 @@ public class RunGame
 		
 		// ADD REGIONS TO THE MAP
 		
-//		ORIGINAL CODE		
-//		map.add(region1); map.add(region2); map.add(region3);
-//		map.add(region4); map.add(region5); map.add(region6);
-//		map.add(region7); map.add(region8); map.add(region9);
-//		map.add(region10); map.add(region11); map.add(region12);
-//		map.add(region13); map.add(region14); map.add(region15);
-//		map.add(region16); map.add(region17); map.add(region18);
-//		map.add(region19); map.add(region20); map.add(region21);
-//		map.add(region22); map.add(region23); map.add(region24);
-//		map.add(region25); map.add(region26); map.add(region27);
-//		map.add(region28); map.add(region29); map.add(region30);
-//		map.add(region31); map.add(region32); map.add(region33);
-//		map.add(region34); map.add(region35); map.add(region36);
-//		map.add(region37); map.add(region38); map.add(region39);
-//		map.add(region40); map.add(region41); map.add(region42);
-		
 		for (RegionData region : regions.values()) {
 			map.add(region);
 		}
 		
 		// ADD SUPER REGIONS TO THE MAP
 
-//		ORIGINAL CODE	
-//		map.add(northAmerica);
-//		map.add(southAmerica);
-//		map.add(europe);
-//		map.add(afrika);
-//		map.add(azia);
-//		map.add(australia);
-		
 		for (ContinentData superRegion : continents.values()) {
 			map.add(superRegion);
 		}
