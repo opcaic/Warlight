@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import conquest.bot.state.GameState.RegionState;
 import conquest.game.world.Region;
 import conquest.view.GUI;
 

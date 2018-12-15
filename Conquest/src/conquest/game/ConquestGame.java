@@ -89,9 +89,10 @@ public class ConquestGame {
             int nrOfRegions = superRegion.getSubRegions().size();
             while(regionsAdded < 2)
             {
-                double rand = random.nextDouble();
-                int randomRegionId = (int) (rand*nrOfRegions);
-                RegionData randomRegion = superRegion.getSubRegions().get(randomRegionId); //get one random subregion from superRegion
+                //get one random subregion from superRegion
+                int randomRegionId = random.nextInt(nrOfRegions);
+                
+                RegionData randomRegion = superRegion.getSubRegions().get(randomRegionId);
                 if(!pickableRegions.contains(randomRegion))
                 {
                     pickableRegions.add(randomRegion);

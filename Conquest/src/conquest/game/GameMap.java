@@ -81,7 +81,8 @@ public class GameMap {
 		}
 		for(RegionData r : regions) //copy regions
 		{
-			RegionData newRegion = new RegionData(Region.forId(r.getId()), r.getId(), newMap.getContinent(r.getContinentData().getId()), r.getPlayerName(), r.getArmies());
+			RegionData newRegion = new RegionData(Region.forId(r.getId()), r.getId(),
+			        newMap.getContinent(r.getContinentData().getId()), r.getPlayerName(), r.getArmies());
 			newMap.add(newRegion);
 		}
 		for(RegionData r : regions) //add neighbors to copied regions

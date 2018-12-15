@@ -1,6 +1,5 @@
 package conquest.bot.state;
 
-import conquest.bot.state.GameState.RegionState;
 import conquest.game.world.Region;
 
 public class MoveCommand implements ICommand {

@@ -6,7 +6,6 @@ import java.util.*;
 import conquest.bot.BotParser;
 import conquest.bot.fight.FightSimulation.FightAttackersResults;
 import conquest.bot.state.*;
-import conquest.bot.state.GameState.RegionState;
 import conquest.engine.Engine.FightMode;
 import conquest.engine.RunGame;
 import conquest.engine.RunGame.Config;
