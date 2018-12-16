@@ -1,8 +1,5 @@
-package conquest.bot.state.compact;
+package conquest.bot.state;
 
-import conquest.bot.state.ContinentState;
-import conquest.bot.state.GameState;
-import conquest.bot.state.RegionState;
 import conquest.game.Player;
 import conquest.game.world.Continent;
 import conquest.game.world.Region;

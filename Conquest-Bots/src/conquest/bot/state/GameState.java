@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import conquest.bot.BotState;
-import conquest.bot.state.compact.GameStateCompact;
 import conquest.game.*;
 import conquest.game.world.Continent;
 import conquest.game.world.Region;
