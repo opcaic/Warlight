@@ -59,7 +59,7 @@ public class RunGame
 			
 			ReplayHandler replay = new ReplayHandler(replayFile);
 			
-			this.config.engine = replay.getConfig().engine;
+			this.config.game = replay.getConfig().game;
 			
 			PlayerInfo player1, player2;
 			Robot robot1, robot2;
@@ -68,8 +68,8 @@ public class RunGame
 			robot1 = new IORobot(replay);
 			robot2 = new IORobot(replay);
 					
-			player1 = new PlayerInfo(config.playerId1, config.player1Name, config.engine.startingArmies);
-			player2 = new PlayerInfo(config.playerId2, config.player2Name, config.engine.startingArmies);
+			player1 = new PlayerInfo(config.playerId1, config.player1Name, config.game.startingArmies);
+			player2 = new PlayerInfo(config.playerId2, config.player2Name, config.game.startingArmies);
 			
 			return go(null, player1, player2, robot1, robot2);
 		} catch (Exception e) {
@@ -94,8 +94,8 @@ public class RunGame
 			robot1 = setupRobot(config.playerId1, config.bot1Init);
 			robot2 = setupRobot(config.playerId2, config.bot2Init);
 					
-			player1 = new PlayerInfo(config.playerId1, config.player1Name, config.engine.startingArmies);
-			player2 = new PlayerInfo(config.playerId2, config.player2Name, config.engine.startingArmies);
+			player1 = new PlayerInfo(config.playerId1, config.player1Name, config.game.startingArmies);
+			player2 = new PlayerInfo(config.playerId2, config.player2Name, config.game.startingArmies);
 						
 			return go(log, player1, player2, robot1, robot2);
 		} catch (Exception e) {
@@ -123,9 +123,11 @@ public class RunGame
 			}
 		}
 		
+		game = new ConquestGame(config.game, map, player1, player2, gui);
+		
 		//start the engine
-		this.engine = new Engine(map, player1, player2, robot1, robot2, gui, config.engine);
-		game = engine.game;
+		this.engine = new Engine(game, map, player1, player2, robot1, robot2, gui,
+		                         config.botCommandTimeoutMillis);
 		
 		if (log != null) {
 			log.start(config);
@@ -134,11 +136,11 @@ public class RunGame
 		// setup robots
 		RobotConfig robot1Cfg =
 			new RobotConfig(player1.getId(), player1.getName(), Team.PLAYER_1,
-				            config.engine.botCommandTimeoutMillis, log, config.logToConsole, gui);
+				            config.botCommandTimeoutMillis, log, config.logToConsole, gui);
 		
 		RobotConfig robot2Cfg =
 			new RobotConfig(player2.getId(), player2.getName(), Team.PLAYER_2,
-					        config.engine.botCommandTimeoutMillis, log, config.logToConsole, gui);
+					        config.botCommandTimeoutMillis, log, config.logToConsole, gui);
 				
 		robot1.setup(robot1Cfg);
 		robot2.setup(robot2Cfg);
@@ -154,16 +156,16 @@ public class RunGame
 		robot2.writeInfo("settings opponent_bot " + player1.getId());
 		sendSetupMapInfo(robot1, initMap);
 		sendSetupMapInfo(robot2, initMap);
-		this.engine.distributeStartingRegions(); //decide the player's starting regions
-		this.engine.sendAllInfo();
+		engine.distributeStartingRegions(); //decide the player's starting regions
+		engine.sendAllInfo();
 		
 		//play the game
-		while(this.game.winningPlayer() == null && this.game.getRoundNr() <= config.engine.maxGameRounds)
+		while(game.winningPlayer() == null && game.getRoundNr() <= config.game.maxGameRounds)
 		{
 			if (log != null) {
-				log.logComment("Engine", "Round " + this.game.getRoundNr());
+				log.logComment("Engine", "Round " + game.getRoundNr());
 			}
-			this.engine.playRound();
+			engine.playRound();
 		}
 
 		GameResult result = finish(map, robot1, robot2);
@@ -397,9 +399,9 @@ public class RunGame
 		//config.bot2Init = "process:java -cp bin conquest.bot.BotStarter";
 		//config.bot2Init = "dir;process:c:/my_bot/;java -cp bin conquest.bot.BotStarter";
 		
-		config.engine.botCommandTimeoutMillis = 24*60*60*1000;
+		config.botCommandTimeoutMillis = 24*60*60*1000;
 		
-		config.engine.maxGameRounds = 100;
+		config.game.maxGameRounds = 100;
 		
 		// visualize the map, if turned off, the simulation would run headless 
 		config.visualize = true;

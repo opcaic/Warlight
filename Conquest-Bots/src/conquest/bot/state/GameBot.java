@@ -5,23 +5,16 @@ import java.util.List;
 
 import conquest.bot.Bot;
 import conquest.bot.BotState;
-import conquest.bot.map.FloydWarshall;
 import conquest.game.RegionData;
 import conquest.game.move.AttackTransferMove;
 import conquest.game.move.PlaceArmiesMove;
 import conquest.game.world.Region;
 
 public abstract class GameBot implements Bot {
-	
-	protected FloydWarshall fw;
-	
-	protected BotState botState;
+
+    protected BotState botState;
 	
 	protected GameState state;
-	
-	public GameBot() {
-		this.fw = new FloydWarshall();
-	}
 	
 	/**
 	 * Overrides bot's internal game {@link #state}.

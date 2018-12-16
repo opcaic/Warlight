@@ -95,11 +95,11 @@ public class MyBot extends GameBot
 		config.bot2Init = "internal:conquest.bot.custom.AggressiveBot";
 		//config.bot2Init = "human";
 		
-		config.engine.botCommandTimeoutMillis = 20 * 1000;
+		config.botCommandTimeoutMillis = 20 * 1000;
 		
-		config.engine.maxGameRounds = 200;
+		config.game.maxGameRounds = 200;
 		
-		config.engine.fight = FightMode.CONTINUAL_1_1_A60_D70;
+		config.game.fight = FightMode.CONTINUAL_1_1_A60_D70;
 		
 		config.visualize = true;
 		

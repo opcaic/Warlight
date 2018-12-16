@@ -19,9 +19,7 @@ package conquest.engine;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 
 import conquest.engine.robot.RobotParser;
 import conquest.game.*;
@@ -31,42 +29,31 @@ import conquest.game.move.PlaceArmiesMove;
 import conquest.view.GUI;
 
 public class Engine {
+    ConquestGame game;
 	
 	private PlayerInfo player1;
 	private PlayerInfo player2;
 	private Robot robot1;
 	private Robot robot2;
+	private long timeoutMillis;
 	private GameMap map;
 	private RobotParser parser;
-	private LinkedList<Move> opponentMoves;
+	private ArrayList<Move> opponentMoves;
 	private GUI gui;
 	
-	private long timeoutMillis;
-	private Random random;
-	private int seed;
-	private boolean fullyObservableGame;
-	
-	ConquestGame game;
-
-	public Engine(GameMap initMap, PlayerInfo player1, PlayerInfo player2, Robot robot1, Robot robot2, GUI gui, EngineConfig config)
+	public Engine(ConquestGame game, GameMap initMap, PlayerInfo player1, PlayerInfo player2,
+	              Robot robot1, Robot robot2, GUI gui, long timeoutMillis)
 	{
-		if (config.seed < 0) {
-			config.seed = new Random().nextInt();
-		}
-		while (config.seed < 0) config.seed += Integer.MAX_VALUE;
-		this.seed = config.seed;
-		this.random = new Random(this.seed);
-		
-		this.fullyObservableGame = config.fullyObservableGame;
-		
+	    this.game = game;
+	    
 		this.gui = gui;
 		this.map = initMap;
-		game = new ConquestGame(config.getGameConfig(), map, player1, player2, random, gui);
+		
 		this.player1 = player1;
 		this.player2 = player2;
 		this.robot1 = robot1;
 		this.robot2 = robot2;
-		this.timeoutMillis = config.botCommandTimeoutMillis;		
+		this.timeoutMillis = timeoutMillis;		
 		
 		parser = new RobotParser(map);
 	}
@@ -198,7 +185,7 @@ public class Engine {
 	private void sendUpdateMapInfo(PlayerInfo player, Robot bot)
 	{
 		ArrayList<RegionData> visibleRegions;
-		if (fullyObservableGame) {
+		if (game.config.fullyObservableGame) {
 			visibleRegions = map.regions;
 		} else {
 			visibleRegions = map.visibleRegionsForPlayer(player);

@@ -2,6 +2,8 @@ package conquest.engine;
 
 import java.io.File;
 
+import conquest.game.GameConfig;
+
 public class Config implements Cloneable {
 	
 	public String gameId = "GAME";
@@ -29,6 +31,8 @@ public class Config implements Cloneable {
 	public String bot1Init;
 	public String bot2Init;
 	
+    public long botCommandTimeoutMillis = 2000;
+	
 	public boolean visualize = true;
 	
 	public Boolean visualizeContinual = null;
@@ -39,12 +43,13 @@ public class Config implements Cloneable {
 	
 	public File replayLog = null;
 	
-	public EngineConfig engine = new EngineConfig();
+	public GameConfig game = new GameConfig();
 	
 	public String asString() {
 		return gameId + ";" + playerId1 + ";" + playerId2 + ";" + player1Name + ";" + player2Name + ";" +
+		       botCommandTimeoutMillis + ";" +
 	           visualize + ";" + visualizeContinual + ";" + visualizeContinualFrameTimeMillis + ";" +
-			   logToConsole + ";" + engine.asString();
+			   logToConsole + ";" + game.asString();
 	}
 	
 	@Override
@@ -59,11 +64,12 @@ public class Config implements Cloneable {
 	}
 	
 	public String getCSVHeader() {
-		return "ID;PlayerName1;PlayerName2;" + engine.getCSVHeader();
+		return "ID;PlayerName1;PlayerName2;timeoutMillis;" + game.getCSVHeader();
 	}
 	
 	public String getCSV() {
-		return gameId + ";" + player1Name + ";" + player2Name + ";" + engine.getCSV();
+		return gameId + ";" + player1Name + ";" + player2Name + ";" +
+	           botCommandTimeoutMillis + ";" + game.getCSV();
 	}
 	
 	public static Config fromString(String line) {
@@ -77,18 +83,19 @@ public class Config implements Cloneable {
 		result.playerId2 = parts[2];
 		result.player1Name = parts[3];
 		result.player2Name = parts[4];
-		result.visualize = Boolean.parseBoolean(parts[5]);
-		result.visualizeContinual = (parts[6].toLowerCase().equals("null") ? null : Boolean.parseBoolean(parts[6]));
-		result.visualizeContinualFrameTimeMillis = (parts[7].toLowerCase().equals("null") ? null : Integer.parseInt(parts[7]));
-		result.logToConsole = Boolean.parseBoolean(parts[8]);
+		result.botCommandTimeoutMillis = Integer.parseInt(parts[5]);
+		result.visualize = Boolean.parseBoolean(parts[6]);
+		result.visualizeContinual = (parts[7].toLowerCase().equals("null") ? null : Boolean.parseBoolean(parts[7]));
+		result.visualizeContinualFrameTimeMillis = (parts[8].toLowerCase().equals("null") ? null : Integer.parseInt(parts[8]));
+		result.logToConsole = Boolean.parseBoolean(parts[9]);
 		
 		int engineConfigStart = 0;
-		for (int i = 0; i < 9; ++i) {
+		for (int i = 0; i < 10; ++i) {
 			engineConfigStart = line.indexOf(";", engineConfigStart);
 			++engineConfigStart;
 		}
 		
-		result.engine = EngineConfig.fromString(line.substring(engineConfigStart));
+		result.game = GameConfig.fromString(line.substring(engineConfigStart));
 		
 		return result;
 	}

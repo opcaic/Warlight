@@ -9,7 +9,7 @@ import conquest.game.world.Region;
 import conquest.view.GUI;
 
 public class ConquestGame {
-    GameConfig config;
+    public GameConfig config;
     GameMap map;
     PlayerInfo player1, player2;
     int round;
@@ -19,12 +19,18 @@ public class ConquestGame {
     
     static final int nrOfStartingRegions = 3;
     
-    public ConquestGame(GameConfig config, GameMap map, PlayerInfo player1, PlayerInfo player2, Random random, GUI gui) {
+    public ConquestGame(GameConfig config, GameMap map, PlayerInfo player1, PlayerInfo player2, GUI gui) {
         this.config = config;
         this.map = map;
         this.player1 = player1;
         this.player2 = player2;
-        this.random = random;
+        
+        if (config.seed < 0) {
+            config.seed = new Random().nextInt();
+        }
+        while (config.seed < 0) config.seed += Integer.MAX_VALUE;
+        this.random = new Random(config.seed);
+                
         round = 1;
         this.gui = gui;
 
@@ -157,7 +163,7 @@ public class ConquestGame {
         recalculateStartingArmies();
     }
     
-    void placeArmies(List<PlaceArmiesMove> moves, LinkedList<Move> opponentMoves)
+    void placeArmies(List<PlaceArmiesMove> moves, List<Move> opponentMoves)
     {       
         for(PlaceArmiesMove move : moves)
         {
@@ -193,7 +199,7 @@ public class ConquestGame {
     }
     
     public void placeArmies(List<PlaceArmiesMove> moves1, List<PlaceArmiesMove> moves2,
-                            LinkedList<Move> opponentMoves) {
+                            List<Move> opponentMoves) {
         placeArmies(moves1, opponentMoves);
         placeArmies(moves2, opponentMoves);
     }

@@ -117,8 +117,8 @@ public class Conquest {
 			try {
 				Config config = new Config();
 				
-				config.engine.maxGameRounds = Integer.parseInt(args[0]);
-				config.engine.botCommandTimeoutMillis = Long.parseLong(args[1]);
+				config.game.maxGameRounds = Integer.parseInt(args[0]);
+				config.botCommandTimeoutMillis = Long.parseLong(args[1]);
 				
 				config.bot1Init = args[2];
 				config.bot2Init = args[3];

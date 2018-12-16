@@ -30,7 +30,7 @@ public class ConquestFightRoundGenerator {
 		for (int i = 0; i < games; ++i) {
 			Config config = prototypeOptions.clone();
 			
-			config.engine.seed = seeds[i];
+			config.game.seed = seeds[i];
 
 			configs[i] = config;
 		}
