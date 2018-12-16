@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import conquest.game.world.Continent;
 import conquest.game.world.Region;
 
-public class GameMap {
+public class GameMap implements Cloneable {
 	
 	public ArrayList<RegionData> regions;
 	public ArrayList<ContinentData> continents;
@@ -72,7 +72,8 @@ public class GameMap {
 	/**
 	 * @return : a new Map object exactly the same as this one
 	 */
-	public GameMap getMapCopy() {
+	@Override
+	public GameMap clone() {
 		GameMap newMap = new GameMap();
 		for(ContinentData sr : continents) //copy continents
 		{

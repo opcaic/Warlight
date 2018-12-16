@@ -2,7 +2,7 @@ package conquest.bot.state;
 
 import conquest.game.world.Region;
 
-public class MoveCommand implements ICommand {
+public class MoveCommand {
 
 	public Region from;
 	public Region to;
@@ -33,19 +33,7 @@ public class MoveCommand implements ICommand {
 	}
 	
 	@Override
-	public void apply(GameState state) {
-		state.apply(this);
-	}
-	
-	@Override
-	public void revert(GameState state) {
-		state.revert(this);
-	}
-	
-	@Override
 	public String toString() {
 		return "MoveCommand[from=" + from + ",to=" + to +",armies=" + armies + "]";
 	}
-
-	
 }

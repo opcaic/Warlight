@@ -4,12 +4,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import conquest.bot.BotState;
-import conquest.game.Player;
-import conquest.game.RegionData;
+import conquest.game.*;
 import conquest.game.world.Continent;
 import conquest.game.world.Region;
 
 public class GameState implements Cloneable {
+    ConquestGame game;
 	
 	/**
 	 * Region state can be found under index 'Region.id'.
@@ -61,44 +61,6 @@ public class GameState implements Cloneable {
 		return new GameState(this);
 	}
 	
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null) return false;
-		if (obj == this) return true;
-		if (!(obj instanceof GameState)) return false;
-		GameState other = (GameState)obj;
-		
-		if (!me.equals(other.me)) {
-			System.out.println("NOT EQUALS: " + me + " vs. " + other.me);
-			return false;
-		}
-		if (!opp.equals(other.opp)) {
-			System.out.println("NOT EQUALS: " + opp + " vs. " + other.opp);
-			return false;
-		}
-		
-		for (int i = 1; i < regions.length; ++i) {
-			if (other.regions[i] == null || !regions[i].equals(other.regions[i])) {
-				System.out.println("NOT EQUALS: " + regions[i] + " vs. " + other.regions[i]);
-				return false;
-			}
-		}
-		for (int i = 1; i < continents.length; ++i) {
-			if (other.continents[i] == null || !continents[i].equals(other.continents[i])) {
-				System.out.println("NOT EQUALS: " + continents[i] + " vs. " + other.continents[i]);
-				return false;
-			}
-		}
-		for (int i = 1; i < players.length; ++i) {
-			if (other.players[i] == null || !players[i].equals(other.players[i])) {
-				System.out.println("NOT EQUALS: " + players[i] + " vs. " + other.players[i]);
-				return false;
-			}
-		}
-	
-		return true;
-	}
-
 	/**
 	 * Recreates all STATE objects.
 	 */
@@ -134,12 +96,20 @@ public class GameState implements Cloneable {
 		this.opp = players[Player.OPPONENT.id];
 	}
 	
+	ConquestGame fromBotState(BotState state) {
+	    return new ConquestGame(
+	            new GameConfig(), state.getMap(), null, null,
+	            state.getRoundNumber(), state.getPickableStartingRegions(), null);
+	}
+	
 	/**
 	 * Fully (re)creates the state out of the {@link BotState}, throwing out all existing objects it has.
 	 * @param state
 	 */
 	private void reset(BotState state) {
 		reset();
+		
+		game = fromBotState(state);
 
 		// FILL IN STATES
 		for (RegionData data : state.getMap().regions) {
@@ -189,6 +159,8 @@ public class GameState implements Cloneable {
 	 */
 	private void reset(GameState gameState) {
 		reset();
+		
+		game = gameState.game.clone();
 
 		// FILL IN STATES
 		for (Region region : Region.values()) {
@@ -236,6 +208,8 @@ public class GameState implements Cloneable {
 	 * @param state
 	 */
 	public void update(BotState state) {
+	    game = fromBotState(state);
+	    
 		// RESET TOTAL ARMIES & PLACE ARMIES
 		for (int i = 1; i < players.length; ++i) {
 			PlayerState player = players[i];
@@ -326,161 +300,6 @@ public class GameState implements Cloneable {
 	
 	public PlayerState player(Player player) {
 		return players[player.id];
-	}
-		
-	public void apply(PlaceCommand cmd) {
-		RegionState region = region(cmd.region); 
-		region.armies += cmd.armies;
-		region.owner.totalArmies += cmd.armies;
-	}
-	
-	public void revert(PlaceCommand cmd) {
-		RegionState region = region(cmd.region);
-		region.armies -= cmd.armies;
-		region.owner.totalArmies -= cmd.armies;
-	}
-	
-	public void apply(MoveCommand cmd) {
-		RegionState from = region(cmd.from);
-		RegionState to = region(cmd.to);
-		
-		if (from.owner.player != to.owner.player) {
-			throw new RuntimeException("Cannot apply " + cmd + " as regions have different owners " + from.region + "->" + from.owner.player + " and " + to.region + "->" + to.owner.player + "!");
-		}
-		
-		if (cmd.armies >= from.armies) cmd.armies = from.armies-1;
-		
-		if (cmd.armies < 1) return;
-		
-		from.armies            -= cmd.armies;
-		to.armies            += cmd.armies;		
-	}
-	
-	public void revert(MoveCommand cmd) {
-		RegionState from = region(cmd.from);
-		RegionState to = region(cmd.to);
-		
-		if (from.owner.player != to.owner.player) {
-			throw new RuntimeException("Cannot revert " + cmd + " as regions have different owners " + from.region + "->" + from.owner.player + " and " + to.region + "->" + to.owner.player + "!");
-		}
-		
-		if (cmd.armies < 1) return;
-		
-		from.armies += cmd.armies;		
-		to.armies   -= cmd.armies;
-	}
-	
-	public void apply(AttackCommand cmd) {		
-		RegionState regionFrom = region(cmd.from);
-		RegionState regionTo = region(cmd.to);
-		
-		PlayerState attacker = regionFrom.owner;
-		PlayerState defender = player(cmd.toOwner);
-		
-		if (regionFrom.armies <= cmd.armies) cmd.armies = regionFrom.armies-1;
-		
-		if (cmd.armies < 1) return;
-		
-		if (attacker == defender) {
-			// MOVE INSTEAD!
-			cmd.movedInstead = new MoveCommand(cmd.from, cmd.to, cmd.armies);
-			apply(cmd.movedInstead);
-			return;
-		} else {
-			cmd.movedInstead = null; // just to be sure... may be someone is reusing those instances...
-		}
-				
-		if (cmd.attackersCasaulties < 0)               cmd.attackersCasaulties = 0;
-		if (cmd.defendersCasaulties < 0)               cmd.defendersCasaulties = 0;
-		if (cmd.attackersCasaulties > cmd.armies)      cmd.attackersCasaulties = cmd.armies;
-		if (cmd.defendersCasaulties > regionTo.armies) cmd.defendersCasaulties = regionTo.armies;
-		
-		cmd.defendersArmies = regionTo.armies;
-		
-		if (cmd.defendersCasaulties < regionTo.armies) {
-			// defenders won
-			cmd.attackersCasaulties = cmd.armies;
-			
-			regionFrom.armies -= cmd.attackersCasaulties;
-			regionTo.armies -= cmd.defendersCasaulties;
-			
-			// update total armies
-			attacker.totalArmies -= cmd.attackersCasaulties;
-			defender.totalArmies -= cmd.defendersCasaulties;
-		} else
-		if (cmd.defendersCasaulties >= regionTo.armies && cmd.armies == cmd.attackersCasaulties) {
-			// defenders are granted 1 army
-			regionFrom.armies -= cmd.attackersCasaulties;
-			regionTo.armies = 1;
-			
-			// update total armies
-			attacker.totalArmies -= cmd.armies;
-			defender.totalArmies -= cmd.defendersCasaulties;
-			defender.totalArmies += 1; // extra one army
-			
-			cmd.defendersExtraOneArmy = 1; // mark that defenders have been granted one army
-		} else {
-			// attackers won
-			cmd.defendersCasaulties = regionTo.armies;
-			
-			// update armies in regions
-			regionFrom.armies -= cmd.armies;
-			regionTo.armies = cmd.armies - cmd.attackersCasaulties;
-			
-			// update total armies
-			attacker.totalArmies -= cmd.attackersCasaulties;
-			defender.totalArmies -= cmd.defendersCasaulties;
-			
-			// change region ownership
-			player(cmd.fromOwner).regions.put(cmd.to, regionTo);
-			player(cmd.toOwner).regions.remove(cmd.to);
-			regionTo.owner = player(cmd.fromOwner);
-			
-			// update continent state
-			ContinentState continent = continent(regionTo.region.continent);
-			continent.owned[attacker.player.id] += 1;
-			continent.owned[defender.player.id] -= 1;			
-			updateContinentOwnership(continent);
-		}		
-	}
-	
-	public void revert(AttackCommand cmd) {		
-		if (cmd.movedInstead != null) {
-			revert(cmd.movedInstead);
-			return;
-		}		
-		
-		if (cmd.armies < 1) return;
-		
-		RegionState regionFrom = region(cmd.from);
-		RegionState regionTo   = region(cmd.to);
-
-		PlayerState attacker = regionFrom.owner;
-		PlayerState defender = player(cmd.toOwner);
-
-		// REVERT ARMIES
-		regionFrom.armies += cmd.armies;		
-		regionTo.armies   -= cmd.armies - cmd.attackersCasaulties - cmd.defendersCasaulties + cmd.defendersExtraOneArmy;
-		
-		// REVERT PLAYER TOTAL ARMIES
-		attacker.totalArmies += cmd.attackersCasaulties;
-		defender.totalArmies += cmd.defendersCasaulties - cmd.defendersExtraOneArmy;
-		
-		// REVERT OWNER
-		if (cmd.defendersCasaulties >= cmd.defendersArmies && cmd.defendersExtraOneArmy == 0) {
-			// ATTACKERS WON		
-			
-			// REVERT REGION OWNERSHIP
-			regionTo.owner = defender;			
-			attacker.regions.remove(regionTo.region);
-			defender.regions.put(regionTo.region, regionTo);
-			
-			// REVERT CONTINENT STATE
-			ContinentState continent = continent(regionTo.region.continent);
-			continent.owned[attacker.player.id] -= 1;
-			continent.owned[defender.player.id] += 1;			
-			updateContinentOwnership(continent);
-		}		
 	}
 	
 	/**

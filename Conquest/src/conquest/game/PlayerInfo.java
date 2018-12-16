@@ -17,7 +17,7 @@
 
 package conquest.game;
 
-public class PlayerInfo {
+public class PlayerInfo implements Cloneable {
 	private String id;
 	private String name;
 	
@@ -27,6 +27,13 @@ public class PlayerInfo {
 	{
 		this.id = id;
 		this.name = name;
+	}
+	
+	@Override
+	public PlayerInfo clone() {
+	    PlayerInfo p = new PlayerInfo(id, name);
+	    p.armiesPerTurn = armiesPerTurn;
+	    return p;
 	}
 	
 	/**

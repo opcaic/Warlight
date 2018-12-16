@@ -150,7 +150,7 @@ public class BotState {
 	//visible regions are given to the bot with player and armies info
 	public void updateMap(String[] mapInput)
 	{
-		visibleMap = fullMap.getMapCopy();
+		visibleMap = fullMap.clone();
 		for(int i=1; i<mapInput.length; i++)
 		{
 			try {

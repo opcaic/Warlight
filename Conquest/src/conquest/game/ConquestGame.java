@@ -6,7 +6,7 @@ import conquest.game.move.*;
 import conquest.game.world.*;
 import conquest.view.GUI;
 
-public class ConquestGame {
+public class ConquestGame implements Cloneable {
     public GameConfig config;
     GameMap map;
     PlayerInfo player1, player2;
@@ -17,11 +17,15 @@ public class ConquestGame {
     
     static final int nrOfStartingRegions = 3;
     
-    public ConquestGame(GameConfig config, PlayerInfo player1, PlayerInfo player2, GUI gui) {
+    // Create a game that is already in progress.
+    public ConquestGame(GameConfig config, GameMap map, PlayerInfo player1, PlayerInfo player2,
+                        int round, ArrayList<RegionData> pickableRegions, GUI gui) {
         this.config = config;
-        this.map = makeInitMap();
-        this.player1 = player1;
-        this.player2 = player2;
+        this.map = map;
+        this.player1 = player1 != null ? player1 : new PlayerInfo("1", "Player 1");
+        this.player2 = player2 != null ? player2 : new PlayerInfo("2", "Player 2");
+        this.round = round;
+        this.pickableRegions = pickableRegions;
         
         if (config.seed < 0) {
             config.seed = new Random().nextInt();
@@ -30,15 +34,30 @@ public class ConquestGame {
             config.seed += Integer.MAX_VALUE;
         this.random = new Random(config.seed);
                 
-        round = 1;
         this.gui = gui;
 
         recalculateStartingArmies();
+    }
+    
+    // Create a new game with the given configuration.
+    public ConquestGame(GameConfig config, PlayerInfo player1, PlayerInfo player2, GUI gui) {
+        this(config, makeInitMap(), player1, player2, 1, null, gui);
         initStartingRegions();
     }
     
+    // Create a new game with default parameters.
     public ConquestGame() {
-        this(new GameConfig(), new PlayerInfo("1", "Player 1"), new PlayerInfo("2", "Player 2"), null);
+        this(new GameConfig(), null, null, null);
+    }
+    
+    @Override
+    public ConquestGame clone() {
+        // Unfortunately java.util.Random is not cloneable.  So a cloned game will have its
+        // own random number generator, and actions applied to it may have different results
+        // than in the original game.
+        
+        return new ConquestGame(config, map.clone(), player1.clone(), player2.clone(),
+                round, pickableRegions, gui);
     }
     
     public GameMap getMap() { return map; }
@@ -91,7 +110,7 @@ public class ConquestGame {
         }
     }
     
-    GameMap makeInitMap()
+    static GameMap makeInitMap()
     {
         GameMap map = new GameMap();
         
