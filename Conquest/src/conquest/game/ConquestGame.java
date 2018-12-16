@@ -2,10 +2,8 @@ package conquest.game;
 
 import java.util.*;
 
-import conquest.game.move.AttackTransferMove;
-import conquest.game.move.Move;
-import conquest.game.move.PlaceArmiesMove;
-import conquest.game.world.Region;
+import conquest.game.move.*;
+import conquest.game.world.*;
 import conquest.view.GUI;
 
 public class ConquestGame {
@@ -19,45 +17,49 @@ public class ConquestGame {
     
     static final int nrOfStartingRegions = 3;
     
-    public ConquestGame(GameConfig config, GameMap map, PlayerInfo player1, PlayerInfo player2, GUI gui) {
+    public ConquestGame(GameConfig config, PlayerInfo player1, PlayerInfo player2, GUI gui) {
         this.config = config;
-        this.map = map;
+        this.map = makeInitMap();
         this.player1 = player1;
         this.player2 = player2;
         
         if (config.seed < 0) {
             config.seed = new Random().nextInt();
         }
-        while (config.seed < 0) config.seed += Integer.MAX_VALUE;
+        while (config.seed < 0)
+            config.seed += Integer.MAX_VALUE;
         this.random = new Random(config.seed);
                 
         round = 1;
         this.gui = gui;
 
+        recalculateStartingArmies();
         initStartingRegions();
     }
+    
+    public ConquestGame() {
+        this(new GameConfig(), new PlayerInfo("1", "Player 1"), new PlayerInfo("2", "Player 2"), null);
+    }
+    
+    public GameMap getMap() { return map; }
 
-    public int getRoundNr() {
+    public int getRoundNumber() {
         return round;
     }
     
-    public void newRound() {
-        round++;
-    }
-    
-    public PlayerInfo getPlayer(String playerName)
+    public PlayerInfo getPlayer(String playerId)
     {
-        if(player1.getId().equals(playerName))
+        if(player1.getId().equals(playerId))
             return player1;
-        if(player2.getId().equals(playerName))
+        if(player2.getId().equals(playerId))
             return player2;
         return null;
     }
     
-    public PlayerInfo otherPlayer(String playerName) {
-        if(player1.getId().equals(playerName))
+    public PlayerInfo otherPlayer(String playerId) {
+        if(player1.getId().equals(playerId))
             return player2;
-        if(player2.getId().equals(playerName))
+        if(player2.getId().equals(playerId))
             return player1;
         return null;
     }
@@ -71,18 +73,85 @@ public class ConquestGame {
         return null;
     }
     
+    public boolean isDone() {
+        return winningPlayer() != null || round > config.maxGameRounds;
+    }
+    
     //calculate how many armies each player is able to place on the map for the next round
     public void recalculateStartingArmies()
     {
-        player1.setArmiesLeft(player1.getArmiesPerTurn());
-        player2.setArmiesLeft(player2.getArmiesPerTurn());
+        player1.setArmiesPerTurn(config.startingArmies);
+        player2.setArmiesPerTurn(config.startingArmies);
         
         for(ContinentData superRegion : map.getContinents())
         {
             PlayerInfo player = getPlayer(superRegion.ownedByPlayer());
             if(player != null)
-                player.setArmiesLeft(player.getArmiesLeft() + superRegion.getArmiesReward());
+                player.setArmiesPerTurn(player.getArmiesPerTurn() + superRegion.getArmiesReward());
         }
+    }
+    
+    GameMap makeInitMap()
+    {
+        GameMap map = new GameMap();
+        
+        // INIT SUPER REGIONS
+
+        Map<Continent, ContinentData> continents = new TreeMap<Continent, ContinentData>(new Comparator<Continent>() {
+            @Override
+            public int compare(Continent o1, Continent o2) {
+                return o1.id - o2.id;
+            }           
+        });
+        
+        for (Continent continent : Continent.values()) {
+            ContinentData continentData = new ContinentData(continent, continent.id, continent.reward);
+            continents.put(continent, continentData);
+        }
+        
+        // INIT REGIONS
+        
+        Map<Region, RegionData> regions = new TreeMap<Region, RegionData>(new Comparator<Region>() {
+            @Override
+            public int compare(Region o1, Region o2) {
+                return o1.id - o2.id;
+            }
+        });
+        
+        for (Region region : Region.values()) {
+            RegionData regionData = new RegionData(region, region.id, continents.get(region.continent));
+            regions.put(region, regionData);
+        }
+        
+        // INIT NEIGHBOURS
+        
+        for (Region regionName : Region.values()) {
+            RegionData region = regions.get(regionName);
+            for (Region neighbour : regionName.getForwardNeighbours()) {
+                region.addNeighbor(regions.get(neighbour));
+            }
+        }
+        
+        // ADD REGIONS TO THE MAP
+        
+        for (RegionData region : regions.values()) {
+            map.add(region);
+        }
+        
+        // ADD SUPER REGIONS TO THE MAP
+
+        for (ContinentData superRegion : continents.values()) {
+            map.add(superRegion);
+        }
+
+        //Make every region neutral with 2 armies to start with
+        for(RegionData region : map.regions)
+        {
+            region.setPlayerName("neutral");
+            region.setArmies(2);
+        }
+
+        return map;
     }
     
     void initStartingRegions() {
@@ -163,45 +232,40 @@ public class ConquestGame {
         recalculateStartingArmies();
     }
     
-    void placeArmies(List<PlaceArmiesMove> moves, List<Move> opponentMoves)
-    {       
+    void placeArmies(PlayerInfo player, List<PlaceArmiesMove> moves, List<Move> opponentMoves)
+    {   
+        int left = player.getArmiesPerTurn(); 
+                
         for(PlaceArmiesMove move : moves)
         {
             RegionData region = move.getRegion();
-            PlayerInfo player = getPlayer(move.getPlayerName());
             int armies = move.getArmies();
             
-            if (!region.ownedByPlayer(player.getId()))
+            if (!move.getPlayerName().equals(player.getId()))
+                move.setIllegalMove("move by wrong player");
+            else if (!region.ownedByPlayer(player.getId()))
                 move.setIllegalMove(move.getRegion().getId() + " not owned");
             else if (armies < 1)
                 move.setIllegalMove("cannot place less than 1 army");
-            else if (player.getArmiesLeft() <= 0)
+            else if (left <= 0)
                 move.setIllegalMove("no armies left to place");
             else {
-                if(armies > player.getArmiesLeft()) //player wants to place more armies than he has left
-                    move.setArmies(player.getArmiesLeft()); //place all armies he has left
+                if(armies > left) //player wants to place more armies than he has left
+                    move.setArmies(left); //place all armies he has left
                 
-                player.setArmiesLeft(player.getArmiesLeft() - move.getArmies());
-                move.getRegion().setArmies(move.getRegion().getArmies() + move.getArmies());
+                left -= armies;
+                region.setArmies(region.getArmies() + armies);
 
-                if(map.visibleRegionsForPlayer(player1).contains(move.getRegion()))
-                {
-                    if(move.getPlayerName().equals(player2.getId()))
-                        opponentMoves.add(move);
-                }
-                if(map.visibleRegionsForPlayer(player2).contains(move.getRegion()))
-                {
-                    if(move.getPlayerName().equals(player1.getId()))
-                        opponentMoves.add(move);
-                }
+                if (region.isVisible(otherPlayer(player.getId())))
+                    opponentMoves.add(move);
             }
         }
     }
     
     public void placeArmies(List<PlaceArmiesMove> moves1, List<PlaceArmiesMove> moves2,
                             List<Move> opponentMoves) {
-        placeArmies(moves1, opponentMoves);
-        placeArmies(moves2, opponentMoves);
+        placeArmies(player1, moves1, opponentMoves);
+        placeArmies(player2, moves2, opponentMoves);
     }
     
     public static enum FightSide {
@@ -244,7 +308,8 @@ public class ConquestGame {
         }
     }
 
-    static FightResult doOriginalAttack(Random random, int attackingArmies, int defendingArmies, double defenderDestroyedChance, double attackerDestroyedChance) {
+    static FightResult doOriginalAttack(Random random, int attackingArmies, int defendingArmies,
+                                        double defenderDestroyedChance, double attackerDestroyedChance) {
         FightResult result = new FightResult();
         
         for(int t=1; t<=attackingArmies; t++) //calculate how much defending armies are destroyed
@@ -388,50 +453,52 @@ public class ConquestGame {
         while(index[0] < moves.get(0).size() || index[1] < moves.get(1).size())
         {
             if (index[turn] >= moves.get(turn).size())  // out of moves
-                turn = 1 - turn;
-            AttackTransferMove move = moves.get(turn).get(index[turn]++);
+                turn = 1 - turn;  // switch to other player
+            AttackTransferMove move = moves.get(turn).get(index[turn]++);  // next move for this player
+            if(!move.getIllegalMove().equals("")) //the move is illegal
+                continue;
             
-            if(move.getIllegalMove().equals("")) //the move is legal
-            {
-                RegionData fromRegion = move.getFromRegion();
-                RegionData toRegion = move.getToRegion();
-                PlayerInfo player = getPlayer(move.getPlayerName());
-                
-                if (!fromRegion.ownedByPlayer(player.getId()))
-                    move.setIllegalMove(move.getFromRegion().getId() + " attack/transfer was taken this round");
-                else if (fromRegion.getArmies() <= 1)
-                    move.setIllegalMove(move.getFromRegion().getId() + " attack/transfer only has 1 army");
-                else {
-                    move.setArmies(Math.min(move.getArmies(), fromRegion.getArmies() - 1));
+            RegionData fromRegion = move.getFromRegion();
+            RegionData toRegion = move.getToRegion();
+            PlayerInfo player = turn == 0 ? player1 : player2;
+            
+            if (!fromRegion.ownedByPlayer(player.getId()))
+                move.setIllegalMove(move.getFromRegion().getId() + " attack/transfer was taken this round");
+            else if (fromRegion.getArmies() <= 1)
+                move.setIllegalMove(move.getFromRegion().getId() + " attack/transfer only has 1 army");
+            else {
+                move.setArmies(Math.min(move.getArmies(), fromRegion.getArmies() - 1));
 
-                    PlayerInfo other = otherPlayer(move.getPlayerName());
-                    if (move.getFromRegion().isVisible(other) || move.getToRegion().isVisible(other))
-                        opponentMoves.add(move);
-                   
-                    if(toRegion.ownedByPlayer(player.getId())) //transfer
-                    {
-                        if (gui != null) {
-                            gui.transfer(move);
-                        }
-                        fromRegion.setArmies(fromRegion.getArmies() - move.getArmies());
-                        toRegion.setArmies(toRegion.getArmies() + move.getArmies());
+                PlayerInfo other = turn == 0 ? player2 : player1;
+                if (move.getFromRegion().isVisible(other) || move.getToRegion().isVisible(other))
+                    opponentMoves.add(move);
+               
+                if(toRegion.ownedByPlayer(player.getId())) //transfer
+                {
+                    if (gui != null) {
+                        gui.transfer(move);
                     }
-                    else //attack
-                    {
-                        if (gui != null) {
-                            gui.attack(move);
-                        }
-                        doAttack(move);
-                    }
-                    
-                    ++count;
-                    if (index[1 - turn] < moves.get(1 - turn).size())  // other player still has moves
-                        if (count % 2 == 0)
-                            turn = random.nextInt(2);
-                        else
-                            turn = 1 - turn;
+                    fromRegion.setArmies(fromRegion.getArmies() - move.getArmies());
+                    toRegion.setArmies(toRegion.getArmies() + move.getArmies());
                 }
+                else //attack
+                {
+                    if (gui != null) {
+                        gui.attack(move);
+                    }
+                    doAttack(move);
+                }
+                
+                ++count;
+                if (index[1 - turn] < moves.get(1 - turn).size())  // other player still has moves
+                    if (count % 2 == 0)
+                        turn = random.nextInt(2);
+                    else
+                        turn = 1 - turn;
             }
         }
+        
+        recalculateStartingArmies();
+        round++;
     }
 }

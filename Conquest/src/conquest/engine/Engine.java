@@ -41,13 +41,13 @@ public class Engine {
 	private ArrayList<Move> opponentMoves;
 	private GUI gui;
 	
-	public Engine(ConquestGame game, GameMap initMap, PlayerInfo player1, PlayerInfo player2,
+	public Engine(ConquestGame game, PlayerInfo player1, PlayerInfo player2,
 	              Robot robot1, Robot robot2, GUI gui, long timeoutMillis)
 	{
 	    this.game = game;
 	    
 		this.gui = gui;
-		this.map = initMap;
+		this.map = game.getMap();
 		
 		this.player1 = player1;
 		this.player2 = player2;
@@ -85,7 +85,7 @@ public class Engine {
 	public void playRound()
 	{
 		if (gui != null) {
-			gui.newRound(game.getRoundNr());
+			gui.newRound(game.getRoundNumber());
 			gui.updateRegions(map.regions);
 		}
 		
@@ -123,9 +123,7 @@ public class Engine {
 			gui.updateAfterRound(map);
 		}
 		
-		game.recalculateStartingArmies();
 		sendAllInfo();	
-		game.newRound();
 	}
 	
 	public void distributeStartingRegions()
@@ -178,7 +176,7 @@ public class Engine {
 	//inform the player about how much armies he can place at the start next round
 	private void sendStartingArmiesInfo(PlayerInfo player, Robot bot)
 	{
-		bot.writeInfo("settings starting_armies " + player.getArmiesLeft());
+		bot.writeInfo("settings starting_armies " + player.getArmiesPerTurn());
 	}
 	
 	//inform the player about how his visible map looks now

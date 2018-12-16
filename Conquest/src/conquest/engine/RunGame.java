@@ -21,9 +21,6 @@ import java.awt.Point;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.TreeMap;
 
 import conquest.engine.Robot.RobotConfig;
 import conquest.engine.replay.FileGameLog;
@@ -34,17 +31,12 @@ import conquest.engine.robot.IORobot;
 import conquest.engine.robot.InternalRobot;
 import conquest.engine.robot.ProcessRobot;
 import conquest.game.*;
-import conquest.game.world.Continent;
-import conquest.game.world.Region;
 import conquest.view.GUI;
 
 public class RunGame
 {
-	
 	Config config;
 	
-	int gameIndex = 1;
-
 	Engine engine;
 	ConquestGame game;
 	
@@ -68,8 +60,8 @@ public class RunGame
 			robot1 = new IORobot(replay);
 			robot2 = new IORobot(replay);
 					
-			player1 = new PlayerInfo(config.playerId1, config.player1Name, config.game.startingArmies);
-			player2 = new PlayerInfo(config.playerId2, config.player2Name, config.game.startingArmies);
+			player1 = new PlayerInfo(config.playerId1, config.player1Name);
+			player2 = new PlayerInfo(config.playerId2, config.player2Name);
 			
 			return go(null, player1, player2, robot1, robot2);
 		} catch (Exception e) {
@@ -94,8 +86,8 @@ public class RunGame
 			robot1 = setupRobot(config.playerId1, config.bot1Init);
 			robot2 = setupRobot(config.playerId2, config.bot2Init);
 					
-			player1 = new PlayerInfo(config.playerId1, config.player1Name, config.game.startingArmies);
-			player2 = new PlayerInfo(config.playerId2, config.player2Name, config.game.startingArmies);
+			player1 = new PlayerInfo(config.playerId1, config.player1Name);
+			player2 = new PlayerInfo(config.playerId2, config.player2Name);
 						
 			return go(log, player1, player2, robot1, robot2);
 		} catch (Exception e) {
@@ -104,13 +96,6 @@ public class RunGame
 	}
 
 	private GameResult go(GameLog log, PlayerInfo player1, PlayerInfo player2, Robot robot1, Robot robot2) throws InterruptedException {
-		
-		//setup the map
-		GameMap initMap, map;
-		
-		initMap = makeInitMap();
-		map = setupMap(initMap);
-
 		// setup GUI
 		GUI gui = null;
 		if (config.visualize) {
@@ -123,10 +108,10 @@ public class RunGame
 			}
 		}
 		
-		game = new ConquestGame(config.game, map, player1, player2, gui);
+		game = new ConquestGame(config.game, player1, player2, gui);
 		
 		//start the engine
-		this.engine = new Engine(game, map, player1, player2, robot1, robot2, gui,
+		this.engine = new Engine(game, player1, player2, robot1, robot2, gui,
 		                         config.botCommandTimeoutMillis);
 		
 		if (log != null) {
@@ -154,21 +139,21 @@ public class RunGame
 		robot1.writeInfo("settings opponent_bot " + player2.getId());
 		robot2.writeInfo("settings your_bot " + player2.getId());
 		robot2.writeInfo("settings opponent_bot " + player1.getId());
-		sendSetupMapInfo(robot1, initMap);
-		sendSetupMapInfo(robot2, initMap);
+		sendSetupMapInfo(robot1, game.getMap());
+		sendSetupMapInfo(robot2, game.getMap());
 		engine.distributeStartingRegions(); //decide the player's starting regions
 		engine.sendAllInfo();
 		
 		//play the game
-		while(game.winningPlayer() == null && game.getRoundNr() <= config.game.maxGameRounds)
+		while(!game.isDone())
 		{
 			if (log != null) {
-				log.logComment("Engine", "Round " + game.getRoundNr());
+				log.logComment("Engine", "Round " + game.getRoundNumber());
 			}
 			engine.playRound();
 		}
 
-		GameResult result = finish(map, robot1, robot2);
+		GameResult result = finish(game.getMap(), robot1, robot2);
 		
 		if (log != null) {
 			log.finish(result);
@@ -217,74 +202,6 @@ public class RunGame
 		return this.saveGame(map, bot1, bot2);        
 	}
 
-	private GameMap makeInitMap()
-	{
-		GameMap map = new GameMap();
-		
-		// INIT SUPER REGIONS
-
-		Map<Continent, ContinentData> continents = new TreeMap<Continent, ContinentData>(new Comparator<Continent>() {
-			@Override
-			public int compare(Continent o1, Continent o2) {
-				return o1.id - o2.id;
-			}			
-		});
-		
-		for (Continent continent : Continent.values()) {
-			ContinentData continentData = new ContinentData(continent, continent.id, continent.reward);
-			continents.put(continent, continentData);
-		}
-		
-		// INIT REGIONS
-		
-		Map<Region, RegionData> regions = new TreeMap<Region, RegionData>(new Comparator<Region>() {
-			@Override
-			public int compare(Region o1, Region o2) {
-				return o1.id - o2.id;
-			}
-		});
-		
-		for (Region region : Region.values()) {
-			RegionData regionData = new RegionData(region, region.id, continents.get(region.continent));
-			regions.put(region, regionData);
-		}
-		
-		// INIT NEIGHBOURS
-		
-		for (Region regionName : Region.values()) {
-			RegionData region = regions.get(regionName);
-			for (Region neighbour : regionName.getForwardNeighbours()) {
-				region.addNeighbor(regions.get(neighbour));
-			}
-		}
-		
-		// ADD REGIONS TO THE MAP
-		
-		for (RegionData region : regions.values()) {
-			map.add(region);
-		}
-		
-		// ADD SUPER REGIONS TO THE MAP
-
-		for (ContinentData superRegion : continents.values()) {
-			map.add(superRegion);
-		}
-
-		return map;
-	}
-	
-	//Make every region neutral with 2 armies to start with
-	private GameMap setupMap(GameMap initMap)
-	{
-		GameMap map = initMap;
-		for(RegionData region : map.regions)
-		{
-			region.setPlayerName("neutral");
-			region.setArmies(2);
-		}
-		return map;
-	}
-	
 	private void sendSetupMapInfo(Robot bot, GameMap initMap)
 	{
 		String setupSuperRegionsString, setupRegionsString, setupNeighborsString;
@@ -382,7 +299,7 @@ public class RunGame
 			result.winner = null;
 		}
 		
-		result.round = game.getRoundNr()-1;
+		result.round = game.getRoundNumber()-1;
 		
 		System.out.println(result.getHumanString());
 		

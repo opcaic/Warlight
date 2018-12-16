@@ -18,24 +18,22 @@
 package conquest.game;
 
 public class PlayerInfo {
-	
 	private String id;
 	private String name;
-	private int armiesPerTurn; 
-	private int armiesLeft;    //variable armies that can be added, changes with superRegions fully owned and moves already placed.
 	
-	public PlayerInfo(String id, String name, int startingArmies)
+	private int armiesPerTurn;
+	
+	public PlayerInfo(String id, String name)
 	{
 		this.id = id;
 		this.name = name;
-		this.armiesPerTurn = startingArmies; //start with 5 armies per turn
 	}
 	
 	/**
-	 * @param n Sets the number of armies this player has left to place
+	 * @param n Sets the number of armies this player can place each turn
 	 */
-	public void setArmiesLeft(int n) {
-		armiesLeft = n;
+	public void setArmiesPerTurn(int n) {
+		armiesPerTurn = n;
 	}
 	
 	/**
@@ -53,17 +51,10 @@ public class PlayerInfo {
 	}
 	
 	/**
-	 * @return The standard number of armies this Player gets each turn to place on the map
+	 * @return The number of armies this Player receives each turn
 	 */
 	public int getArmiesPerTurn() {
 		return armiesPerTurn;
-	}
-	
-	/**
-	 * @return The number of armies this Player has left to place on the map
-	 */
-	public int getArmiesLeft() {
-		return armiesLeft;
 	}
 
 }

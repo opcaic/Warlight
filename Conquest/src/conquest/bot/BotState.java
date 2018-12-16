@@ -31,10 +31,15 @@ public class BotState {
 	private String myName = "";
 	private String opponentName = "";
 	
-	private final GameMap fullMap = new GameMap(); // This map is known from the start, contains all the regions and how they are connected, doesn't change after initialization
-	private GameMap visibleMap; // This map represents everything the player can see, updated at the end of each round.
+	// This map is known from the start, contains all the regions and how they are connected,
+	// doesn't change after initialization
+	private final GameMap fullMap = new GameMap(); 
 	
-	private ArrayList<RegionData> pickableStartingRegions; //2 randomly chosen regions from each continent are given, which the bot can chose to start with
+	// This map represents everything the player can see, updated at the end of each round.
+	private GameMap visibleMap; 
+	
+	//2 randomly chosen regions from each continent are given, which the bot can choose to start with
+	private ArrayList<RegionData> pickableStartingRegions; 
 	
 	private int startingArmies; //number of armies the player can place on map
 	
