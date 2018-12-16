@@ -7,9 +7,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import conquest.engine.RunGame.Config;
-import conquest.engine.RunGame.GameResult;
-
 public class FileBotLog {
 
 	private File file;

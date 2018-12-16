@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
 
-import conquest.engine.RunGame.GameResult;
+import conquest.engine.GameResult;
 import conquest.tournament.run.ConquestFightRound;
 import conquest.tournament.run.ConquestFightRoundGenerator;
 import conquest.tournament.utils.Sanitize;

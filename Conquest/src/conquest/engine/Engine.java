@@ -32,78 +32,6 @@ import conquest.view.GUI;
 
 public class Engine {
 	
-	public static enum FightMode {
-		
-		/**
-		 * Original Warlight fight without luck:
-		 * -- each attacking army has 60% chance to kill one defending army
-		 * -- each defending army has 70% chance to kill one attacking army
-		 * 
-		 * You may use: {@link Engine#doAttack_ORIGINAL_A60_D70(Random, int, int)} method for off-engine simulation.
-		 */
-		ORIGINAL_A60_D70,
-
-		/**
-		 * RISK-like attack
-		 * -- fight happens in round until one of side is fully wiped out
-		 * -- each round there is a 60% chance that 1 defending army is killed and 70% chance that 1 attacking army is killed (independent variables)
-		 * 
-		 * You may use: {@link Engine#doAttack_CONTINUAL_1_1_A60_D70(Random, int, int)} method for off-engine simulation.
-		 */
-		CONTINUAL_1_1_A60_D70
-		
-	}
-	
-	public static class EngineConfig implements Cloneable {
-		
-		/**
-		 * Non-negative seed => use concrete seed.
-		 * Negative seed => pick random seed.
-		 */
-		public int seed = -1;
-		
-		public boolean fullyObservableGame = true;
-		
-		public long botCommandTimeoutMillis = 2000;
-		
-		public int startingArmies = 5;
-		public int maxGameRounds = 100;
-		
-		public FightMode fight = FightMode.ORIGINAL_A60_D70;
-		
-		public GameConfig getGameConfig() {
-		    return new GameConfig(fight);
-		}
-		
-		public String asString() {
-			return seed + ";" + fullyObservableGame + ";" + botCommandTimeoutMillis + ";" + startingArmies + ";" + maxGameRounds + ";" + fight;
-		}
-		
-		public static EngineConfig fromString(String line) {
-			EngineConfig result = new EngineConfig();
-			
-			String[] parts = line.split(";");
-			
-			result.seed = Integer.parseInt(parts[0]);
-			result.fullyObservableGame = Boolean.parseBoolean(parts[1]);
-			result.botCommandTimeoutMillis = Long.parseLong(parts[2]);
-			result.startingArmies = Integer.parseInt(parts[3]);
-			result.maxGameRounds = Integer.parseInt(parts[4]);
-			result.fight = FightMode.valueOf(parts[5]);
-
-			return result;
-		}
-
-		public String getCSVHeader() {
-			return "seed;fullyObservable;timeoutMillis;startingArmies;maxGameRounds;fightMode";			
-		}
-		
-		public String getCSV() {
-			return seed + ";" + fullyObservableGame + ";" + botCommandTimeoutMillis + ";" + startingArmies + ";" + maxGameRounds + ";" + fight;
-		}
-		
-	}
-	
 	private PlayerInfo player1;
 	private PlayerInfo player2;
 	private Robot robot1;
@@ -263,12 +191,7 @@ public class Engine {
 	//inform the player about how much armies he can place at the start next round
 	private void sendStartingArmiesInfo(PlayerInfo player, Robot bot)
 	{
-		String updateStartingArmiesString = "settings starting_armies";
-		
-		updateStartingArmiesString = updateStartingArmiesString.concat(" " + player.getArmiesLeft());
-		
-		//System.out.println("sending to " + player.getName() + ": " + updateStartingArmiesString);
-		bot.writeInfo(updateStartingArmiesString);
+		bot.writeInfo("settings starting_armies " + player.getArmiesLeft());
 	}
 	
 	//inform the player about how his visible map looks now

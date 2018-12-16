@@ -1,7 +1,7 @@
 package conquest.engine.replay;
 
-import conquest.engine.RunGame.Config;
-import conquest.engine.RunGame.GameResult;
+import conquest.engine.Config;
+import conquest.engine.GameResult;
 
 public abstract class GameLog {
 	

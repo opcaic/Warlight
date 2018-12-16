@@ -2,7 +2,7 @@ package conquest.tournament.run;
 
 import java.util.Random;
 
-import conquest.engine.RunGame.Config;
+import conquest.engine.Config;
 
 
 public class ConquestFightRoundGenerator {

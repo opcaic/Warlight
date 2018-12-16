@@ -2,9 +2,9 @@ package conquest;
 
 import java.io.File;
 
+import conquest.engine.Config;
+import conquest.engine.GameResult;
 import conquest.engine.RunGame;
-import conquest.engine.RunGame.Config;
-import conquest.engine.RunGame.GameResult;
 
 public class Conquest {
 	

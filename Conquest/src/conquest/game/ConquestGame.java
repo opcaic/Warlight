@@ -181,12 +181,12 @@ public class ConquestGame {
                 if(map.visibleRegionsForPlayer(player1).contains(move.getRegion()))
                 {
                     if(move.getPlayerName().equals(player2.getId()))
-                        opponentMoves.add(move); //for the opponent_moves output
+                        opponentMoves.add(move);
                 }
                 if(map.visibleRegionsForPlayer(player2).contains(move.getRegion()))
                 {
                     if(move.getPlayerName().equals(player1.getId()))
-                        opponentMoves.add(move); //for the opponent_moves output
+                        opponentMoves.add(move);
                 }
             }
         }

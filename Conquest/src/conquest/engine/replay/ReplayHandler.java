@@ -8,8 +8,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import conquest.engine.RunGame.Config;
-import conquest.engine.RunGame.GameResult;
+import conquest.engine.Config;
 import conquest.engine.io.handler.IHandler;
 import conquest.engine.replay.GameLog.LogLine;
 import conquest.engine.replay.GameLog.Way;

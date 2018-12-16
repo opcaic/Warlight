@@ -22,12 +22,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
 
-import conquest.bot.external.JavaBot;
-import conquest.engine.Engine.EngineConfig;
 import conquest.engine.Robot.RobotConfig;
 import conquest.engine.replay.FileGameLog;
 import conquest.engine.replay.GameLog;
@@ -37,169 +34,12 @@ import conquest.engine.robot.IORobot;
 import conquest.engine.robot.InternalRobot;
 import conquest.engine.robot.ProcessRobot;
 import conquest.game.*;
-import conquest.game.move.MoveResult;
 import conquest.game.world.Continent;
 import conquest.game.world.Region;
 import conquest.view.GUI;
 
 public class RunGame
 {
-	
-	public static class Config implements Cloneable {
-		
-		public String gameId = "GAME";
-		
-		/**
-		 * Used by ENGINE as PLAYER IDENTIFIER of the player 1
-		 * BETTER NOT TO ALTER AT ALL...
-		 */
-		public String playerId1 = "PLR1";
-		/**
-		 * Used by ENGINE as PLAYER IDENTIFIER of the player 2
-		 * BETTER NOT TO ALTER AT ALL...
-		 */
-		public String playerId2 = "PLR2";
-		
-		/**
-		 * Human-readable name of player 1 to display during visualization or to report into CSV.
-		 */
-		public String player1Name = "Bot1";
-		/**
-		 * Human-readable name of player 2 to display during visualization or to report into CSV.
-		 */
-		public String player2Name = "Bot2";
-		
-		public String bot1Init;
-		public String bot2Init;
-		
-		public boolean visualize = true;
-		
-		public Boolean visualizeContinual = null;
-		
-		public Integer visualizeContinualFrameTimeMillis = null;
-		
-		public boolean logToConsole = true;
-		
-		public File replayLog = null;
-		
-		public EngineConfig engine = new EngineConfig();
-		
-		public String asString() {
-			return gameId + ";" + playerId1 + ";" + playerId2 + ";" + player1Name + ";" + player2Name + ";" +
-		           visualize + ";" + visualizeContinual + ";" + visualizeContinualFrameTimeMillis + ";" +
-				   logToConsole + ";" + engine.asString();
-		}
-		
-		@Override
-		public Config clone() {
-			Config result = fromString(asString());
-			
-			result.replayLog = replayLog;
-			result.bot1Init = bot1Init;
-			result.bot2Init = bot2Init;
-			
-			return result;
-		}
-		
-		public String getCSVHeader() {
-			return "ID;PlayerName1;PlayerName2;" + engine.getCSVHeader();
-		}
-		
-		public String getCSV() {
-			return gameId + ";" + player1Name + ";" + player2Name + ";" + engine.getCSV();
-		}
-		
-		public static Config fromString(String line) {
-			
-			String[] parts = line.split(";");
-			
-			Config result = new Config();
-
-			result.gameId = parts[0];
-			result.playerId1 = parts[1];
-			result.playerId2 = parts[2];
-			result.player1Name = parts[3];
-			result.player2Name = parts[4];
-			result.visualize = Boolean.parseBoolean(parts[5]);
-			result.visualizeContinual = (parts[6].toLowerCase().equals("null") ? null : Boolean.parseBoolean(parts[6]));
-			result.visualizeContinualFrameTimeMillis = (parts[7].toLowerCase().equals("null") ? null : Integer.parseInt(parts[7]));
-			result.logToConsole = Boolean.parseBoolean(parts[8]);
-			
-			int engineConfigStart = 0;
-			for (int i = 0; i < 9; ++i) {
-				engineConfigStart = line.indexOf(";", engineConfigStart);
-				++engineConfigStart;
-			}
-			
-			result.engine = EngineConfig.fromString(line.substring(engineConfigStart));
-			
-			return result;
-		}
-		
-	}
-	
-	public static class GameResult {
-		
-		public Config config;
-		
-		public int player1Regions;
-		public int player1Armies;
-		
-		public int player2Regions;
-		public int player2Armies;
-		
-		public Team winner = null;
-		
-		/**
-		 * Number of the round the game ended.
-		 */
-		public int round;
-
-		public String getWinnerId() {
-			if (winner == null) return "NONE";
-			switch (winner) {
-			case NEUTRAL: return "NONE";
-			case PLAYER_1: return config == null ? "Player1" : config.playerId1;
-			case PLAYER_2: return config == null ? "Player2" : config.playerId2;
-			}
-			return null;
-		}
-		
-		public String getWinnerName() {
-			if (winner == null) return "NONE";
-			switch (winner) {
-			case NEUTRAL: return "NONE";
-			case PLAYER_1: return config == null ? "Bot1" : config.player1Name;
-			case PLAYER_2: return config == null ? "Bot2" : config.player2Name;
-			}
-			return null;
-		}
-		
-		public int getWinnerRegions() {
-			return winner == Team.PLAYER_1 ? player1Regions : player2Regions;
-		}
-		
-		public int getWinnerArmies() {
-			return winner == Team.PLAYER_1 ? player1Armies : player2Armies;
-		}
-
-		public String asString() {
-			return getWinnerId() + ";" + player1Regions + ";" + player1Armies + ";" + player2Regions + ";" + player2Armies + ";" + round;
-		}
-		
-		public String getHumanString() {
-			return "Winner: " + getWinnerId() + "[" + getWinnerName() + "] in round " + round + "\nPlayer1: " + player1Regions + " regions / " + player1Armies + " armies\nPlayer2: " + player2Regions + " regions / " + player2Armies + " armies";
-		}
-		
-		public String getCSVHeader() {
-			return "winnerName;winner;winnerId;player1Regions;player1Armies;player2Regions;player2Armies;round;" + config.getCSVHeader();
-		}
-		
-		public String getCSV() {
-			return getWinnerName() + ";" + (winner == null || winner == Team.NEUTRAL ? "NONE" : winner) + ";" + getWinnerId() + ";" + player1Regions + ";" + player1Armies + ";" + player2Regions + ";" + player2Armies + ";" + round + ";" + config.getCSV();
-		}
-		
-	}
 	
 	Config config;
 	
@@ -359,7 +199,6 @@ public class RunGame
 		throw new RuntimeException("Invalid init string for player '" + playerId + "', must start either with 'process:' or 'internal:' or 'human', passed value was: " + botInit);
 	}
 
-	//aanpassen en een QPlayer class maken? met eigen finish
 	private GameResult finish(GameMap map, Robot bot1, Robot bot2) throws InterruptedException
 	{
 		System.out.println("GAME FINISHED: stopping bots...");
@@ -452,11 +291,8 @@ public class RunGame
 		setupNeighborsString = getNeighborsString(initMap);
 		
 		bot.writeInfo(setupSuperRegionsString);
-		// System.out.println(setupSuperRegionsString);
 		bot.writeInfo(setupRegionsString);
-		// System.out.println(setupRegionsString);
 		bot.writeInfo(setupNeighborsString);
-		// System.out.println(setupNeighborsString);
 	}
 	
 	private String getSuperRegionsString(GameMap map)
@@ -483,7 +319,6 @@ public class RunGame
 		return regionsString;
 	}
 	
-	//beetje inefficiente methode, maar kan niet sneller wss
 	private String getNeighborsString(GameMap map)
 	{
 		String neighborsString = "setup_map neighbors";
@@ -552,7 +387,7 @@ public class RunGame
 		return result;
 	}
 	
-	public static void main(String args[]) throws Exception
+	public static void main(String args[])
 	{	
 		Config config = new Config();
 		
