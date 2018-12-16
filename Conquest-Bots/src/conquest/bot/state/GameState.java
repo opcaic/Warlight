@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import conquest.bot.BotState;
+import conquest.bot.state.compact.GameStateCompact;
 import conquest.game.*;
 import conquest.game.world.Continent;
 import conquest.game.world.Region;
@@ -56,6 +57,10 @@ public class GameState implements Cloneable {
 		reset(state);		
 	}
 	
+	public GameState(GameStateCompact gameStateCompact) {
+		reset(gameStateCompact);
+	}
+	
 	@Override
 	public GameState clone() {
 		return new GameState(this);
@@ -102,6 +107,54 @@ public class GameState implements Cloneable {
 	            state.getRoundNumber(), state.getPickableStartingRegions(), null);
 	}
 	
+	/**
+	 * Fully (re)creates the state out of the {@link GameStateCompact}, throwing out all existing objects it has.
+	 * @param gameStateCompact
+	 */
+	private void reset(GameStateCompact gameStateCompact) {
+		reset();
+
+		// FILL IN STATES
+		for (Region region : Region.values()) {
+			// REGION
+			RegionState regionState = region(region);
+			regionState.armies = gameStateCompact.armiesAt(region);
+			regionState.owner = player(gameStateCompact.ownedBy(region));
+			
+			// CONTINENT
+			ContinentState continentState = continent(regionState.region);
+			continentState.regions.put(regionState.region, regionState);
+			continentState.owned[regionState.owner.player.id] += 1;
+			
+			// PLAYER STATE
+			PlayerState playerState = regionState.owner;
+			playerState.regions.put(regionState.region, regionState);
+			playerState.totalArmies += regionState.armies;
+		}
+		
+		// UPDATE CONTINENT OWNERSHIPS & PLACE ARMIES
+		for (Continent continent : Continent.values()) {
+			ContinentState continentState = continent(continent);
+			boolean isNeutral = true;
+			for (Player player : Player.values()) {
+				if (continentState.owned[player.id] == continentState.regions.size()) {
+					continentState.owner = player;
+					PlayerState playerState = player(player);
+					playerState.continents.put(continent, continentState);		
+					if (player != Player.NEUTRAL) {
+						playerState.placeArmies += continent.reward;
+					}
+					isNeutral = player == Player.NEUTRAL;
+					break;
+				}
+			}
+			if (isNeutral) {
+				continentState.owner = Player.NEUTRAL;
+				player(Player.NEUTRAL).continents.put(continent, continentState);
+			}
+		}
+	}
+
 	/**
 	 * Fully (re)creates the state out of the {@link BotState}, throwing out all existing objects it has.
 	 * @param state
