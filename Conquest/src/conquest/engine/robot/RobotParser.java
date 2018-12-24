@@ -121,7 +121,7 @@ public class RobotParser {
 		return map.getRegion(id);
 	}
 	
-	public ArrayList<RegionData> parsePreferredStartingRegions(String input, ArrayList<RegionData> pickableRegions, PlayerInfo player)
+	public ArrayList<RegionData> parsePreferredStartingRegions(String input, PlayerInfo player)
 	{
 		ArrayList<RegionData> preferredStartingRegions = new ArrayList<RegionData>();
 

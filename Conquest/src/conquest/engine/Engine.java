@@ -31,31 +31,30 @@ import conquest.view.GUI;
 public class Engine {
     ConquestGame game;
 	
-	private PlayerInfo player1;
-	private PlayerInfo player2;
-	private Robot robot1;
-	private Robot robot2;
+	private Robot[] robots;
 	private long timeoutMillis;
-	private GameMap map;
 	private RobotParser parser;
 	private ArrayList<Move> opponentMoves;
 	private GUI gui;
 	
-	public Engine(ConquestGame game, PlayerInfo player1, PlayerInfo player2,
-	              Robot robot1, Robot robot2, GUI gui, long timeoutMillis)
+	public Engine(ConquestGame game, Robot[] robots, GUI gui, long timeoutMillis)
 	{
 	    this.game = game;
 	    
 		this.gui = gui;
-		this.map = game.getMap();
 		
-		this.player1 = player1;
-		this.player2 = player2;
-		this.robot1 = robot1;
-		this.robot2 = robot2;
+		this.robots = robots;
 		this.timeoutMillis = timeoutMillis;		
 		
-		parser = new RobotParser(map);
+		parser = new RobotParser(game.getMap());
+	}
+	
+	PlayerInfo player(int i) {
+	    return game.player(i);
+	}
+	
+	Robot robot(int i) {
+	    return robots[i - 1];
 	}
 	
     private List<PlaceArmiesMove> placeArmiesMoves(String input, PlayerInfo player) {
@@ -86,41 +85,39 @@ public class Engine {
 	{
 		if (gui != null) {
 			gui.newRound(game.getRoundNumber());
-			gui.updateRegions(map.regions);
+			gui.updateRegions(game.getMap().regions);
 		}
 		
-		List<PlaceArmiesMove> placeMoves1 =
-		    placeArmiesMoves(robot1.getPlaceArmiesMoves(timeoutMillis), player1);
-		
-        List<PlaceArmiesMove> placeMoves2 =
-            placeArmiesMoves(robot2.getPlaceArmiesMoves(timeoutMillis), player2);
-		
-		game.placeArmies(placeMoves1, placeMoves2, opponentMoves);
-
-		sendUpdateMapInfo(player1, robot1);
-		sendUpdateMapInfo(player2, robot2);
-		
-		if (gui != null) {
-	        List<PlaceArmiesMove> legalMoves = new ArrayList<PlaceArmiesMove>();
-
-	        for (PlaceArmiesMove move : placeMoves1)
-	            if (move.getIllegalMove().equals(""))
-	                legalMoves.add(move);
-            
-	        for (PlaceArmiesMove move : placeMoves2)
-                if (move.getIllegalMove().equals(""))
-                    legalMoves.add(move);
-	        
-			gui.placeArmies(map.regions, legalMoves);
+		for (int i = 1 ; i <= 2 ; ++i) {
+    		List<PlaceArmiesMove> placeMoves =
+    		    placeArmiesMoves(robot(i).getPlaceArmiesMoves(timeoutMillis), player(i));
+    		
+    		game.placeArmies(placeMoves, opponentMoves);
+    
+    		for (int j = 1 ; j <= 2 ; ++j)
+    		    sendUpdateMapInfo(player(j), robot(j));
+    		
+    		if (gui != null) {
+    	        List<PlaceArmiesMove> legalMoves = new ArrayList<PlaceArmiesMove>();
+    
+    	        for (PlaceArmiesMove move : placeMoves)
+    	            if (move.getIllegalMove().equals(""))
+    	                legalMoves.add(move);
+                
+    			gui.placeArmies(game.getMap().regions, legalMoves);
+    		}
+    		
+    		List<AttackTransferMove> moves =
+    		    attackTransferMoves(robot(i).getAttackTransferMoves(timeoutMillis), player(i));
+    		
+    		game.attackTransfer(moves, opponentMoves);
+    		
+    		if (game.isDone())
+    		    break;
 		}
 		
-		List<AttackTransferMove> moves1 = attackTransferMoves(robot1.getAttackTransferMoves(timeoutMillis), player1);
-        List<AttackTransferMove> moves2 = attackTransferMoves(robot2.getAttackTransferMoves(timeoutMillis), player2);
-		
-		game.attackTransfer(moves1, moves2, opponentMoves);
-		
 		if (gui != null) {
-			gui.updateAfterRound(map);
+			gui.updateAfterRound(game.getMap());
 		}
 		
 		sendAllInfo();	
@@ -134,25 +131,21 @@ public class Engine {
 			gui.pickableRegions(pickableRegions);
 		}
 		
-		//get the preferred starting regions from the players
-		List<RegionData> p1Regions = parser.parsePreferredStartingRegions(
-		        robot1.getPreferredStartingArmies(timeoutMillis, pickableRegions), pickableRegions, player1);
-		List<RegionData> p2Regions = parser.parsePreferredStartingRegions(
-		        robot2.getPreferredStartingArmies(timeoutMillis, pickableRegions), pickableRegions, player2);
-		
-		//if the bot did not correctly return his starting regions, get some random ones
-		if(game.validateStartingRegions(p1Regions) != null) {
-			p1Regions = getRandomStartingRegions(pickableRegions);
-		}
-		if(game.validateStartingRegions(p2Regions) != null) {
-		    p2Regions = getRandomStartingRegions(pickableRegions);
-		}
-
-		game.distributeRegions(p1Regions, p2Regions);
-		
-		if (gui != null) {
-			gui.regionsChosen(map.regions);
-		}
+	    for (int i = 1 ; i <= 2 ; ++i) {
+    		List<RegionData> regions = parser.parsePreferredStartingRegions(
+    		    robot(i).getPreferredStartingArmies(timeoutMillis, pickableRegions), player(i));
+    		
+    		//if the bot did not correctly return his starting regions, get some random ones
+    		if(game.validateStartingRegions(regions) != null) {
+    			regions = getRandomStartingRegions(pickableRegions);
+    		}
+    
+    		game.distributeRegions(regions);
+    		
+    		if (gui != null) {
+    			gui.regionsChosen(game.getMap().regions);
+    		}
+	    }
 	}
 	
 	private List<RegionData> getRandomStartingRegions(ArrayList<RegionData> pickableRegions)
@@ -164,12 +157,11 @@ public class Engine {
 	
 	public void sendAllInfo()
 	{
-		sendStartingArmiesInfo(player1, robot1);
-		sendStartingArmiesInfo(player2, robot2);
-		sendUpdateMapInfo(player1, robot1);
-		sendUpdateMapInfo(player2, robot2);
-		sendOpponentMovesInfo(player1, robot1);
-		sendOpponentMovesInfo(player2, robot2);
+	    for (int i = 1 ; i <= 2 ; ++i) {
+	        sendStartingArmiesInfo(player(i), robot(i));
+	        sendUpdateMapInfo(player(i), robot(i));
+	        sendOpponentMovesInfo(player(i), robot(i));
+	    }
 		opponentMoves.clear();
 	}
 		
@@ -184,9 +176,9 @@ public class Engine {
 	{
 		ArrayList<RegionData> visibleRegions;
 		if (game.config.fullyObservableGame) {
-			visibleRegions = map.regions;
+			visibleRegions = game.getMap().regions;
 		} else {
-			visibleRegions = map.visibleRegionsForPlayer(player);
+			visibleRegions = game.getMap().visibleRegionsForPlayer(player);
 		}
 		String updateMapString = "update_map";
 		for(RegionData region : visibleRegions)

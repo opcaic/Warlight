@@ -53,17 +53,16 @@ public class RunGame
 			
 			this.config.game = replay.getConfig().game;
 			
-			PlayerInfo player1, player2;
-			Robot robot1, robot2;
+			PlayerInfo[] players = new PlayerInfo[2];
+			Robot[] robots = new Robot[2];
 			
-			//setup the bots: bot1, bot2
-			robot1 = new IORobot(replay);
-			robot2 = new IORobot(replay);
+			robots[0] = new IORobot(replay);
+			robots[1] = new IORobot(replay);
 					
-			player1 = new PlayerInfo(config.playerId1, config.player1Name);
-			player2 = new PlayerInfo(config.playerId2, config.player2Name);
+			players[0] = new PlayerInfo(config.playerId1, config.player1Name);
+			players[1] = new PlayerInfo(config.playerId2, config.player2Name);
 			
-			return go(null, player1, player2, robot1, robot2);
+			return go(null, players, robots);
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to replay the game.", e);
 		}
@@ -79,27 +78,26 @@ public class RunGame
 			
 			System.out.println("starting game " + config.gameId);
 			
-			PlayerInfo player1, player2;
-			Robot robot1, robot2;
+			PlayerInfo[] players = new PlayerInfo[2];
+			Robot[] robots = new Robot[2];
 			
-			//setup the bots: bot1, bot2
-			robot1 = setupRobot(config.playerId1, config.bot1Init);
-			robot2 = setupRobot(config.playerId2, config.bot2Init);
+			robots[0] = setupRobot(config.playerId1, config.bot1Init);
+			robots[1] = setupRobot(config.playerId2, config.bot2Init);
 					
-			player1 = new PlayerInfo(config.playerId1, config.player1Name);
-			player2 = new PlayerInfo(config.playerId2, config.player2Name);
+			players[0] = new PlayerInfo(config.playerId1, config.player1Name);
+			players[1] = new PlayerInfo(config.playerId2, config.player2Name);
 						
-			return go(log, player1, player2, robot1, robot2);
+			return go(log, players, robots);
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to run/finish the game.", e);
 		}
 	}
 
-	private GameResult go(GameLog log, PlayerInfo player1, PlayerInfo player2, Robot robot1, Robot robot2) throws InterruptedException {
+	private GameResult go(GameLog log, PlayerInfo[] players, Robot[] robots) throws InterruptedException {
 		// setup GUI
 		GUI gui = null;
 		if (config.visualize) {
-			gui = new GUI(config.playerId1, config.playerId2, robot1.getRobotPlayerId(), robot2.getRobotPlayerId());
+			gui = new GUI(config.playerId1, config.playerId2, robots[0].getRobotPlayerId(), robots[1].getRobotPlayerId());
 			if (config.visualizeContinual != null) {
 				gui.setContinual(config.visualizeContinual);
 			}
@@ -108,39 +106,33 @@ public class RunGame
 			}
 		}
 		
-		game = new ConquestGame(config.game, player1, player2, gui);
+		game = new ConquestGame(config.game, players, gui);
 		
 		//start the engine
-		this.engine = new Engine(game, player1, player2, robot1, robot2, gui,
-		                         config.botCommandTimeoutMillis);
+		this.engine = new Engine(game, robots, gui, config.botCommandTimeoutMillis);
 		
 		if (log != null) {
 			log.start(config);
 		}
 		
-		// setup robots
-		RobotConfig robot1Cfg =
-			new RobotConfig(player1.getId(), player1.getName(), Team.PLAYER_1,
-				            config.botCommandTimeoutMillis, log, config.logToConsole, gui);
-		
-		RobotConfig robot2Cfg =
-			new RobotConfig(player2.getId(), player2.getName(), Team.PLAYER_2,
-					        config.botCommandTimeoutMillis, log, config.logToConsole, gui);
-				
-		robot1.setup(robot1Cfg);
-		robot2.setup(robot2Cfg);
+		for (int i = 0 ; i < 2 ; ++i) {
+		    RobotConfig robotCfg =
+		            new RobotConfig(players[i].getId(), players[i].getName(), i == 0 ? Team.PLAYER_1 : Team.PLAYER_2,
+		                    config.botCommandTimeoutMillis, log, config.logToConsole, gui);
+		    robots[i].setup(robotCfg);
+		}
 		
 		if (gui != null) {
-			gui.setPlayerNames(robot1.getRobotPlayerName(), robot2.getRobotPlayerName());
+			gui.setPlayerNames(robots[0].getRobotPlayerName(), robots[1].getRobotPlayerName());
 		}		
 				
 		//send the bots the info they need to start
-		robot1.writeInfo("settings your_bot " + player1.getId());
-		robot1.writeInfo("settings opponent_bot " + player2.getId());
-		robot2.writeInfo("settings your_bot " + player2.getId());
-		robot2.writeInfo("settings opponent_bot " + player1.getId());
-		sendSetupMapInfo(robot1, game.getMap());
-		sendSetupMapInfo(robot2, game.getMap());
+		for (int i = 0 ; i < 2 ; ++i) {
+		    robots[i].writeInfo("settings your_bot " + players[i].getId());
+		    robots[i].writeInfo("settings opponent_bot " + players[2 - i].getId());
+		    robots[i].writeInfo("settings your_player_number " + (i + 1));
+		    sendSetupMapInfo(robots[i], game.getMap());
+		}
 		engine.distributeStartingRegions(); //decide the player's starting regions
 		engine.sendAllInfo();
 		
@@ -153,7 +145,7 @@ public class RunGame
 			engine.playRound();
 		}
 
-		GameResult result = finish(game.getMap(), robot1, robot2);
+		GameResult result = finish(game.getMap(), robots);
 		
 		if (log != null) {
 			log.finish(result);
@@ -166,7 +158,7 @@ public class RunGame
 		if (botInit.startsWith("dir;process:")) {
 			String cmd = botInit.substring(12);
 			int semicolon = cmd.indexOf(";");
-			if (semicolon < 0) throw new RuntimeException("Invalid bot torrent (does not contain ';' separating directory and commmend): " + botInit);
+			if (semicolon < 0) throw new RuntimeException("Invalid bot torrent (does not contain ';' separating directory and command): " + botInit);
 			String dir = cmd.substring(0, semicolon);
 			String process = cmd.substring(semicolon+1);			
 			return new ProcessRobot(playerId, dir, process);
@@ -186,20 +178,15 @@ public class RunGame
 		throw new RuntimeException("Invalid init string for player '" + playerId + "', must start either with 'process:' or 'internal:' or 'human', passed value was: " + botInit);
 	}
 
-	private GameResult finish(GameMap map, Robot bot1, Robot bot2) throws InterruptedException
+	private GameResult finish(GameMap map, Robot[] bots) throws InterruptedException
 	{
 		System.out.println("GAME FINISHED: stopping bots...");
-		try {
-			bot1.finish();
-		} catch (Exception e) {			
-		}
+		for (Robot r : bots)
+    		try {
+    			r.finish();
+    		} catch (Exception e) { }
 		
-		try {
-			bot2.finish();
-		} catch (Exception e) {			
-		}
-		
-		return this.saveGame(map, bot1, bot2);        
+		return this.saveGame(map);        
 	}
 
 	private void sendSetupMapInfo(Robot bot, GameMap initMap)
@@ -271,7 +258,7 @@ public class RunGame
 		return true;
 	}
 
-	public GameResult saveGame(GameMap map, Robot bot1, Robot bot2) {
+	public GameResult saveGame(GameMap map) {
 
 		GameResult result = new GameResult();
 		

@@ -44,6 +44,7 @@ public class BotState {
 	private int startingArmies; //number of armies the player can place on map
 	
 	private int roundNumber;
+	private int playerNumber;
 	
 	public BotState()
 	{
@@ -70,7 +71,8 @@ public class BotState {
 		{
 			startingArmies = Integer.parseInt(value);
 			roundNumber++; //next round
-		}
+		} else if (key.equals("your_player_number"))
+		    playerNumber = Integer.parseInt(value);
 	}
 	
 	//initial map is given to the bot with all the information except for player and armies info
@@ -190,6 +192,10 @@ public class BotState {
 	
 	public int getRoundNumber(){
 		return roundNumber;
+	}
+	
+	public int getMyPlayerNumber() {
+	    return playerNumber;
 	}
 	
 	/**
