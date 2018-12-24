@@ -173,7 +173,7 @@ public class ConquestGame implements Cloneable {
     }
     
     void initStartingRegions() {
-        ArrayList<RegionData> pickableRegions = new ArrayList<RegionData>();
+        pickableRegions = new ArrayList<RegionData>();
         int regionsAdded = 0;
         
         //pick semi random regions to start with
@@ -230,8 +230,14 @@ public class ConquestGame implements Cloneable {
         String s = validateStartingRegions(regions);
         if (s != null) throw new Error(s);
         
+        int count = 0;
         for (RegionData r : regions)
-            r.setPlayerName(player(turn).getId());
+            if (r.getPlayerName().equals(Neutral)) {
+                r.setPlayerName(player(turn).getId());
+                count += 1;
+                if (count == nrOfStartingRegions)
+                    break;
+            }
         
         turn = 3 - turn;
     }

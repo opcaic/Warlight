@@ -129,7 +129,7 @@ public class RunGame
 		//send the bots the info they need to start
 		for (int i = 0 ; i < 2 ; ++i) {
 		    robots[i].writeInfo("settings your_bot " + players[i].getId());
-		    robots[i].writeInfo("settings opponent_bot " + players[2 - i].getId());
+		    robots[i].writeInfo("settings opponent_bot " + players[1 - i].getId());
 		    robots[i].writeInfo("settings your_player_number " + (i + 1));
 		    sendSetupMapInfo(robots[i], game.getMap());
 		}

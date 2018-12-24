@@ -102,7 +102,7 @@ public class GameState implements Cloneable {
 	
 	ConquestGame fromBotState(BotState state) {
 	    PlayerInfo[] pi = new PlayerInfo[2];
-	    for (int i = 1 ; i < 2 ; ++i) {
+	    for (int i = 1 ; i <= 2 ; ++i) {
 	        String name = (i == state.getMyPlayerNumber() ? state.getMyPlayerName() : state.getOpponentPlayerName());
 	        pi[i - 1] = new PlayerInfo(name, "Player " + i);
 	    }

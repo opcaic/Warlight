@@ -47,6 +47,7 @@ public class Engine {
 		this.timeoutMillis = timeoutMillis;		
 		
 		parser = new RobotParser(game.getMap());
+		opponentMoves = new ArrayList<Move>();
 	}
 	
 	PlayerInfo player(int i) {
@@ -136,16 +137,18 @@ public class Engine {
     		    robot(i).getPreferredStartingArmies(timeoutMillis, pickableRegions), player(i));
     		
     		//if the bot did not correctly return his starting regions, get some random ones
-    		if(game.validateStartingRegions(regions) != null) {
+    		String error = game.validateStartingRegions(regions); 
+    		if(error != null) {
+    		    System.out.println(error);
     			regions = getRandomStartingRegions(pickableRegions);
     		}
     
     		game.distributeRegions(regions);
-    		
-    		if (gui != null) {
-    			gui.regionsChosen(game.getMap().regions);
-    		}
 	    }
+        
+        if (gui != null) {
+            gui.regionsChosen(game.getMap().regions);
+        }
 	}
 	
 	private List<RegionData> getRandomStartingRegions(ArrayList<RegionData> pickableRegions)
