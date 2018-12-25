@@ -22,7 +22,7 @@ public class ConquestGame implements Cloneable {
     
     // Create a game that is already in progress.
     public ConquestGame(GameConfig config, GameMap map, PlayerInfo[] players,
-                        int round, int turn, ArrayList<RegionData> pickableRegions, GUI gui) {
+                        int round, int turn, ArrayList<RegionData> pickableRegions) {
         this.config = config;
         this.map = map;
         this.players = players != null ? players :
@@ -38,20 +38,22 @@ public class ConquestGame implements Cloneable {
             config.seed += Integer.MAX_VALUE;
         this.random = new Random(config.seed);
                 
-        this.gui = gui;
-
         recalculateStartingArmies();
     }
     
     // Create a new game with the given configuration.
-    public ConquestGame(GameConfig config, PlayerInfo[] players, GUI gui) {
-        this(config, makeInitMap(), players, 1, 1, null, gui);
+    public ConquestGame(GameConfig config, PlayerInfo[] players) {
+        this(config, makeInitMap(), players, 1, 1, null);
         initStartingRegions();
     }
     
     // Create a new game with default parameters.
     public ConquestGame() {
-        this(new GameConfig(), null, null);
+        this(new GameConfig(), null);
+    }
+    
+    public void setGUI(GUI gui) {
+        this.gui = gui;
     }
     
     @Override
@@ -62,7 +64,7 @@ public class ConquestGame implements Cloneable {
         
         return new ConquestGame(
             config, map.clone(), new PlayerInfo[] { players[0].clone(), players[1].clone() },
-            round, turn, pickableRegions, gui);
+            round, turn, pickableRegions);
     }
     
     public GameMap getMap() { return map; }
@@ -73,6 +75,10 @@ public class ConquestGame implements Cloneable {
     
     public PlayerInfo player(int i) {
         return players[i - 1];
+    }
+    
+    public String playerName(int i) {
+        return player(i).getName();
     }
     
     public PlayerInfo getPlayer(String playerId)
@@ -271,8 +277,6 @@ public class ConquestGame implements Cloneable {
                     opponentMoves.add(move);
             }
         }
-        
-        turn = 3 - turn;
     }
     
     public static enum FightSide {
@@ -436,7 +440,7 @@ public class ConquestGame implements Cloneable {
             else if (totalFrom[fromRegion.getId()] + move.getArmies() >= fromRegion.getArmies())
                 move.setIllegalMove(fromRegion.getId() +
                         " attack/transfer has used all available armies");
-            else
+            else {
                 for (int j = 0 ; j < i ; ++j) {
                     AttackTransferMove n = moves.get(j);
                     if (n.getFromRegion() == fromRegion && n.getToRegion() == toRegion) {
@@ -445,6 +449,8 @@ public class ConquestGame implements Cloneable {
                         break;
                     }
                 }
+                totalFrom[fromRegion.getId()] += move.getArmies();
+            }
         }
     }
     

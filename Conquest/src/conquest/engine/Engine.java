@@ -105,7 +105,7 @@ public class Engine {
     	            if (move.getIllegalMove().equals(""))
     	                legalMoves.add(move);
                 
-    			gui.placeArmies(game.getMap().regions, legalMoves);
+    			gui.placeArmies(i, game.getMap().regions, legalMoves);
     		}
     		
     		List<AttackTransferMove> moves =

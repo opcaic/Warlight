@@ -34,6 +34,7 @@ public class Move {
 	 */
 	public void setIllegalMove(String illegalMove) {
 		this.illegalMove = illegalMove;
+		System.err.println(illegalMove);
 	}
 	
 	/**

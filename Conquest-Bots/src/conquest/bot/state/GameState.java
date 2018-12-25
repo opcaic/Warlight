@@ -109,7 +109,7 @@ public class GameState implements Cloneable {
 	                
 	    return new ConquestGame(
 	        new GameConfig(), state.getMap(), pi,
-	        state.getRoundNumber(), state.getMyPlayerNumber(), state.getPickableStartingRegions(), null);
+	        state.getRoundNumber(), state.getMyPlayerNumber(), state.getPickableStartingRegions());
 	}
 	
 	/**

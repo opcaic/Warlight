@@ -94,19 +94,19 @@ public class RunGame
 	}
 
 	private GameResult go(GameLog log, PlayerInfo[] players, Robot[] robots) throws InterruptedException {
-		// setup GUI
-		GUI gui = null;
+        game = new ConquestGame(config.game, players);
+
+        GUI gui;
 		if (config.visualize) {
-			gui = new GUI(config.playerId1, config.playerId2, robots[0].getRobotPlayerId(), robots[1].getRobotPlayerId());
+			gui = new GUI(game, config.playerId1, config.playerId2, robots[0].getRobotPlayerId(), robots[1].getRobotPlayerId());
 			if (config.visualizeContinual != null) {
 				gui.setContinual(config.visualizeContinual);
 			}
 			if (config.visualizeContinualFrameTimeMillis != null) {
 				gui.setContinualFrameTime(config.visualizeContinualFrameTimeMillis);
 			}
-		}
-		
-		game = new ConquestGame(config.game, players, gui);
+			game.setGUI(gui);
+		} else gui = null;
 		
 		//start the engine
 		this.engine = new Engine(game, robots, gui, config.botCommandTimeoutMillis);

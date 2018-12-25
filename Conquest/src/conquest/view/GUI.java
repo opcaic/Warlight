@@ -13,9 +13,7 @@ import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.SwingUtilities;
 
-import conquest.game.GameMap;
-import conquest.game.RegionData;
-import conquest.game.Team;
+import conquest.game.*;
 import conquest.game.move.AttackTransferMove;
 import conquest.game.move.PlaceArmiesMove;
 import conquest.game.world.Continent;
@@ -74,6 +72,8 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		{1055,500}, //42. Eastern Australia
 	};
 	
+	private ConquestGame game;
+	
 	private GUINotif notification;
 	
 	private JLabel roundNumTxt;
@@ -100,11 +100,12 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 	
 	public boolean showIds = false;
 	
-	public GUI(String playerEngineName1, String playerEngineName2, String playerName1, String playerName2)
+	public GUI(ConquestGame game, String playerEngineName1, String playerEngineName2, String playerName1, String playerName2)
 	{
 		System.out.println("GUI: Click to advance to next round.");
 		System.out.println("GUI: Hold right mouse button to QUICKLY advance through many rounds.");
 		
+		this.game = game;
 		this.playerName1 = playerEngineName1;
 		this.playerName2 = playerEngineName2;
 		
@@ -446,10 +447,10 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		updateStats();
 	}
 	
-	public void placeArmies(ArrayList<RegionData> regions, List<PlaceArmiesMove> placeArmiesMoves) {
+	public void placeArmies(int player, ArrayList<RegionData> regions, List<PlaceArmiesMove> placeArmiesMoves) {
 		this.requestFocusInWindow();
 		
-		actionTxt.setText("ARMIES PLACED");
+		actionTxt.setText(botName(player) + " places armies");
 		
 		updateRegions(regions);
 		
@@ -517,6 +518,10 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		mainArrow.setVisible(false);
 		
 		actionTxt.setText("---");
+	}
+	
+	String botName(int player) {
+	    return player == 1 ? botName1 : botName2;
 	}
 
 	String botName(String playerName) {
