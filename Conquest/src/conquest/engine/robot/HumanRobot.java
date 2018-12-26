@@ -26,15 +26,10 @@ public class HumanRobot implements Robot {
 	@Override
 	public String getPreferredStartingArmies(long timeOut, ArrayList<RegionData> pickableRegions) {
 		if (config.gameLog != null) {
-			System.out.println(config.playerId + "-Human --> getPrefferedStartingArmies()");
+			System.out.println(config.playerId + "-Human --> getPreferredStartingArmies()");
 		}
 		
-		List<Region> availableRegions = new ArrayList<Region>(pickableRegions.size());
-		for (RegionData data : pickableRegions) {
-			availableRegions.add(data.getRegion());
-		}
-		
-		List<Region> chosen = config.gui.chooseRegionsHuman(config.playerId, availableRegions);
+		List<Region> chosen = config.gui.chooseRegionsHuman(config.playerId);
 		
 		String result = "";
 		

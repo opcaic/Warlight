@@ -373,11 +373,11 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		waitForClick();		
 	}
 	
-	public void updateAfterRound(GameMap map) { //called by Engine.playRound()
+	public void updateMap() {
 		this.requestFocusInWindow();
 		
 		//Update regions info
-		for(RegionData region : map.regions) {
+		for(RegionData region : game.getMap().regions) {
 			int id = region.getId();
 			this.regions[id-1].setArmies(region.getArmies());
 			this.regions[id-1].setText(Integer.toString(region.getArmies()));			
@@ -645,20 +645,28 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		return b;
 	}
 	
-	public List<Region> chooseRegionsHuman(String playerName, List<Region> availableRegions) {
-		this.requestFocusInWindow();
+	public List<Region> chooseRegionsHuman(String playerName) {
+		requestFocusInWindow();
 		
-		this.chooseRegionsPlayerName = playerName;
+		chooseRegionsPlayerName = playerName;
 		chooseRegionsAction = new CountDownLatch(1);
 		
-		this.availableRegions = availableRegions;
-		this.chosenRegions = new ArrayList<Region>();
+		availableRegions = new ArrayList<Region>();
+		for (RegionData rd : game.pickableRegions)
+		    if (rd.getPlayerName().equals(ConquestGame.Neutral))
+		        availableRegions.add(rd.getRegion());
 		
-		actionTxt.setText(botName(chooseRegionsPlayerName) + ": choose " + (6-chosenRegions.size()) + " regions");
+		chosenRegions = new ArrayList<Region>();
+		
+		actionTxt.setText(botName(chooseRegionsPlayerName) + ": choose " +
+		                  (ConquestGame.nrOfStartingRegions -chosenRegions.size()) + " regions");
 		
 		regionButtons = new ArrayList<Button>();
 		
 		for (Region region : availableRegions) {
+		    if (!game.getMap().getRegion(region.id).getPlayerName().equals(ConquestGame.Neutral))
+		        continue;  // already taken
+		    
 			Button button = new Button("+");
 			button.setForeground(Color.WHITE);
 			button.setBackground(Color.BLACK);
@@ -703,7 +711,7 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		mainLayer.repaint();
 		
 		for (Region region : availableRegions) {
-			if (chosenRegions.size() == 6) break;
+			if (chosenRegions.size() == ConquestGame.nrOfStartingRegions) break;
 			if (chosenRegions.contains(region)) continue;
 			chosenRegions.add(region);
 		}
@@ -715,20 +723,20 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		if (chosenRegions.contains(region)) {
 			chosenRegions.remove(region);
 			renumberButtons();
-			finishedButton.setVisible(chosenRegions.size() == 6);
+			finishedButton.setVisible(chosenRegions.size() == ConquestGame.nrOfStartingRegions);
 			return;
 		}
 		
-		if (chosenRegions.size() == 6) return;
+		if (chosenRegions.size() == ConquestGame.nrOfStartingRegions) return;
 
 		chosenRegions.add(region);
 		renumberButtons();
 		
-		finishedButton.setVisible(chosenRegions.size() == 6);
+		finishedButton.setVisible(chosenRegions.size() == ConquestGame.nrOfStartingRegions);
 	}
 	
 	private void renumberButtons() {
-		int n = 6 - chosenRegions.size();
+		int n = ConquestGame.nrOfStartingRegions - chosenRegions.size();
 		actionTxt.setText(botName(chooseRegionsPlayerName) + ": choose " +
 	                     n + " region" + (n == 1 ? "" : "s"));
 		for (int i = 0; i < regionButtons.size(); ++i) {

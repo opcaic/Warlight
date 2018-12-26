@@ -129,7 +129,7 @@ public class RegionData {
 	 * @return A string with the name of the player that owns this region
 	 */
 	public String getPlayerName() {
-			return playerName;
+		return playerName;
 	}
 
 	public Region getRegion() {

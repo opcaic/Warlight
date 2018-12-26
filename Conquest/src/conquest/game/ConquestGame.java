@@ -16,9 +16,9 @@ public class ConquestGame implements Cloneable {
     Random random;
     GUI gui;
     
-    static final int nrOfStartingRegions = 3;
+    public static final int nrOfStartingRegions = 3;
     
-    static final String Neutral = "neutral";
+    public static final String Neutral = "neutral";
     
     // Create a game that is already in progress.
     public ConquestGame(GameConfig config, GameMap map, PlayerInfo[] players,

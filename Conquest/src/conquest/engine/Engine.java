@@ -118,7 +118,7 @@ public class Engine {
 		}
 		
 		if (gui != null) {
-			gui.updateAfterRound(game.getMap());
+			gui.updateMap();
 		}
 		
 		sendAllInfo();	
@@ -144,6 +144,8 @@ public class Engine {
     		}
     
     		game.distributeRegions(regions);
+    		if (gui != null)
+    		    gui.updateMap();
 	    }
         
         if (gui != null) {
