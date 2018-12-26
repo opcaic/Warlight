@@ -20,6 +20,7 @@ package conquest.engine;
 import java.util.ArrayList;
 import java.util.List;
 
+import conquest.engine.robot.HumanRobot;
 import conquest.engine.robot.RobotParser;
 import conquest.game.*;
 import conquest.game.move.AttackTransferMove;
@@ -98,7 +99,7 @@ public class Engine {
     		for (int j = 1 ; j <= 2 ; ++j)
     		    sendUpdateMapInfo(player(j), robot(j));
     		
-    		if (gui != null) {
+    		if (gui != null && !(robot(i) instanceof HumanRobot)) {
     	        List<PlaceArmiesMove> legalMoves = new ArrayList<PlaceArmiesMove>();
     
     	        for (PlaceArmiesMove move : placeMoves)
@@ -129,7 +130,7 @@ public class Engine {
 	    ArrayList<Region> pickableRegions = game.pickableRegions;
 	    
 		if (gui != null) {
-			gui.pickableRegions(pickableRegions);
+			gui.pickableRegions();
 		}
 		
 		for (int i = 1 ; i <= ConquestGame.nrOfStartingRegions ; ++i)

@@ -1,19 +1,13 @@
 package conquest.bot.custom;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 import conquest.bot.BotParser;
 import conquest.bot.fight.FightSimulation.FightAttackersResults;
 import conquest.bot.fight.FightSimulation.FightDefendersResults;
 import conquest.bot.map.RegionBFS;
-import conquest.bot.map.RegionBFS.BFSNode;
-import conquest.bot.map.RegionBFS.BFSVisitResult;
-import conquest.bot.map.RegionBFS.BFSVisitResultType;
-import conquest.bot.map.RegionBFS.BFSVisitor;
+import conquest.bot.map.RegionBFS.*;
 import conquest.bot.state.ChooseCommand;
 import conquest.bot.state.GameBot;
 import conquest.bot.state.MoveCommand;

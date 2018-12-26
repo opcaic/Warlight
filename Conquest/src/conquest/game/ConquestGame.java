@@ -71,6 +71,10 @@ public class ConquestGame implements Cloneable {
         return round;
     }
     
+    public int getTurn() {
+        return turn;
+    }
+    
     public PlayerInfo player(int i) {
         return players[i - 1];
     }
@@ -102,8 +106,11 @@ public class ConquestGame implements Cloneable {
     //calculate how many armies each player is able to place on the map for the next round
     public void recalculateStartingArmies()
     {
-        for (PlayerInfo p : players)
-            p.setArmiesPerTurn(config.startingArmies);
+        for (int p = 0 ; p < 2 ; ++p) {
+            PlayerInfo pi = players[p];
+            pi.setArmiesPerTurn(p == 0 && round <= 1 ? config.startingArmies / 2 :
+                                                       config.startingArmies);
+        }
         
         for(ContinentData superRegion : map.getContinents())
         {
@@ -439,9 +446,10 @@ public class ConquestGame implements Cloneable {
             }
         }
         
-        recalculateStartingArmies();
         turn = 3 - turn;
         if (turn == 1)
             round++;
+        
+        recalculateStartingArmies();
     }
 }

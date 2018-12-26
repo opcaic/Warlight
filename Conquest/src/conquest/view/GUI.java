@@ -387,24 +387,20 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		updateStats();
 	}
 
-	List<Region> pickableRegions = null;
-	
-	public void pickableRegions(List<Region> pickableRegions) {
+	public void pickableRegions() {
 		this.requestFocusInWindow();
 		
 		actionTxt.setText("PICKABLE REGIONS");
 		
-		for (Region region : pickableRegions) {
+		for (Region region : game.pickableRegions) {
 			int id = region.id;
 			RegionInfo ri = this.regions[id-1];
 			ri.setHighlight(RegionInfo.Green);
 		}
 		
-		this.pickableRegions = pickableRegions;
-		
 		waitForClick();
 		
-		for (Region region : pickableRegions) {
+		for (Region region : game.pickableRegions) {
 			int id = region.id;
 			RegionInfo ri = this.regions[id-1];
 			ri.setHighlight(false);
@@ -624,17 +620,9 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 	// CHOOSE INITIAL REGIONS
 	// ======================
 	
-	private CountDownLatch chooseRegionsAction;
+	private CountDownLatch chooseRegionAction;
 	
-	private List<Region> chosenRegions;
-	
-	private List<Region> availableRegions;
-	
-	private List<Button> regionButtons;
-	
-	private Button finishedButton;
-	
-	private String chooseRegionsPlayerName;
+	private Region chosenRegion;
 	
 	Button doneButton() {
 		Button b = new Button("DONE");
@@ -645,109 +633,31 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		return b;
 	}
 	
-	public List<Region> chooseRegionsHuman(String playerName) {
+	public Region chooseRegionHuman() {
 		requestFocusInWindow();
 		
-		chooseRegionsPlayerName = playerName;
-		chooseRegionsAction = new CountDownLatch(1);
+		chooseRegionAction = new CountDownLatch(1);
 		
-		availableRegions = new ArrayList<Region>();
-		for (Region r : game.pickableRegions)
-		    if (game.getMap().getRegionData(r).isNeutral())
-		        availableRegions.add(r);
+		actionTxt.setText(botName(game.getTurn()) + ": choose a starting region");
 		
-		chosenRegions = new ArrayList<Region>();
-		
-		actionTxt.setText(botName(chooseRegionsPlayerName) + ": choose " +
-		                  (ConquestGame.nrOfStartingRegions -chosenRegions.size()) + " regions");
-		
-		regionButtons = new ArrayList<Button>();
-		
-		for (Region region : availableRegions) {
-		    if (!game.getMap().getRegion(region.id).isNeutral())
-		        continue;  // already taken
-		    
-			Button button = new Button("+");
-			button.setForeground(Color.WHITE);
-			button.setBackground(Color.BLACK);
-			button.setSize(30, 20);
-			int[] regionPos = positions[region.id-1];
-			button.setLocation(regionPos[0] - 15, regionPos[1] + 40);
-			regionButtons.add(button);
-			
-			mainLayer.add(button, JLayeredPane.MODAL_LAYER);
-			
-			final Region targetRegion = region;
-			button.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					regionChosen(targetRegion);
-					GUI.this.requestFocusInWindow();
-				}
-			});
+		for (Region region : game.pickableRegions) {
+		    RegionInfo ri = this.regions[region.id-1];
+            ri.setHighlight(RegionInfo.Green);
 		}
 		
-		finishedButton = doneButton();
-		finishedButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				chooseRegionsAction.countDown();
-				GUI.this.requestFocusInWindow();
-			}
-		});
-		finishedButton.setVisible(false);
-		mainLayer.add(finishedButton, JLayeredPane.MODAL_LAYER);
-		
 		try {
-			chooseRegionsAction.await();
+			chooseRegionAction.await();
 		} catch (InterruptedException e) {
 			throw new RuntimeException("Interrupted while awaiting user action.");
 		}
 		
-		for (Button button : regionButtons) {
-			mainLayer.remove(button);			
-		}
-		mainLayer.remove(finishedButton);
-		mainLayer.repaint();
-		
-		for (Region region : availableRegions) {
-			if (chosenRegions.size() == ConquestGame.nrOfStartingRegions) break;
-			if (chosenRegions.contains(region)) continue;
-			chosenRegions.add(region);
+		for (Region region : game.pickableRegions) {
+            RegionInfo ri = this.regions[region.id-1];
+            ri.setHighlight(false);
 		}
 		
-		return chosenRegions;
-	}
-	
-	private void regionChosen(Region region) {
-		if (chosenRegions.contains(region)) {
-			chosenRegions.remove(region);
-			renumberButtons();
-			finishedButton.setVisible(chosenRegions.size() == ConquestGame.nrOfStartingRegions);
-			return;
-		}
-		
-		if (chosenRegions.size() == ConquestGame.nrOfStartingRegions) return;
-
-		chosenRegions.add(region);
-		renumberButtons();
-		
-		finishedButton.setVisible(chosenRegions.size() == ConquestGame.nrOfStartingRegions);
-	}
-	
-	private void renumberButtons() {
-		int n = ConquestGame.nrOfStartingRegions - chosenRegions.size();
-		actionTxt.setText(botName(chooseRegionsPlayerName) + ": choose " +
-	                     n + " region" + (n == 1 ? "" : "s"));
-		for (int i = 0; i < regionButtons.size(); ++i) {
-			Button button = regionButtons.get(i);
-			if (chosenRegions.contains(availableRegions.get(i))) {
-				int index = chosenRegions.indexOf(availableRegions.get(i));				
-				button.setLabel(String.valueOf(index+1) + ".");
-			} else {
-				button.setLabel("+");
-			}
-		}
+		chooseRegionAction = null;
+		return chosenRegion;
 	}
 	
 	// ============
@@ -973,21 +883,29 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 	}
 	
 	void regionClicked(RegionInfo ri, boolean left) {
+        Region region = ri.getRegion();
+        
+	    if (chooseRegionAction != null) {
+	        if (game.pickableRegions.contains(region)) {
+	            chosenRegion = region;
+                chooseRegionAction.countDown();
+	        }
+	        return;
+	    }
+	    
 		if (moving == null) {
 			clicked = true;
 			return;
 		}
 		
-		Region r = ri.getRegion();
-		
-		if (moveFrom != null && isNeighbor(moveFrom, r)) {
-			move(moveFrom, r, left ? 1 : -1);
+		if (moveFrom != null && isNeighbor(moveFrom, region)) {
+			move(moveFrom, region, left ? 1 : -1);
 			return;
 		}
 		if (!left)
 			return;
 		
-		moveFrom = (ri.getTeam() == moving) ? r : null;
+		moveFrom = (ri.getTeam() == moving) ? region : null;
 		highlight();
 	}
 

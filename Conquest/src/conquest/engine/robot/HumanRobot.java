@@ -28,19 +28,13 @@ public class HumanRobot implements Robot {
 			System.out.println(config.playerId + "-Human --> getPreferredStartingArmies()");
 		}
 		
-		List<Region> chosen = config.gui.chooseRegionsHuman(config.playerId);
+		Region chosen = config.gui.chooseRegionHuman();
 		
-		String result = "";
-		
-		for (Region region : chosen) {
-			if (result.length() > 0) result += " ";
-			result += region.id;
-		}
+		String result = chosen.id + "";
 		
 		if (config.gameLog != null) {
 			System.out.println(config.playerId + "-Human <-- " + result);
 		}
-		
 		
 		return result;
 	}
