@@ -62,12 +62,12 @@ public class ProcessRobot implements Robot
 //	}
 	
 	@Override
-	public String getPreferredStartingArmies(long timeOut, ArrayList<Region> pickableRegions)
+	public String getStartingRegion(long timeOut, ArrayList<Region> pickableRegions)
 	{
 		if (!isRunning()) {
 			throw new RuntimeException("Bot died out. Executed from '" + childDir.getAbsolutePath() + "' with command '" + childCommand + "'.");
 		}
-		return robot.getPreferredStartingArmies(timeOut, pickableRegions);
+		return robot.getStartingRegion(timeOut, pickableRegions);
 	}
 	
 	@Override

@@ -107,21 +107,14 @@ public class RobotParser {
 		return Region.forId(id);
 	}
 	
-	public ArrayList<Region> parsePreferredStartingRegions(String input, PlayerInfo player)
+	public Region parseStartingRegion(String input, PlayerInfo player)
 	{
-		ArrayList<Region> preferredStartingRegions = new ArrayList<Region>();
-
-		for (String s : input.split(" ")) {
-			Region r = parseRegion(s, input, player);
-			if (r != null)
-			    preferredStartingRegions.add(r);
-		}
-		return preferredStartingRegions;
+	    return parseRegion(input, input, player);
 	}
 
 	private void errorOut(String error, String input, PlayerInfo player)
 	{
-		//player.getBot().addToDump("Parse error: " + error + " (" + input + ")");
+		System.out.println("Parse error: " + error + " (" + input + ")");
 	}
 
 }

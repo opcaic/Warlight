@@ -31,9 +31,9 @@ public enum Region {
 	Great_Britain("Great Britain", 15, Continent.Europe, false, 16, 18 ,19), 
 	Scandinavia("Scandinavia", 16, Continent.Europe, false, 17), 
 	Ukraine("Ukraine", 17, Continent.Europe, true, 19, 20, 27, 32, 36), 
-	Western_Europe("West.Eur", 18, Continent.Europe, true, 19, 20, 21), 
-	Northern_Europe("North.Eur", 19, Continent.Europe, false, 20), 
-	Southern_Europe("South.Eur", 20, Continent.Europe, true, 21, 22, 36),
+	Western_Europe("West. Eur", 18, Continent.Europe, true, 19, 20, 21), 
+	Northern_Europe("North. Eur", 19, Continent.Europe, false, 20), 
+	Southern_Europe("South. Eur", 20, Continent.Europe, true, 21, 22, 36),
 	
 	// AFRIKA
 	North_Africa("North Africa", 21, Continent.Africa, true, 22, 23, 24), 

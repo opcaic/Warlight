@@ -36,17 +36,11 @@ public class MyBot extends GameBot
 	// This is a dummy implemementation that moves randomly.
 	//
 	
-	// Return 6 starting regions in order of preference.
+	// Choose a starting region.
 	
 	@Override
-	public List<ChooseCommand> chooseRegions(List<Region> choosable, long timeout) {
-		List<Region> l = new ArrayList<Region>(choosable);	// make a copy
-		Collections.shuffle(l);  // shuffle it randomly
-		
-		List<ChooseCommand> ret = new ArrayList<ChooseCommand>();
-		for (int i = 0 ; i < 6 ; ++i)
-			ret.add(new ChooseCommand(l.get(i)));
-		return ret;
+	public ChooseCommand chooseRegion(List<Region> choosable, long timeout) {
+		return new ChooseCommand(choosable.get(rand.nextInt(choosable.size())));
 	}
 
 	// Decide where to place armies this turn.

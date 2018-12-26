@@ -30,29 +30,14 @@ public abstract class GameBot implements Bot {
 	}
 	
 	@Override
-	public final ArrayList<Region> getPreferredStartingRegions(BotState state, Long timeOut) {
-		List<Region> pickableRegions = new ArrayList<Region>();
-		for (Region pickable : state.getPickableStartingRegions()) {
-			if (pickable == null) continue;
-			pickableRegions.add(pickable);
-		}
-		
-		List<ChooseCommand> cmds = chooseRegions(pickableRegions, timeOut == null ? Long.MAX_VALUE : timeOut);
-		
-		ArrayList<Region> result = new ArrayList<Region>(cmds.size());
-		for (ChooseCommand cmd : cmds) {
-			if (cmd == null) continue;
-			for (Region pickable : state.getPickableStartingRegions()) {
-				if (pickable.id == cmd.region.id) {
-					result.add(pickable);
-				}
-			}
-		}
-		
-		return result;
+	public final Region getStartingRegion(BotState state, Long timeOut) {
+		ChooseCommand cmd = chooseRegion(state.getPickableStartingRegions(),
+		                                 timeOut == null ? Long.MAX_VALUE : timeOut);
+
+		return cmd.region;
 	}
 	
-	public abstract List<ChooseCommand> chooseRegions(List<Region> choosable, long timeout);	
+	public abstract ChooseCommand chooseRegion(List<Region> choosable, long timeout);	
 	
 	@Override
 	public ArrayList<PlaceArmiesMove> getPlaceArmiesMoves(BotState state, Long timeOut) {

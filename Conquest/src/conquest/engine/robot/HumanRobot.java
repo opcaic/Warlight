@@ -23,7 +23,7 @@ public class HumanRobot implements Robot {
 	}
 
 	@Override
-	public String getPreferredStartingArmies(long timeOut, ArrayList<Region> pickableRegions) {
+	public String getStartingRegion(long timeOut, ArrayList<Region> pickableRegions) {
 		if (config.gameLog != null) {
 			System.out.println(config.playerId + "-Human --> getPreferredStartingArmies()");
 		}

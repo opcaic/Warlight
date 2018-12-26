@@ -64,7 +64,7 @@ public interface Robot {
 	
 	//public void writeMove(Move move);
 	
-	public String getPreferredStartingArmies(long timeOut, ArrayList<Region> pickableRegions);
+	public String getStartingRegion(long timeOut, ArrayList<Region> pickableRegions);
 	
 	public String getPlaceArmiesMoves(long timeOut);
 	

@@ -20,7 +20,6 @@ package conquest.bot;
 import java.util.ArrayList;
 
 import conquest.engine.robot.InternalRobot;
-import conquest.game.RegionData;
 import conquest.game.move.AttackTransferMove;
 import conquest.game.move.PlaceArmiesMove;
 import conquest.game.world.Region;
@@ -34,7 +33,7 @@ public interface Bot {
 	 * @param timeoutMillis in milliseconds
 	 * @return
 	 */
-	public ArrayList<Region> getPreferredStartingRegions(BotState state, Long timeoutMillis);
+	public Region getStartingRegion(BotState state, Long timeoutMillis);
 	
 	/**
 	 * PLACE ARMIES - distribute armies between your regions.

@@ -96,12 +96,12 @@ public class InternalRobot implements Robot {
 	}
 	
 	@Override
-	public String getPreferredStartingArmies(long timeOut, ArrayList<Region> pickableRegions)
+	public String getStartingRegion(long timeOut, ArrayList<Region> pickableRegions)
 	{
 		if (hijacked) {
-			return humanHijack.getPreferredStartingArmies(timeOut, pickableRegions);			
+			return humanHijack.getStartingRegion(timeOut, pickableRegions);			
 		}
-		return robot.getPreferredStartingArmies(timeOut, pickableRegions);
+		return robot.getStartingRegion(timeOut, pickableRegions);
 	}
 	
 	@Override

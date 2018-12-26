@@ -18,7 +18,6 @@
 package conquest.engine;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import conquest.engine.robot.RobotParser;
@@ -133,32 +132,30 @@ public class Engine {
 			gui.pickableRegions(pickableRegions);
 		}
 		
-	    for (int i = 1 ; i <= 2 ; ++i) {
-    		List<Region> regions = parser.parsePreferredStartingRegions(
-    		    robot(i).getPreferredStartingArmies(timeoutMillis, pickableRegions), player(i));
-    		
-    		//if the bot did not correctly return his starting regions, get some random ones
-    		String error = game.validateStartingRegions(regions); 
-    		if(error != null) {
-    		    System.out.println(error);
-    			regions = getRandomStartingRegions(pickableRegions);
-    		}
-    
-    		game.distributeRegions(regions);
-    		if (gui != null)
-    		    gui.updateMap();
-	    }
+		for (int i = 1 ; i <= ConquestGame.nrOfStartingRegions ; ++i)
+    	    for (int p = 1 ; p <= 2 ; ++p) {
+        		Region region = parser.parseStartingRegion(
+        		    robot(p).getStartingRegion(timeoutMillis, pickableRegions), player(p));
+        		
+        		//if the bot did not correctly return a starting region, get some random ones
+        		if (!game.pickableRegions.contains(region)) {
+        		    System.err.println("invalid starting region; choosing one at random");
+        			region = getRandomStartingRegion();
+        		}
+        
+        		game.chooseRegion(region);
+        		if (gui != null)
+        		    gui.updateMap();
+    	    }
         
         if (gui != null) {
             gui.regionsChosen(game.getMap().regions);
         }
 	}
 	
-	private List<Region> getRandomStartingRegions(ArrayList<Region> pickableRegions)
+	private Region getRandomStartingRegion()
 	{
-		List<Region> startingRegions = new ArrayList<Region>(pickableRegions);
-		Collections.shuffle(startingRegions);
-		return startingRegions.subList(0,6);
+		return game.pickableRegions.get(game.random.nextInt(game.pickableRegions.size()));
 	}
 	
 	public void sendAllInfo()

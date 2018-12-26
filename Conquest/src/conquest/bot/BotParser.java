@@ -25,7 +25,6 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 
 import conquest.engine.io.BotStreamReader;
-import conquest.game.RegionData;
 import conquest.game.move.AttackTransferMove;
 import conquest.game.move.PlaceArmiesMove;
 import conquest.game.world.Region;
@@ -142,13 +141,11 @@ public class BotParser extends Thread {
 			if(line.length() == 0) { continue; }
 			log("IN : " + line);
 			String[] parts = line.split(" ");
-			if(parts[0].equals("pick_starting_regions")) {
-				//pick which regions you want to start with
+			if(parts[0].equals("pick_starting_region")) {
+				//pick a region you want to start with
 				currentState.setPickableStartingRegions(parts);
-				ArrayList<Region> preferredStartingRegions = bot.getPreferredStartingRegions(currentState, Long.valueOf(parts[1]));
-				String output = "";
-				for(Region region : preferredStartingRegions)
-					output = output.concat(region.id + " ");
+				Region startingRegion = bot.getStartingRegion(currentState, Long.valueOf(parts[1]));
+				String output = startingRegion.id + "";
 				
 				log("OUT: " + output);
 				this.output.println(output);

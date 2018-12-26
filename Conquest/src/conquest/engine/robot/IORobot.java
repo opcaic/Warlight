@@ -66,9 +66,9 @@ public class IORobot implements Robot
 //	}
 	
 	@Override
-	public String getPreferredStartingArmies(long timeOut, ArrayList<Region> pickableRegions)
+	public String getStartingRegion(long timeOut, ArrayList<Region> pickableRegions)
 	{
-		String output = "pick_starting_regions " + timeOut;
+		String output = "pick_starting_region " + timeOut;
 		for(Region region : pickableRegions)
 			output = output.concat(" " + region.id);
 		

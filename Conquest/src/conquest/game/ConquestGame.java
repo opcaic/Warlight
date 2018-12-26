@@ -13,7 +13,7 @@ public class ConquestGame implements Cloneable {
     int round;
     int turn;
     public ArrayList<Region> pickableRegions;
-    Random random;
+    public Random random;
     GUI gui;
     
     public static final int nrOfStartingRegions = 3;
@@ -62,7 +62,7 @@ public class ConquestGame implements Cloneable {
         
         return new ConquestGame(
             config, map.clone(), new PlayerInfo[] { players[0].clone(), players[1].clone() },
-            round, turn, pickableRegions);
+            round, turn, new ArrayList<Region>(pickableRegions));
     }
     
     public GameMap getMap() { return map; }
@@ -117,8 +117,6 @@ public class ConquestGame implements Cloneable {
     {
         GameMap map = new GameMap();
         
-        // INIT SUPER REGIONS
-
         Map<Continent, ContinentData> continents = new TreeMap<Continent, ContinentData>(new Comparator<Continent>() {
             @Override
             public int compare(Continent o1, Continent o2) {
@@ -130,8 +128,6 @@ public class ConquestGame implements Cloneable {
             ContinentData continentData = new ContinentData(continent, continent.id, continent.reward);
             continents.put(continent, continentData);
         }
-        
-        // INIT REGIONS
         
         Map<Region, RegionData> regions = new TreeMap<Region, RegionData>(new Comparator<Region>() {
             @Override
@@ -145,8 +141,6 @@ public class ConquestGame implements Cloneable {
             regions.put(region, regionData);
         }
         
-        // INIT NEIGHBOURS
-        
         for (Region regionName : Region.values()) {
             RegionData region = regions.get(regionName);
             for (Region neighbour : regionName.getForwardNeighbours()) {
@@ -154,19 +148,15 @@ public class ConquestGame implements Cloneable {
             }
         }
         
-        // ADD REGIONS TO THE MAP
-        
         for (RegionData region : regions.values()) {
             map.add(region);
         }
         
-        // ADD SUPER REGIONS TO THE MAP
-
-        for (ContinentData superRegion : continents.values()) {
-            map.add(superRegion);
+        for (ContinentData continent : continents.values()) {
+            map.add(continent);
         }
 
-        //Make every region neutral with 2 armies to start with
+        // Make every region neutral with 2 armies to start with
         for(RegionData region : map.regions)
         {
             region.setPlayerName(Player.Neutral);
@@ -200,43 +190,12 @@ public class ConquestGame implements Cloneable {
         }
     }
     
-    public String validateStartingRegions(List<Region> regions) {
-        int count = 0;
+    public void chooseRegion(Region region) {
+        if (!pickableRegions.contains(region))
+            throw new Error("starting region is not pickable");
         
-        for (int i = 0 ; i < regions.size() ; ++i) {
-            Region r = regions.get(i);
-            
-            if (!map.getRegionData(r).isNeutral())
-                continue;  // already taken
-            
-            for (int j = 0 ; j < i ; ++j)
-                if (r == regions.get(j))
-                    return "same starting region appears more than once";
-            
-            count += 1;
-            
-            if (count == nrOfStartingRegions)
-                return null;
-        }
-        
-        return "not enough starting regions";
-    }
-    
-    public void distributeRegions(List<Region> regions) {
-        String s = validateStartingRegions(regions);
-        if (s != null) throw new Error(s);
-        
-        int count = 0;
-        for (Region r : regions) {
-            RegionData rd = map.getRegionData(r);
-            if (rd.isNeutral()) {
-                rd.setPlayerName(player(turn).getId());
-                count += 1;
-                if (count == nrOfStartingRegions)
-                    break;
-            }
-        }
-        
+        map.getRegionData(region).setPlayerName(player(turn).getId());
+        pickableRegions.remove(region);
         turn = 3 - turn;
     }
     

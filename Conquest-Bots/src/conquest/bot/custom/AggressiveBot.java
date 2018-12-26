@@ -50,29 +50,19 @@ public class AggressiveBot extends GameBot
 	// ================
 	
 	@Override
-	public List<ChooseCommand> chooseRegions(List<Region> choosable, long timeout) {
-		int m = 6;
-		
-		// SORT PICKABLE REGIONS ACCORDING TO THE PRIORITY
-		Collections.sort(choosable, new Comparator<Region>() {
-			@Override
-			public int compare(Region o1, Region o2) {
-				int priority1 = getPreferredContinentPriority(o1.continent);
-				int priority2 = getPreferredContinentPriority(o2.continent);				
-				return priority1 - priority2;
-			}
-		});
-		
-		// REMOVE CONTINENT WE DO NOT WANT
-		while (choosable.size() > m) choosable.remove(choosable.size()-1);
-		
-		// CREATE COMMANDS
-		List<ChooseCommand> result = new ArrayList<ChooseCommand>(choosable.size());
-		for (Region region : choosable) {
-			result.add(new ChooseCommand(region));
-		}
-		
-		return result;
+	public ChooseCommand chooseRegion(List<Region> choosable, long timeout) {
+	    int min = Integer.MAX_VALUE;
+	    Region best = null;
+	    
+	    for (Region r : choosable) {
+	        int p = getPreferredContinentPriority(r.continent);
+	        if (p < min) {
+	            min = p;
+	            best = r;
+	        }
+	    }
+	    
+		return new ChooseCommand(best);
 	}
 	
 	public int getPreferredContinentPriority(Continent continent) {
