@@ -16,7 +16,7 @@
 //    file that was distributed with this source code.
 
 package conquest.game.move;
-import conquest.game.RegionData;
+import conquest.game.world.Region;
 
 /**
  * This Move is used in the second part of each round. It represents the attack or transfer of armies from
@@ -26,12 +26,11 @@ import conquest.game.RegionData;
 
 public class AttackTransferMove extends Move {
 	
-	private RegionData fromRegion;
-	private RegionData toRegion;
+	private Region fromRegion;
+	private Region toRegion;
 	private int armies;
 	
-	//geen misbruik maken van playerName aub, alleen je eigen botnaam invullen
-	public AttackTransferMove(String playerName, RegionData fromRegion, RegionData toRegion, int armies)
+	public AttackTransferMove(String playerName, Region fromRegion, Region toRegion, int armies)
 	{
 		super.setPlayerName(playerName);
 		this.fromRegion = fromRegion;
@@ -49,14 +48,14 @@ public class AttackTransferMove extends Move {
 	/**
 	 * @return The Region this Move is attacking or transferring from
 	 */
-	public RegionData getFromRegion() {
+	public Region getFromRegion() {
 		return fromRegion;
 	}
 	
 	/**
 	 * @return The Region this Move is attacking or transferring to
 	 */
-	public RegionData getToRegion() {
+	public Region getToRegion() {
 		return toRegion;
 	}
 	
@@ -72,7 +71,7 @@ public class AttackTransferMove extends Move {
 	 */
 	public String getString() {
 		if(getIllegalMove().equals(""))
-			return getPlayerName() + " attack/transfer " + fromRegion.getId() + " " + toRegion.getId() + " " + armies;
+			return getPlayerName() + " attack/transfer " + fromRegion.id + " " + toRegion.id + " " + armies;
 		else
 			return getPlayerName() + " illegal_move " + getIllegalMove();
 	}

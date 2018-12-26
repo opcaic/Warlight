@@ -122,6 +122,10 @@ public class GameMap implements Cloneable {
 		return null;
 	}
 	
+	public RegionData getRegionData(Region r) {
+	    return getRegion(r.id);
+	}
+	
 	/**
 	 * @param id : a Continent id number
 	 * @return : the matching Continent object

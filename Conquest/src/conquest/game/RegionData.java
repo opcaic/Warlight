@@ -131,6 +131,10 @@ public class RegionData {
 	public String getPlayerName() {
 		return playerName;
 	}
+	
+	public boolean isNeutral() {
+	    return playerName.equals(Player.Neutral);
+	}
 
 	public Region getRegion() {
 		return region;

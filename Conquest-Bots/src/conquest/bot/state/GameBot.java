@@ -5,7 +5,6 @@ import java.util.List;
 
 import conquest.bot.Bot;
 import conquest.bot.BotState;
-import conquest.game.RegionData;
 import conquest.game.move.AttackTransferMove;
 import conquest.game.move.PlaceArmiesMove;
 import conquest.game.world.Region;
@@ -31,20 +30,20 @@ public abstract class GameBot implements Bot {
 	}
 	
 	@Override
-	public final ArrayList<RegionData> getPreferredStartingRegions(BotState state, Long timeOut) {
+	public final ArrayList<Region> getPreferredStartingRegions(BotState state, Long timeOut) {
 		List<Region> pickableRegions = new ArrayList<Region>();
-		for (RegionData pickable : state.getPickableStartingRegions()) {
+		for (Region pickable : state.getPickableStartingRegions()) {
 			if (pickable == null) continue;
-			pickableRegions.add(pickable.getRegion());
+			pickableRegions.add(pickable);
 		}
 		
 		List<ChooseCommand> cmds = chooseRegions(pickableRegions, timeOut == null ? Long.MAX_VALUE : timeOut);
 		
-		ArrayList<RegionData> result = new ArrayList<RegionData>(cmds.size());
+		ArrayList<Region> result = new ArrayList<Region>(cmds.size());
 		for (ChooseCommand cmd : cmds) {
 			if (cmd == null) continue;
-			for (RegionData pickable : state.getPickableStartingRegions()) {
-				if (pickable.getId() == cmd.region.id) {
+			for (Region pickable : state.getPickableStartingRegions()) {
+				if (pickable.id == cmd.region.id) {
 					result.add(pickable);
 				}
 			}
@@ -64,7 +63,7 @@ public abstract class GameBot implements Bot {
 		ArrayList<PlaceArmiesMove> result = new ArrayList<PlaceArmiesMove>(cmds.size());
 		for (PlaceCommand cmd : cmds) {
 			if (cmd == null) continue;
-			result.add(new PlaceArmiesMove(botState.getMyPlayerName(), botState.getMap().getRegion(cmd.region.id), cmd.armies));
+			result.add(new PlaceArmiesMove(botState.getMyPlayerName(), cmd.region, cmd.armies));
 		}
 		
 		return result;
@@ -81,7 +80,7 @@ public abstract class GameBot implements Bot {
 		ArrayList<AttackTransferMove> result = new ArrayList<AttackTransferMove>(cmds.size());
 		for (MoveCommand cmd : cmds) {
 			if (cmd == null) continue;
-			result.add(new AttackTransferMove(botState.getMyPlayerName(), botState.getMap().getRegion(cmd.from.id), botState.getMap().getRegion(cmd.to.id), cmd.armies));
+			result.add(new AttackTransferMove(botState.getMyPlayerName(), cmd.from, cmd.to, cmd.armies));
 		}
 		
 		return result;

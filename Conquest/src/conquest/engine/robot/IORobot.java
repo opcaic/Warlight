@@ -24,14 +24,10 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 
 import conquest.engine.Robot;
-import conquest.engine.Robot.RobotConfig;
 import conquest.engine.io.handler.Handler;
 import conquest.engine.io.handler.IHandler;
 import conquest.engine.replay.GameLog;
-import conquest.game.RegionData;
-import conquest.game.move.Move;
-import conquest.view.GUI;
-
+import conquest.game.world.Region;
 
 public class IORobot implements Robot
 {
@@ -70,11 +66,11 @@ public class IORobot implements Robot
 //	}
 	
 	@Override
-	public String getPreferredStartingArmies(long timeOut, ArrayList<RegionData> pickableRegions)
+	public String getPreferredStartingArmies(long timeOut, ArrayList<Region> pickableRegions)
 	{
 		String output = "pick_starting_regions " + timeOut;
-		for(RegionData region : pickableRegions)
-			output = output.concat(" " + region.getId());
+		for(Region region : pickableRegions)
+			output = output.concat(" " + region.id);
 		
 		handler.writeLine(output);
 		String line = handler.readLine(timeOut);

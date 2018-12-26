@@ -10,9 +10,8 @@ import java.util.ArrayList;
 import conquest.bot.BotParser;
 import conquest.engine.Robot;
 import conquest.engine.io.InputOutputStream;
-import conquest.game.RegionData;
 import conquest.game.Team;
-
+import conquest.game.world.Region;
 
 public class InternalRobot implements Robot {
 	
@@ -97,7 +96,7 @@ public class InternalRobot implements Robot {
 	}
 	
 	@Override
-	public String getPreferredStartingArmies(long timeOut, ArrayList<RegionData> pickableRegions)
+	public String getPreferredStartingArmies(long timeOut, ArrayList<Region> pickableRegions)
 	{
 		if (hijacked) {
 			return humanHijack.getPreferredStartingArmies(timeOut, pickableRegions);			

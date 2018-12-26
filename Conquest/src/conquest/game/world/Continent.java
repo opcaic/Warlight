@@ -1,10 +1,6 @@
 package conquest.game.world;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public enum Continent {
 	
@@ -25,8 +21,8 @@ public enum Continent {
 	public final int continentFlag;
 	public final String mapName;
 	
-	private Set<Region> regions = null;
-
+	private List<Region> regions = null;
+	
 	private Continent(String mapName, int id, int reward) {
 		this.mapName = mapName;
 		this.id = id;
@@ -34,11 +30,11 @@ public enum Continent {
 		this.continentFlag = 1 << (id-1);
 	}
 	
-	public Set<Region> getRegions() {
+	public List<Region> getRegions() {
 		if (regions == null) {
 			synchronized(this) {
 				if (regions == null) {
-					Set<Region> regions = new HashSet<Region>();
+					List<Region> regions = new ArrayList<Region>();
 					for (Region regionName : Region.values()) {
 						if (regionName.continent == this) {
 							regions.add(regionName);

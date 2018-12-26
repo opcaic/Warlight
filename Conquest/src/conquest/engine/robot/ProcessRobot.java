@@ -22,8 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import conquest.engine.Robot;
-import conquest.game.RegionData;
-
+import conquest.game.world.Region;
 
 public class ProcessRobot implements Robot
 {
@@ -63,7 +62,7 @@ public class ProcessRobot implements Robot
 //	}
 	
 	@Override
-	public String getPreferredStartingArmies(long timeOut, ArrayList<RegionData> pickableRegions)
+	public String getPreferredStartingArmies(long timeOut, ArrayList<Region> pickableRegions)
 	{
 		if (!isRunning()) {
 			throw new RuntimeException("Bot died out. Executed from '" + childDir.getAbsolutePath() + "' with command '" + childCommand + "'.");

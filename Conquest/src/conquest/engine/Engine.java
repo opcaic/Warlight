@@ -26,6 +26,7 @@ import conquest.game.*;
 import conquest.game.move.AttackTransferMove;
 import conquest.game.move.Move;
 import conquest.game.move.PlaceArmiesMove;
+import conquest.game.world.Region;
 import conquest.view.GUI;
 
 public class Engine {
@@ -46,7 +47,7 @@ public class Engine {
 		this.robots = robots;
 		this.timeoutMillis = timeoutMillis;		
 		
-		parser = new RobotParser(game.getMap());
+		parser = new RobotParser();
 		opponentMoves = new ArrayList<Move>();
 	}
 	
@@ -126,14 +127,14 @@ public class Engine {
 	
 	public void distributeStartingRegions()
 	{
-	    ArrayList<RegionData> pickableRegions = game.pickableRegions;
+	    ArrayList<Region> pickableRegions = game.pickableRegions;
 	    
 		if (gui != null) {
 			gui.pickableRegions(pickableRegions);
 		}
 		
 	    for (int i = 1 ; i <= 2 ; ++i) {
-    		List<RegionData> regions = parser.parsePreferredStartingRegions(
+    		List<Region> regions = parser.parsePreferredStartingRegions(
     		    robot(i).getPreferredStartingArmies(timeoutMillis, pickableRegions), player(i));
     		
     		//if the bot did not correctly return his starting regions, get some random ones
@@ -153,9 +154,9 @@ public class Engine {
         }
 	}
 	
-	private List<RegionData> getRandomStartingRegions(ArrayList<RegionData> pickableRegions)
+	private List<Region> getRandomStartingRegions(ArrayList<Region> pickableRegions)
 	{
-		List<RegionData> startingRegions = new ArrayList<RegionData>(pickableRegions);
+		List<Region> startingRegions = new ArrayList<Region>(pickableRegions);
 		Collections.shuffle(startingRegions);
 		return startingRegions.subList(0,6);
 	}

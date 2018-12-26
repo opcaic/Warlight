@@ -387,27 +387,27 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		updateStats();
 	}
 
-	List<RegionData> pickableRegions = null;
+	List<Region> pickableRegions = null;
 	
-	public void pickableRegions(List<RegionData> pickableRegions) {
+	public void pickableRegions(List<Region> pickableRegions) {
 		this.requestFocusInWindow();
 		
 		actionTxt.setText("PICKABLE REGIONS");
 		
-		for (RegionData regionData : pickableRegions) {
-			int id = regionData.getId();
-			RegionInfo region = this.regions[id-1];
-			region.setHighlight(RegionInfo.Green);
+		for (Region region : pickableRegions) {
+			int id = region.id;
+			RegionInfo ri = this.regions[id-1];
+			ri.setHighlight(RegionInfo.Green);
 		}
 		
 		this.pickableRegions = pickableRegions;
 		
 		waitForClick();
 		
-		for (RegionData regionData : pickableRegions) {
-			int id = regionData.getId();
-			RegionInfo region = this.regions[id-1];
-			region.setHighlight(false);
+		for (Region region : pickableRegions) {
+			int id = region.id;
+			RegionInfo ri = this.regions[id-1];
+			ri.setHighlight(false);
 		}
 	}
 	
@@ -455,7 +455,7 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		updateRegions(regions);
 		
 		for (PlaceArmiesMove move : placeArmiesMoves) {
-			int id = move.getRegion().getId();
+			int id = move.getRegion().id;
 			RegionInfo region = this.regions[id-1];	
 			region.setArmies(region.getArmies() - move.getArmies());
 			region.armiesPlus += move.getArmies();
@@ -466,7 +466,7 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		waitForClick();
 		
 		for (PlaceArmiesMove move : placeArmiesMoves) {
-			int id = move.getRegion().getId();
+			int id = move.getRegion().id;
 			RegionInfo region = this.regions[id-1];
 			region.setArmies(region.getArmies() + region.armiesPlus);
 			region.armiesPlus = 0;
@@ -482,12 +482,12 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 	public void transfer(AttackTransferMove move) {
 		this.requestFocusInWindow();
 		
-		String toName = move.getToRegion().getRegion().mapName;
+		String toName = move.getToRegion().mapName;
 		actionTxt.setText(botName(move.getPlayerName()) + " transfers to " + toName);
 		Team player = getTeam(move.getPlayerName());
 		
-		RegionInfo fromRegion = this.regions[move.getFromRegion().getId() - 1];
-		RegionInfo toRegion = this.regions[move.getToRegion().getId() - 1];
+		RegionInfo fromRegion = this.regions[move.getFromRegion().id - 1];
+		RegionInfo toRegion = this.regions[move.getToRegion().id - 1];
 		int armies = move.getArmies();
 		
 		fromRegion.armiesPlus = -armies;
@@ -496,8 +496,8 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		toRegion.armiesPlus = armies;
 		toRegion.setHighlight(true);
 		
-		int[] fromPos = positions[move.getFromRegion().getId() - 1];
-		int[] toPos = positions[move.getToRegion().getId() - 1];
+		int[] fromPos = positions[move.getFromRegion().id - 1];
+		int[] toPos = positions[move.getToRegion().id - 1];
 		mainArrow.setFromTo(fromPos[0], fromPos[1] + 20, toPos[0], toPos[1] + 20);
 		mainArrow.setColor(TeamView.getColor(player));
 		mainArrow.setNumber(armies);
@@ -544,12 +544,12 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 	public void attack(AttackTransferMove move) {
 		this.requestFocusInWindow();
 		
-		String toName = move.getToRegion().getRegion().mapName;
+		String toName = move.getToRegion().mapName;
 		actionTxt.setText(botName(move.getPlayerName()) + " attacks " + toName);
 		
 		Team attacker = getTeam(move.getPlayerName());
-		RegionInfo fromRegion = this.regions[move.getFromRegion().getId() - 1];
-		RegionInfo toRegion = this.regions[move.getToRegion().getId() - 1];
+		RegionInfo fromRegion = this.regions[move.getFromRegion().id - 1];
+		RegionInfo toRegion = this.regions[move.getToRegion().id - 1];
 		int armies = move.getArmies();
 		
 		fromRegion.armiesPlus = -armies;
@@ -558,7 +558,7 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		toRegion.armiesPlus = armies;
 		toRegion.setHighlight(true);
 		
-		showArrow(mainArrow, move.getFromRegion().getId(), move.getToRegion().getId(), attacker, armies);
+		showArrow(mainArrow, move.getFromRegion().id, move.getToRegion().id, attacker, armies);
 		
 		waitForClick();		
 	}
@@ -652,9 +652,9 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		chooseRegionsAction = new CountDownLatch(1);
 		
 		availableRegions = new ArrayList<Region>();
-		for (RegionData rd : game.pickableRegions)
-		    if (rd.getPlayerName().equals(ConquestGame.Neutral))
-		        availableRegions.add(rd.getRegion());
+		for (Region r : game.pickableRegions)
+		    if (game.getMap().getRegionData(r).isNeutral())
+		        availableRegions.add(r);
 		
 		chosenRegions = new ArrayList<Region>();
 		
@@ -664,7 +664,7 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		regionButtons = new ArrayList<Button>();
 		
 		for (Region region : availableRegions) {
-		    if (!game.getMap().getRegion(region.id).getPlayerName().equals(ConquestGame.Neutral))
+		    if (!game.getMap().getRegion(region.id).isNeutral())
 		        continue;  // already taken
 		    
 			Button button = new Button("+");
@@ -850,7 +850,7 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 				info.setText("" + info.getArmies());
 				info.setHighlight(false);
 
-				PlaceArmiesMove command = new PlaceArmiesMove(playerName, new RegionData(region, region.id, null), info.armiesPlus);
+				PlaceArmiesMove command = new PlaceArmiesMove(playerName, region, info.armiesPlus);
 				info.armiesPlus = 0;
 				
 				result.add(command);
@@ -1029,11 +1029,7 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		List<AttackTransferMove> moveArmies = new ArrayList<AttackTransferMove>();
 		
 		for (Move m : moves.values()) {
-			moveArmies.add(new AttackTransferMove(
-				playerName,
-				new RegionData(m.from, m.from.id, null),
-				new RegionData(m.to, m.to.id, null),
-				m.armies));
+			moveArmies.add(new AttackTransferMove(playerName, m.from, m.to,	m.armies));
 			mainLayer.remove(m.arrow);
 		}
 		repaint();

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import conquest.engine.Robot;
-import conquest.game.RegionData;
 import conquest.game.move.AttackTransferMove;
 import conquest.game.move.PlaceArmiesMove;
 import conquest.game.world.Region;
@@ -24,7 +23,7 @@ public class HumanRobot implements Robot {
 	}
 
 	@Override
-	public String getPreferredStartingArmies(long timeOut, ArrayList<RegionData> pickableRegions) {
+	public String getPreferredStartingArmies(long timeOut, ArrayList<Region> pickableRegions) {
 		if (config.gameLog != null) {
 			System.out.println(config.playerId + "-Human --> getPreferredStartingArmies()");
 		}

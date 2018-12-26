@@ -39,7 +39,7 @@ public class BotState {
 	private GameMap visibleMap; 
 	
 	//2 randomly chosen regions from each continent are given, which the bot can choose to start with
-	private ArrayList<RegionData> pickableStartingRegions; 
+	private ArrayList<Region> pickableStartingRegions; 
 	
 	private int startingArmies; //number of armies the player can place on map
 	
@@ -48,7 +48,7 @@ public class BotState {
 	
 	public BotState()
 	{
-		pickableStartingRegions = new ArrayList<RegionData>();
+		pickableStartingRegions = new ArrayList<Region>();
 		roundNumber = 0;
 	}
 	
@@ -140,7 +140,7 @@ public class BotState {
 			int regionId;
 			try {
 				regionId = Integer.parseInt(mapInput[i]);
-				RegionData pickableRegion = fullMap.getRegion(regionId);
+				Region pickableRegion = Region.forId(regionId);
 				pickableStartingRegions.add(pickableRegion);
 			}
 			catch(Exception e) {
@@ -210,7 +210,7 @@ public class BotState {
 		return fullMap;
 	}
 	
-	public ArrayList<RegionData> getPickableStartingRegions(){
+	public ArrayList<Region> getPickableStartingRegions(){
 		return pickableStartingRegions;
 	}
 

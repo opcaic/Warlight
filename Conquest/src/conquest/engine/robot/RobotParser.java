@@ -19,23 +19,14 @@ package conquest.engine.robot;
 
 import java.util.ArrayList;
 
-import conquest.game.GameMap;
 import conquest.game.PlayerInfo;
-import conquest.game.RegionData;
 import conquest.game.move.AttackTransferMove;
 import conquest.game.move.Move;
 import conquest.game.move.PlaceArmiesMove;
-
+import conquest.game.world.Region;
 
 public class RobotParser {
-	
-	private GameMap map;
-	
-	public RobotParser(GameMap map)
-	{
-		this.map = map;
-	}
-	
+    
 	public ArrayList<Move> parseMoves(String input, PlayerInfo player)
 	{
 		ArrayList<Move> moves = new ArrayList<Move>();
@@ -79,9 +70,7 @@ public class RobotParser {
 		
 		if(split[1].equals("place_armies"))		
 		{
-			RegionData region = null;
-
-			region = parseRegion(split[2], input, player);
+			Region region = parseRegion(split[2], input, player);
 
 			try { armies = Integer.parseInt(split[3]); }
 			catch(Exception e) { errorOut("Number of armies input incorrect", input, player);}
@@ -92,11 +81,8 @@ public class RobotParser {
 		}
 		else if(split[1].equals("attack/transfer"))
 		{
-			RegionData fromRegion = null;
-			RegionData toRegion = null;
-			
-			fromRegion = parseRegion(split[2], input, player);
-			toRegion = parseRegion(split[3], input, player);
+			Region fromRegion = parseRegion(split[2], input, player);
+			Region toRegion = parseRegion(split[3], input, player);
 			
 			try { armies = Integer.parseInt(split[4]); }
 			catch(Exception e) { errorOut("Number of armies input incorrect", input, player);}
@@ -111,22 +97,22 @@ public class RobotParser {
 	}
 	
 	//parse the region given the id string.
-	private RegionData parseRegion(String regionId, String input, PlayerInfo player)
+	private Region parseRegion(String regionId, String input, PlayerInfo player)
 	{
 		int id = -1;
 		
 		try { id = Integer.parseInt(regionId); }
 		catch(NumberFormatException e) { errorOut("Region id input incorrect", input, player); return null;}
 		
-		return map.getRegion(id);
+		return Region.forId(id);
 	}
 	
-	public ArrayList<RegionData> parsePreferredStartingRegions(String input, PlayerInfo player)
+	public ArrayList<Region> parsePreferredStartingRegions(String input, PlayerInfo player)
 	{
-		ArrayList<RegionData> preferredStartingRegions = new ArrayList<RegionData>();
+		ArrayList<Region> preferredStartingRegions = new ArrayList<Region>();
 
 		for (String s : input.split(" ")) {
-			RegionData r = parseRegion(s, input, player);
+			Region r = parseRegion(s, input, player);
 			if (r != null)
 			    preferredStartingRegions.add(r);
 		}

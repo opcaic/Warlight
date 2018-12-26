@@ -20,10 +20,9 @@ package conquest.engine;
 import java.util.ArrayList;
 
 import conquest.engine.replay.GameLog;
-import conquest.game.RegionData;
 import conquest.game.Team;
 import conquest.view.GUI;
-
+import conquest.game.world.Region;
 
 public interface Robot {
 	
@@ -65,7 +64,7 @@ public interface Robot {
 	
 	//public void writeMove(Move move);
 	
-	public String getPreferredStartingArmies(long timeOut, ArrayList<RegionData> pickableRegions);
+	public String getPreferredStartingArmies(long timeOut, ArrayList<Region> pickableRegions);
 	
 	public String getPlaceArmiesMoves(long timeOut);
 	
