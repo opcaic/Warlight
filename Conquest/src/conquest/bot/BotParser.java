@@ -86,19 +86,13 @@ public class BotParser extends Thread {
 		return bot;
 	}
 	
-	public static BotParser runInternal(String playerName, String botFQCN, InputStream input, PrintStream output, File logFile) {
+	public static BotParser runInternal(String botFQCN, InputStream input, PrintStream output) {
 		Bot bot = constructBot(botFQCN);
-		return runInternal(playerName, bot, input, output, logFile);
+		return runInternal(bot, input, output);
 	}
 	
-	public static BotParser runInternal(String playerName, Class botClass, InputStream input, PrintStream output, File logFile) {
-		Bot bot = constructBot(botClass);
-		return runInternal(playerName, bot, input, output, logFile);
-	}
-	
-	public static BotParser runInternal(String playerName, Bot bot, InputStream input, PrintStream output, File logFile) {
+	public static BotParser runInternal(Bot bot, InputStream input, PrintStream output) {
 		BotParser parser = new BotParser(bot, input, output);
-		if (logFile != null) parser.setLogFile(logFile);
 		parser.start();
 		return parser;
 	}
@@ -180,7 +174,9 @@ public class BotParser extends Thread {
 				currentState.updateMap(parts);
 			} else if(parts[0].equals("opponent_moves")) {
 				// TODO: finish implementation
-			} else {
+			} else if (parts[0].equals("next_round"))
+			    currentState.nextRound();
+			else {
 				log("Unable to parse line: " + line);
 			}
 		}

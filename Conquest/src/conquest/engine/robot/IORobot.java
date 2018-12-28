@@ -39,8 +39,6 @@ public class IORobot implements Robot
 
 	private GameLog log;
 
-	private String logPlayerName;
-
 	private RobotConfig config;
 	
 	public IORobot(IHandler handler) throws IOException
@@ -49,16 +47,17 @@ public class IORobot implements Robot
 		errorCounter = 0;
 	}
 	
-	public IORobot(String playerId, OutputStream input, boolean inputAutoFlush, InputStream output, InputStream error) throws IOException
+	public IORobot(int player, OutputStream input, boolean inputAutoFlush,
+	               InputStream output, InputStream error) throws IOException
 	{
-		handler = new Handler(playerId + "-Robot", input, inputAutoFlush, output, error);
+		handler = new Handler("PLR" + player + "-Robot", input, inputAutoFlush, output, error);
 		errorCounter = 0;
 	}
 	
 	@Override
 	public void setup(RobotConfig config) {
 		this.config = config;
-		handler.setGameLog(config.gameLog, config.playerId, config.logToConsole);
+		handler.setGameLog(config.gameLog, config.player, config.logToConsole);
 	}
 		
 //	@Override
@@ -115,8 +114,8 @@ public class IORobot implements Robot
 		else
 		{
 			if (log != null) {
-				log.logComment(logPlayerName, "go " + moveType + " " + timeOut + "\n");
-				log.logComment(logPlayerName, "Maximum number of idle moves returned: skipping move (let bot return 'No moves' instead of nothing)");
+				log.logComment(0, "go " + moveType + " " + timeOut + "\n");
+				log.logComment(0, "Maximum number of idle moves returned: skipping move (let bot return 'No moves' instead of nothing)");
 			}
 		}
 		return line;
@@ -136,9 +135,9 @@ public class IORobot implements Robot
 	}
 
 	@Override
-	public String getRobotPlayerId() {
-		if (config == null) return "N/A";
-		return config.playerId;
+	public int getRobotPlayer() {
+		if (config == null) return 0;
+		return config.player;
 	}
 
 	@Override
@@ -146,5 +145,5 @@ public class IORobot implements Robot
 		if (config == null) return "N/A";
 		return config.playerName;
 	}
-	
+
 }

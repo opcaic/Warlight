@@ -19,14 +19,14 @@ public class GameResult {
 	 */
 	public int round;
 
-	public String getWinnerId() {
-		if (winner == null) return "NONE";
+	public int getWinner() {
+		if (winner == null) return 0;
 		switch (winner) {
-		case NEUTRAL: return "NONE";
-		case PLAYER_1: return config == null ? "Player1" : config.playerId1;
-		case PLAYER_2: return config == null ? "Player2" : config.playerId2;
+		case NEUTRAL: return 0;
+		case PLAYER_1: return 1;
+		case PLAYER_2: return 2;
 		}
-		return null;
+		return 0;
 	}
 	
 	public String getWinnerName() {
@@ -48,12 +48,12 @@ public class GameResult {
 	}
 
 	public String asString() {
-		return getWinnerId() + ";" + player1Regions + ";" + player1Armies + ";" +
+		return getWinner() + ";" + player1Regions + ";" + player1Armies + ";" +
 	           player2Regions + ";" + player2Armies + ";" + round;
 	}
 	
 	public String getHumanString() {
-		return "Winner: " + getWinnerId() + "[" + getWinnerName() + "] in round " + round +
+		return "Winner: " + getWinner() + "[" + getWinnerName() + "] in round " + round +
 		       "\nPlayer1: " + player1Regions + " regions / " + player1Armies +
 		       " armies\nPlayer2: " +player2Regions + " regions / " + player2Armies + " armies";
 	}
@@ -65,7 +65,7 @@ public class GameResult {
 	public String getCSV() {
 		return getWinnerName() + ";" +
 	    (winner == null || winner == Team.NEUTRAL ? "NONE" : winner) + ";" +
-		getWinnerId() + ";" + player1Regions + ";" + player1Armies + ";" +
+		getWinner() + ";" + player1Regions + ";" + player1Armies + ";" +
 	    player2Regions + ";" + player2Armies + ";" + round + ";" + config.getCSV();
 	}
 	

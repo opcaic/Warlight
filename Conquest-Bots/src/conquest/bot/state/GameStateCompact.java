@@ -1,93 +1,28 @@
 package conquest.bot.state;
 
-import conquest.game.Player;
+import conquest.game.ConquestGame;
 import conquest.game.world.Continent;
 import conquest.game.world.Region;
 
 /**
- * Compact game state suitable for game-tree search. All data hidden within int flags of {@link #regions} and {@link #continents}.
- * 
- * It could be made more slim by kicking out the {@link Continent} cache (we store who controls what there in order to compute {@link #placeArmies(Player)} faster).  
+ * Compact game state suitable for game-tree search.
  * 
  * @author Jimmy
  */
 public class GameStateCompact implements Cloneable {
+    ConquestGame game;
 	
-	public static final int SOME_PLAYER_FLAG = Player.ME.playerFlag | Player.OPPONENT.playerFlag | Player.NEUTRAL.playerFlag;
-	
-	/**
-	 * First two bits (from the right) is {@link Player#playerFlag}, the rest of the bits is "NUMBER OF ARMIES" there.
-	 * Indexed via {@link Region#id}.
-	 * Length: max {@link Region#id}.
-	 */
-	public int[] regions;
-	
-	/**
-	 * Contains {@link Player#playerFlag} of the continent owner; -1 means "uncomputed yet"
-	 * Indexed via {@link Continent#id}.
-	 * Length: max {@link Continent#id}.
-	 */
-	public int[] continents;
-	
-	// =======
-	// GETTERS
-	// =======
-	
-	/**
-	 * PLAYER FLAG of the 'continent' owner.
-	 * @param continent
-	 * @return
-	 */
-	public int ownedByFlag(Continent continent) {
-		if (continents[continent.id] < 0) {
-			return continents[continent.id] = computeContinentOwner(continent).playerFlag;
-		}
-		return continents[continent.id]; 
-	}
-	
-	/**
-	 * Computes who controls the 'continent' out of {@link #regions}.
-	 * @param continent
-	 * @return
-	 */
-	public Player computeContinentOwner(Continent continent) {
-		Player owner = Player.ME;
-		boolean first = true;
-		for (Region region : continent.getRegions()) {
-			switch (ownedBy(region)) {
-			case ME: 
-				if (owner != Player.ME) {
-					return Player.NEUTRAL;
-				}
-				break;
-			case OPPONENT: 
-				if (first) {
-					owner = Player.OPPONENT;
-				} else { 
-					if (owner != Player.OPPONENT) {
-						return Player.NEUTRAL;
-					}
-				}
-				break;
-			case NEUTRAL:
-				return Player.NEUTRAL;
-			default: 
-				throw new RuntimeException("Unhandled Player: " + ownedBy(region));
-			}
-			
-			first = false;
-		}
-		return owner;
-	}
-
-	
+    public GameStateCompact(ConquestGame game) {
+        this.game = game;
+    }
+    
 	/**
 	 * Who owns the continent?
 	 * @param continent
 	 * @return
 	 */
-	public Player ownedBy(Continent continent) {
-		return Player.fromFlag(ownedByFlag(continent)); 
+	public int ownedBy(Continent continent) {
+		return game.getMap().getContinent(continent.id).owner();
 	}
 	
 	/**
@@ -96,17 +31,8 @@ public class GameStateCompact implements Cloneable {
 	 * @param player
 	 * @return
 	 */
-	public boolean owned(Region region, Player player) {
-		return ownedByFlag(region) == player.playerFlag;
-	}
-	
-	/**
-	 * PLAYER FLAG of the 'region' owner.
-	 * @param region
-	 * @return
-	 */
-	public int ownedByFlag(Region region) {
-		return regions[region.id] & SOME_PLAYER_FLAG;
+	public boolean owned(Region region, int player) {
+		return ownedBy(region) == player;
 	}
 	
 	/**
@@ -114,8 +40,8 @@ public class GameStateCompact implements Cloneable {
 	 * @param region
 	 * @return
 	 */
-	public Player ownedBy(Region region) {
-		return Player.fromFlag(ownedByFlag(region));
+	public int ownedBy(Region region) {
+		return game.getMap().getRegion(region.id).getOwner();
 	}
 	
 	/**
@@ -124,8 +50,8 @@ public class GameStateCompact implements Cloneable {
 	 * @param player
 	 * @return
 	 */
-	public boolean owned(Continent continent, Player player) {
-		return ownedByFlag(continent) == player.playerFlag;
+	public boolean owned(Continent continent, int player) {
+		return ownedBy(continent) == player;
 	}
 	
 	/**
@@ -134,15 +60,15 @@ public class GameStateCompact implements Cloneable {
 	 * @return
 	 */
 	public int armiesAt(Region region) {
-		return regions[region.id] >> Player.LAST_ID;
+		return game.getMap().getRegion(region.id).getArmies();
 	}
 	
 	/**
-	 * How many total armies does 'player' have? WARNING: time O(n)!
+	 * How many total armies does 'player' have?
 	 * @param player
 	 * @return
 	 */
-	public int totalArmies(Player player) {
+	public int totalArmies(int player) {
 		int result = 0;
 		for (Region region : Region.values()) {
 			if (owned(region, player)) result += armiesAt(region);
@@ -151,63 +77,16 @@ public class GameStateCompact implements Cloneable {
 	}
 	
 	/**
-	 * How many armies does/will 'player' have to place in this/next turn given this state? WARNING: time O(n)!
+	 * How many armies does/will 'player' have to place in this/next turn given this state?
 	 * @param player
 	 * @return
 	 */
-	public int placeArmies(Player player) {
-		int result = 0;
-		for (Continent continent : Continent.values()) {
-			if (owned(continent, player)) result += continent.reward;
-		}
-		return 5+result;
+	public int placeArmies(int player) {
+		return game.armiesPerTurn(player);
 	}
-	
-	// =======================
-	// COMMAND SUPPORT METHODS
-	// =======================
-	
-	/**
-	 * Set number of 'armies' into 'region'.
-	 * @param region
-	 * @param armies
-	 */
-	public void setArmies(Region region, int armies) {
-		int ownerPlayerFlag = regions[region.id] & SOME_PLAYER_FLAG;
-		regions[region.id] = (armies << Player.LAST_ID) | ownerPlayerFlag;
-	}
-	
-	/**
-	 * Change the number of armies within 'region' with 'armiesDelta'.
-	 * @param region
-	 * @param armiesDelta
-	 */
-	public void setArmiesDelta(Region region, int armiesDelta) {
-		int armiesNow = armiesAt(region);
-		setArmies(region, armiesNow + armiesDelta);
-	}
-	
-	/**
-	 * Changes ownership of the region; nullifies continents[region.continent.id] as the ownership could have changed by this.
-	 * @param region
-	 * @param player
-	 */
-	public void setOwner(Region region, Player player) {
-		regions[region.id] = regions[region.id] & Player.NULL_PLAYER_FLAG | player.playerFlag;
-		continents[region.continent.id] = -1;
-	}
-	
-	// ===============
-	// UTILITY METHODS
-	// ===============
 	
 	public GameStateCompact clone() {
-		GameStateCompact result = new GameStateCompact();
-		result.regions = new int[Region.LAST_ID+1];
-		result.continents = new int[Continent.LAST_ID+1];
-		System.arraycopy(regions, 0, result.regions, 0, regions.length);
-		System.arraycopy(continents, 0, result.continents, 0, continents.length);		
-		return result;
+	    return new GameStateCompact(game);
 	}
 	
 	public GameState toGameState() {
@@ -215,33 +94,6 @@ public class GameStateCompact implements Cloneable {
 	}
 
 	public static GameStateCompact fromGameState(GameState state) {
-		
-		GameStateCompact result = new GameStateCompact();
-		
-		result.regions = new int[Region.LAST_ID+1];
-		result.regions[0] = 0;
-		
-		RegionState region;
-		for (int i = 1; i < state.regions.length; ++i) {
-			region = state.regions[i];
-			int regionCompact = region.armies;
-			regionCompact <<= Player.LAST_ID;
-			regionCompact |= region.owner.player.playerFlag;
-			result.regions[region.region.id] = regionCompact;
-		}
-		
-		result.continents = new int[Continent.LAST_ID+1];
-		result.continents[0] = 0;
-		
-		ContinentState continent;
-		for (int i = 1; i < state.continents.length; ++i) {
-			continent = state.continents[i];
-			int continentCompact = continent.owner.playerFlag;
-			result.continents[continent.continent.id] = continentCompact;
-		}
-		
-		// WE'RE DONE!	
-		return result;
+	    return new GameStateCompact(state.game);
 	}
-	
 }

@@ -20,7 +20,7 @@ public abstract class GameLog {
 		
 		boolean comment = false;
 		
-		String player;
+		int player;
 		Way way;
 		String line;
 		
@@ -29,7 +29,7 @@ public abstract class GameLog {
 		 * @param who
 		 * @param line
 		 */
-		public LogLine(String who, String msg) {
+		public LogLine(int who, String msg) {
 			comment = true;
 			player = who;
 			line = msg;
@@ -41,7 +41,7 @@ public abstract class GameLog {
 		 * @param way
 		 * @param line
 		 */
-		public LogLine(String player, Way way, String line) {
+		public LogLine(int player, Way way, String line) {
 			this.player = player;
 			this.way = way;
 			this.line = line;
@@ -59,7 +59,7 @@ public abstract class GameLog {
 			if (line.startsWith("#")) {
 				line = line.substring(1);
 				int whoEndIndex = line.indexOf(":");
-				String who = line.substring(0, whoEndIndex);
+				int who = Integer.parseInt(line.substring(0, whoEndIndex));
 				String msg = line.substring(whoEndIndex+1);
 				return new LogLine(who, msg);
 			} else {
@@ -67,7 +67,7 @@ public abstract class GameLog {
 				if (parts.length < 2 || parts.length > 3) {
 					throw new RuntimeException("Invalid line, split into less/more than 2 or 3 parts ... 2 or 3 != " + parts.length + ": " + line);
 				}
-				String player = parts[0];
+				int player = Integer.parseInt(parts[0]);
 				Way way = parts[1].equals(Way.ENGINE_TO_BOT.mark) ? Way.ENGINE_TO_BOT : Way.BOT_TO_ENGINE;
 				String log = "";
 				if (parts.length == 3) {
@@ -83,15 +83,15 @@ public abstract class GameLog {
 	
 	public abstract void finish(GameResult result);
 	
-	public void logComment(String who, String line) {
+	public void logComment(int who, String line) {
 		log(new LogLine(who, line));
 	}
 	
-	public void logEngineToBot(String player, String line) {
+	public void logEngineToBot(int player, String line) {
 		log(new LogLine(player, Way.ENGINE_TO_BOT, line));
 	}
 	
-	public void logBotToEngine(String player, String line) {
+	public void logBotToEngine(int player, String line) {
 		log(new LogLine(player, Way.BOT_TO_ENGINE, line));
 	}
 	

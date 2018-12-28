@@ -29,7 +29,7 @@ public class RegionData {
 	private ArrayList<RegionData> neighbors;
 	private ContinentData continent;
 	private int armies;
-	private String playerName;
+	private int owner;
 	
 	public RegionData(Region region, int id, ContinentData superRegion)
 	{
@@ -37,20 +37,20 @@ public class RegionData {
 		this.id = id;
 		this.continent = superRegion;
 		this.neighbors = new ArrayList<RegionData>();
-		this.playerName = "unknown";
+		this.owner = 0;
 		this.armies = 0;
 		if (superRegion != null) {
 			superRegion.addSubRegion(this);
 		}
 	}
 	
-	public RegionData(Region region, int id, ContinentData superRegion, String playerName, int armies)
+	public RegionData(Region region, int id, ContinentData superRegion, int owner, int armies)
 	{
 		this.region = region;
 		this.id = id;
 		this.continent = superRegion;
 		this.neighbors = new ArrayList<RegionData>();
-		this.playerName = playerName;
+		this.owner = owner;
 		this.armies = armies;
 		
 		superRegion.addSubRegion(this);
@@ -75,12 +75,12 @@ public class RegionData {
 	}
 
 	/**
-	 * @param playerName A string with a player's name
-	 * @return True if this region is owned by given playerName, false otherwise
+	 * @param player
+	 * @return True if this region is owned by the given player, false otherwise
 	 */
-	public boolean ownedByPlayer(String playerName)
+	public boolean ownedByPlayer(int player)
 	{
-		return playerName.equals(this.playerName);
+		return owner == player;
 	}
 	
 	/**
@@ -91,10 +91,10 @@ public class RegionData {
 	}
 	
 	/**
-	 * @param playerName Sets the Name of the player that this Region belongs to
+	 * @param playerName Sets the player that this Region belongs to
 	 */
-	public void setPlayerName(String playerName) {
-		this.playerName = playerName;
+	public void setOwner(int owner) {
+		this.owner = owner;
 	}
 	
 	/**
@@ -128,12 +128,12 @@ public class RegionData {
 	/**
 	 * @return A string with the name of the player that owns this region
 	 */
-	public String getPlayerName() {
-		return playerName;
+	public int getOwner() {
+		return owner;
 	}
 	
 	public boolean isNeutral() {
-	    return playerName.equals(Player.Neutral);
+	    return owner == 0;
 	}
 
 	public Region getRegion() {
@@ -144,12 +144,12 @@ public class RegionData {
 		return region.continent;
 	}
 	
-    public boolean isVisible(PlayerInfo player) {
-        if (ownedByPlayer(player.getId()))
+    public boolean isVisible(int player) {
+        if (ownedByPlayer(player))
             return true;
         
         for (RegionData s : getNeighbors())
-            if (s.ownedByPlayer(player.getId()))
+            if (s.ownedByPlayer(player))
                 return true;
         
         return false;
@@ -157,6 +157,6 @@ public class RegionData {
 	
 	@Override
 	public String toString() {
-		return region.name() + "[" + playerName + "|" + armies + "]";
+		return region.name() + "[" + owner + "|" + armies + "]";
 	}
 }

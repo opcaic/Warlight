@@ -83,7 +83,7 @@ public class GameMap implements Cloneable {
 		for(RegionData r : regions) //copy regions
 		{
 			RegionData newRegion = new RegionData(Region.forId(r.getId()), r.getId(),
-			        newMap.getContinent(r.getContinentData().getId()), r.getPlayerName(), r.getArmies());
+			        newMap.getContinent(r.getContinentData().getId()), r.getOwner(), r.getArmies());
 			newMap.add(newRegion);
 		}
 		for(RegionData r : regions) //add neighbors to copied regions
@@ -144,18 +144,18 @@ public class GameMap implements Cloneable {
 		String mapString = "";
 		for(RegionData region : regions)
 		{
-			mapString = mapString.concat(region.getId() + ";" + region.getPlayerName() + ";" + region.getArmies() + " ");
+			mapString = mapString.concat(region.getId() + ";" + region.getOwner() + ";" + region.getArmies() + " ");
 		}
 		return mapString;
 	}
 	
 	//return all regions owned by given player
-	public ArrayList<RegionData> ownedRegionsByPlayer(PlayerInfo player)
+	public ArrayList<RegionData> ownedRegionsByPlayer(int player)
 	{
 		ArrayList<RegionData> ownedRegions = new ArrayList<RegionData>();
 		
 		for(RegionData region : this.getRegions())
-			if(region.getPlayerName().equals(player.getId()))
+			if(region.getOwner() == player)
 				ownedRegions.add(region);
 
 		return ownedRegions;
@@ -163,7 +163,7 @@ public class GameMap implements Cloneable {
 	
 	//fog of war
 	//return all regions visible to given player
-	public ArrayList<RegionData> visibleRegionsForPlayer(PlayerInfo player)
+	public ArrayList<RegionData> visibleRegionsForPlayer(int player)
 	{
 		ArrayList<RegionData> visibleRegions = new ArrayList<RegionData>();
 		ArrayList<RegionData> ownedRegions = ownedRegionsByPlayer(player);

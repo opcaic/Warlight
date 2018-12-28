@@ -30,9 +30,8 @@ public class AttackTransferMove extends Move {
 	private Region toRegion;
 	private int armies;
 	
-	public AttackTransferMove(String playerName, Region fromRegion, Region toRegion, int armies)
+	public AttackTransferMove(Region fromRegion, Region toRegion, int armies)
 	{
-		super.setPlayerName(playerName);
 		this.fromRegion = fromRegion;
 		this.toRegion = toRegion;
 		this.armies = armies;
@@ -71,8 +70,8 @@ public class AttackTransferMove extends Move {
 	 */
 	public String getString() {
 		if(getIllegalMove().equals(""))
-			return getPlayerName() + " attack/transfer " + fromRegion.id + " " + toRegion.id + " " + armies;
+			return "attack/transfer " + fromRegion.id + " " + toRegion.id + " " + armies;
 		else
-			return getPlayerName() + " illegal_move " + getIllegalMove();
+			return "illegal_move " + getIllegalMove();
 	}
 }

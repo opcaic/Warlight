@@ -19,7 +19,6 @@ package conquest.engine.robot;
 
 import java.util.ArrayList;
 
-import conquest.game.PlayerInfo;
 import conquest.game.move.AttackTransferMove;
 import conquest.game.move.Move;
 import conquest.game.move.PlaceArmiesMove;
@@ -27,7 +26,7 @@ import conquest.game.world.Region;
 
 public class RobotParser {
     
-	public ArrayList<Move> parseMoves(String input, PlayerInfo player)
+	public ArrayList<Move> parseMoves(String input, int player)
 	{
 		ArrayList<Move> moves = new ArrayList<Move>();
 		
@@ -56,63 +55,57 @@ public class RobotParser {
 	}
 
 	//returns the correct Move. Null if input is incorrect.
-	private Move parseMove(String input, PlayerInfo player)
+	private Move parseMove(String input, int player)
 	{
 		int armies = -1;
 		
 		String[] split = input.trim().split(" ");
 
-		if(!split[0].equals(player.getId()))
+		if(split[0].equals("place_armies"))		
 		{
-			errorOut("Incorrect player name or move format incorrect", input, player);
-			return null;
-		}	
-		
-		if(split[1].equals("place_armies"))		
-		{
-			Region region = parseRegion(split[2], input, player);
+			Region region = parseRegion(split[1], input);
 
-			try { armies = Integer.parseInt(split[3]); }
-			catch(Exception e) { errorOut("Number of armies input incorrect", input, player);}
+			try { armies = Integer.parseInt(split[2]); }
+			catch(Exception e) { errorOut("Number of armies input incorrect", input);}
 		
 			if(!(region == null || armies == -1))
-				return new PlaceArmiesMove(player.getId(), region, armies);
+				return new PlaceArmiesMove(region, armies);
 			return null;
 		}
-		else if(split[1].equals("attack/transfer"))
+		else if(split[0].equals("attack/transfer"))
 		{
-			Region fromRegion = parseRegion(split[2], input, player);
-			Region toRegion = parseRegion(split[3], input, player);
+			Region fromRegion = parseRegion(split[1], input);
+			Region toRegion = parseRegion(split[2], input);
 			
-			try { armies = Integer.parseInt(split[4]); }
-			catch(Exception e) { errorOut("Number of armies input incorrect", input, player);}
+			try { armies = Integer.parseInt(split[3]); }
+			catch(Exception e) { errorOut("Number of armies input incorrect", input);}
 
 			if(!(fromRegion == null || toRegion == null || armies == -1))
-				return new AttackTransferMove(player.getId(), fromRegion, toRegion, armies);
+				return new AttackTransferMove(fromRegion, toRegion, armies);
 			return null;
 		}
 
-		errorOut("Bot's move format incorrect", input, player);
+		errorOut("Bot's move format incorrect", input);
 		return null;
 	}
 	
 	//parse the region given the id string.
-	private Region parseRegion(String regionId, String input, PlayerInfo player)
+	private Region parseRegion(String regionId, String input)
 	{
 		int id = -1;
 		
 		try { id = Integer.parseInt(regionId); }
-		catch(NumberFormatException e) { errorOut("Region id input incorrect", input, player); return null;}
+		catch(NumberFormatException e) { errorOut("Region id input incorrect", input); return null;}
 		
 		return Region.forId(id);
 	}
 	
-	public Region parseStartingRegion(String input, PlayerInfo player)
+	public Region parseStartingRegion(String input)
 	{
-	    return parseRegion(input, input, player);
+	    return parseRegion(input, input);
 	}
 
-	private void errorOut(String error, String input, PlayerInfo player)
+	private void errorOut(String error, String input)
 	{
 		System.out.println("Parse error: " + error + " (" + input + ")");
 	}

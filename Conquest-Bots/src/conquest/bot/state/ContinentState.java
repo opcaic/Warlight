@@ -3,7 +3,6 @@ package conquest.bot.state;
 import java.util.HashMap;
 import java.util.Map;
 
-import conquest.game.Player;
 import conquest.game.world.Continent;
 import conquest.game.world.Region;
 
@@ -16,7 +15,7 @@ public class ContinentState {
 	/**
 	 * Who owns this {@link #continent}.
 	 */
-	public Player owner;
+	public int owner;
 	
 	/**
 	 * All {@link Region} states of this {@link #continent}.
@@ -24,19 +23,14 @@ public class ContinentState {
 	public Map<Region, RegionState> regions;
 	
 	/**
-	 * How many regions particular {@link Player} controls within this continent.
-	 * 
-	 * Indexed by {@link Player#id}.
-	 * 
-	 * 1-based! [0] is 0 and does not have any meaning!
+	 * How many regions each player controls within this continent.
 	 */
 	public int[] owned;
 	
 	public ContinentState(Continent continent) {
 		this.continent = continent;
-		owner = Player.NEUTRAL;
-		owned = new int[4];
-		for (int i = 0; i < 4; ++i) owned[i] = 0;
+		owner = 0;
+		owned = new int[3];
 		regions = new HashMap<Region, RegionState>();
 	}
 	
@@ -50,8 +44,8 @@ public class ContinentState {
 		if (continent != other.continent) return false;
 		if (owner != other.owner) return false;
 		
-		for (Player player : Player.values()) {
-			if (owned[player.id] != other.owned[player.id]) return false;
+		for (int p = 0 ; p <= 2 ; ++p) {
+			if (owned[p] != other.owned[p]) return false;
 		}
 		if (other.regions == null || regions.size() != other.regions.size()) return false;
 		for (Region region : regions.keySet()) {
@@ -76,7 +70,7 @@ public class ContinentState {
 	 * @param player
 	 * @return
 	 */
-	public boolean ownedBy(Player player) {
+	public boolean ownedBy(int player) {
 		return owner == player;
 	}
 	
@@ -85,31 +79,14 @@ public class ContinentState {
 	 * @param player
 	 * @return
 	 */
-	public int regionsOwnedBy(Player player) {
-		return owned[player.id];
+	public int regionsOwnedBy(int player) {
+		return owned[player];
 	}
 	
 	@Override
 	public String toString() {
-		return (continent == null ? "ContinentState" : continent.name())
-				  + "[" + (owner == null ? "null" : owner.name()) 
-				  + "|ME=" + (owned == null ? "N/A" : owned[Player.ME.id])
-				  + "|OPP=" + (owned == null ? "N/A" : owned[Player.OPPONENT.id]) 
-				  + "|NEU=" + (owned == null ? "N/A" : owned[Player.NEUTRAL.id])
-				  + "]";
-	}
-
-	/**
-	 * ME becomes OPPONENT and vice versa, OPPONENT becomes ME.
-	 */
-	protected void swapPlayer() {
-		owner = Player.swapPlayer(owner);
-		
-		int newOppOwned = owned[Player.ME.id];
-		int newMeOwned  = owned[Player.OPPONENT.id];
-		
-		owned[Player.OPPONENT.id] = newOppOwned;
-		owned[Player.ME.id] = newMeOwned;
+		return continent.name() + "[" + owner + 
+				   "|P1=" + owned[1] + "|P2=" + owned[2] + "|NEU=" + owned[0] + "]";
 	}
 	
 }

@@ -48,7 +48,7 @@ public abstract class GameBot implements Bot {
 		ArrayList<PlaceArmiesMove> result = new ArrayList<PlaceArmiesMove>(cmds.size());
 		for (PlaceCommand cmd : cmds) {
 			if (cmd == null) continue;
-			result.add(new PlaceArmiesMove(botState.getMyPlayerName(), cmd.region, cmd.armies));
+			result.add(new PlaceArmiesMove(cmd.region, cmd.armies));
 		}
 		
 		return result;
@@ -65,7 +65,7 @@ public abstract class GameBot implements Bot {
 		ArrayList<AttackTransferMove> result = new ArrayList<AttackTransferMove>(cmds.size());
 		for (MoveCommand cmd : cmds) {
 			if (cmd == null) continue;
-			result.add(new AttackTransferMove(botState.getMyPlayerName(), cmd.from, cmd.to, cmd.armies));
+			result.add(new AttackTransferMove(cmd.from, cmd.to, cmd.armies));
 		}
 		
 		return result;

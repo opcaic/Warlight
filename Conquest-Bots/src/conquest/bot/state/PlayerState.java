@@ -3,7 +3,6 @@ package conquest.bot.state;
 import java.util.HashMap;
 import java.util.Map;
 
-import conquest.game.Player;
 import conquest.game.world.Continent;
 import conquest.game.world.Region;
 
@@ -12,7 +11,7 @@ public class PlayerState {
 	/**
 	 * What player this object describes.
 	 */
-	public Player player;
+	public int player;
 	
 	/**
 	 * What {@link Region} {@link #player} owns.
@@ -34,12 +33,11 @@ public class PlayerState {
 	 */
 	public int placeArmies;
 	
-	public PlayerState(Player player) {
+	public PlayerState(int player) {
 		this.player = player;
 		regions = new HashMap<Region, RegionState>();
 		continents = new HashMap<Continent, ContinentState>();
 		totalArmies = 0;
-		placeArmies = (player == Player.NEUTRAL ? 0 : 5);
 	}
 	
 	@Override
@@ -102,6 +100,9 @@ public class PlayerState {
 	
 	@Override
 	public String toString() {
-		return (player == null ? "PlayerState" : player.name()) + "[#continents=" + (continents == null ? "null" : continents.size()) + "|#regions=" + (regions == null ? "null" : regions.size()) + "|totalArmies=" + totalArmies + "|placeArmies=" + placeArmies + "]";
+		return player + " " +
+		    "[#continents=" + (continents == null ? "null" : continents.size()) +
+		    "|#regions=" + (regions == null ? "null" : regions.size()) +
+		    "|totalArmies=" + totalArmies + "|placeArmies=" + placeArmies + "]";
 	}
 }

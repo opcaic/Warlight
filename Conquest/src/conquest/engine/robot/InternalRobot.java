@@ -29,7 +29,7 @@ public class InternalRobot implements Robot {
 					hijacked = !hijacked;
 					if (config.gui != null) {
 						config.gui.showNotification(
-							hijacked ? InternalRobot.this.config.playerId + " hijacked!" : InternalRobot.this.config.playerId + " resumed!"
+							hijacked ? InternalRobot.this.config.player + " hijacked!" : InternalRobot.this.config.player + " resumed!"
 						);
 					}
 				}
@@ -39,7 +39,7 @@ public class InternalRobot implements Robot {
 					hijacked = !hijacked;
 					if (config.gui != null) {
 						config.gui.showNotification(
-							hijacked ? InternalRobot.this.config.playerId + " hijacked!" : InternalRobot.this.config.playerId + " resumed!"
+							hijacked ? InternalRobot.this.config.player + " hijacked!" : InternalRobot.this.config.player + " resumed!"
 						);
 					}
 				}
@@ -66,18 +66,18 @@ public class InternalRobot implements Robot {
 
 	private String botFQCN;
 	
-	public InternalRobot(String playerId, String botFQCN) throws IOException {
+	public InternalRobot(int player, String botFQCN) throws IOException {
 		this.botFQCN = botFQCN;
 		
 		botInput = new InputOutputStream();
 		botOutput = new InputOutputStream();
 		
-		bot = BotParser.runInternal(playerId, botFQCN, botInput.getInputStream(), new PrintStream(botOutput.getOutputStream()), null);
-		System.out.println(playerId + " -> " + botFQCN);
+		bot = BotParser.runInternal(botFQCN, botInput.getInputStream(), new PrintStream(botOutput.getOutputStream()));
+		System.out.println(player + " -> " + botFQCN);
 		
-		robot = new IORobot(playerId, botInput.getOutputStream(), true, botOutput.getInputStream(), null);
+		robot = new IORobot(player, botInput.getOutputStream(), true, botOutput.getInputStream(), null);
 		
-		humanHijack = new HumanRobot(playerId);
+		humanHijack = new HumanRobot();
 	}
 	
 	@Override
@@ -121,7 +121,7 @@ public class InternalRobot implements Robot {
 		}
 		return robot.getAttackTransferMoves(timeOut);
 	}
-		
+	
 	@Override
 	public void writeInfo(String info){
 		robot.writeInfo(info);
@@ -175,16 +175,14 @@ public class InternalRobot implements Robot {
 	}
 
 	@Override
-	public String getRobotPlayerId() {
-		if (config == null) return "N/A";
-		return config.playerId;
+	public int getRobotPlayer() {
+		if (config == null) return 0;
+		return config.player;
 	}
 	
 	public String getRobotPlayerName() {
 		if (config == null) return botFQCN.substring(1+botFQCN.lastIndexOf("."));
 		return botFQCN.substring(1+botFQCN.lastIndexOf("."));
 	}
-
-	
 
 }

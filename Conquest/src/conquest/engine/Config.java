@@ -9,17 +9,6 @@ public class Config implements Cloneable {
 	public String gameId = "GAME";
 	
 	/**
-	 * Used by ENGINE as PLAYER IDENTIFIER of the player 1
-	 * BETTER NOT TO ALTER AT ALL...
-	 */
-	public String playerId1 = "PLR1";
-	/**
-	 * Used by ENGINE as PLAYER IDENTIFIER of the player 2
-	 * BETTER NOT TO ALTER AT ALL...
-	 */
-	public String playerId2 = "PLR2";
-	
-	/**
 	 * Human-readable name of player 1 to display during visualization or to report into CSV.
 	 */
 	public String player1Name = "Bot1";
@@ -46,7 +35,7 @@ public class Config implements Cloneable {
 	public GameConfig game = new GameConfig();
 	
 	public String asString() {
-		return gameId + ";" + playerId1 + ";" + playerId2 + ";" + player1Name + ";" + player2Name + ";" +
+		return gameId + ";" + player1Name + ";" + player2Name + ";" +
 		       botCommandTimeoutMillis + ";" +
 	           visualize + ";" + visualizeContinual + ";" + visualizeContinualFrameTimeMillis + ";" +
 			   logToConsole + ";" + game.asString();
@@ -79,18 +68,16 @@ public class Config implements Cloneable {
 		Config result = new Config();
 
 		result.gameId = parts[0];
-		result.playerId1 = parts[1];
-		result.playerId2 = parts[2];
-		result.player1Name = parts[3];
-		result.player2Name = parts[4];
-		result.botCommandTimeoutMillis = Integer.parseInt(parts[5]);
-		result.visualize = Boolean.parseBoolean(parts[6]);
-		result.visualizeContinual = (parts[7].toLowerCase().equals("null") ? null : Boolean.parseBoolean(parts[7]));
-		result.visualizeContinualFrameTimeMillis = (parts[8].toLowerCase().equals("null") ? null : Integer.parseInt(parts[8]));
-		result.logToConsole = Boolean.parseBoolean(parts[9]);
+		result.player1Name = parts[1];
+		result.player2Name = parts[2];
+		result.botCommandTimeoutMillis = Integer.parseInt(parts[3]);
+		result.visualize = Boolean.parseBoolean(parts[4]);
+		result.visualizeContinual = (parts[5].toLowerCase().equals("null") ? null : Boolean.parseBoolean(parts[5]));
+		result.visualizeContinualFrameTimeMillis = (parts[6].toLowerCase().equals("null") ? null : Integer.parseInt(parts[6]));
+		result.logToConsole = Boolean.parseBoolean(parts[7]);
 		
 		int engineConfigStart = 0;
-		for (int i = 0; i < 10; ++i) {
+		for (int i = 0; i < 8; ++i) {
 			engineConfigStart = line.indexOf(";", engineConfigStart);
 			++engineConfigStart;
 		}

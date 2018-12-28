@@ -53,16 +53,16 @@ public class RunGame
 			
 			this.config.game = replay.getConfig().game;
 			
-			PlayerInfo[] players = new PlayerInfo[2];
+			String[] playerNames = new String[2];
 			Robot[] robots = new Robot[2];
 			
 			robots[0] = new IORobot(replay);
 			robots[1] = new IORobot(replay);
 					
-			players[0] = new PlayerInfo(config.playerId1, config.player1Name);
-			players[1] = new PlayerInfo(config.playerId2, config.player2Name);
+			playerNames[0] = config.player1Name;
+			playerNames[1] = config.player2Name;
 			
-			return go(null, players, robots);
+			return go(null, playerNames, robots);
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to replay the game.", e);
 		}
@@ -78,27 +78,27 @@ public class RunGame
 			
 			System.out.println("starting game " + config.gameId);
 			
-			PlayerInfo[] players = new PlayerInfo[2];
+			String[] playerNames = new String[2];
 			Robot[] robots = new Robot[2];
 			
-			robots[0] = setupRobot(config.playerId1, config.bot1Init);
-			robots[1] = setupRobot(config.playerId2, config.bot2Init);
+			robots[0] = setupRobot(1, config.bot1Init);
+			robots[1] = setupRobot(2, config.bot2Init);
 					
-			players[0] = new PlayerInfo(config.playerId1, config.player1Name);
-			players[1] = new PlayerInfo(config.playerId2, config.player2Name);
+			playerNames[0] = config.player1Name;
+			playerNames[1] = config.player2Name;
 						
-			return go(log, players, robots);
+			return go(log, playerNames, robots);
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to run/finish the game.", e);
 		}
 	}
 
-	private GameResult go(GameLog log, PlayerInfo[] players, Robot[] robots) throws InterruptedException {
-        game = new ConquestGame(config.game, players);
+	private GameResult go(GameLog log, String[] playerNames, Robot[] robots) throws InterruptedException {
+        game = new ConquestGame(config.game, playerNames);
 
         GUI gui;
 		if (config.visualize) {
-			gui = new GUI(game, config.playerId1, config.playerId2, robots[0].getRobotPlayerId(), robots[1].getRobotPlayerId());
+			gui = new GUI(game);
 			if (config.visualizeContinual != null) {
 				gui.setContinual(config.visualizeContinual);
 			}
@@ -115,11 +115,11 @@ public class RunGame
 			log.start(config);
 		}
 		
-		for (int i = 0 ; i < 2 ; ++i) {
+		for (int i = 1 ; i <= 2 ; ++i) {
 		    RobotConfig robotCfg =
-		            new RobotConfig(players[i].getId(), players[i].getName(), i == 0 ? Team.PLAYER_1 : Team.PLAYER_2,
+		            new RobotConfig(i, playerNames[i - 1], i == 1 ? Team.PLAYER_1 : Team.PLAYER_2,
 		                    config.botCommandTimeoutMillis, log, config.logToConsole, gui);
-		    robots[i].setup(robotCfg);
+		    robots[i - 1].setup(robotCfg);
 		}
 		
 		if (gui != null) {
@@ -128,8 +128,6 @@ public class RunGame
 				
 		//send the bots the info they need to start
 		for (int i = 0 ; i < 2 ; ++i) {
-		    robots[i].writeInfo("settings your_bot " + players[i].getId());
-		    robots[i].writeInfo("settings opponent_bot " + players[1 - i].getId());
 		    robots[i].writeInfo("settings your_player_number " + (i + 1));
 		    sendSetupMapInfo(robots[i], game.getMap());
 		}
@@ -140,7 +138,7 @@ public class RunGame
 		while(!game.isDone())
 		{
 			if (log != null) {
-				log.logComment("Engine", "Round " + game.getRoundNumber());
+				log.logComment(0, "Round " + game.getRoundNumber());
 			}
 			engine.playRound();
 		}
@@ -154,28 +152,30 @@ public class RunGame
 		return result;
 	}
 
-	private Robot setupRobot(String playerId, String botInit) throws IOException {
+	private Robot setupRobot(int player, String botInit) throws IOException {
 		if (botInit.startsWith("dir;process:")) {
 			String cmd = botInit.substring(12);
 			int semicolon = cmd.indexOf(";");
-			if (semicolon < 0) throw new RuntimeException("Invalid bot torrent (does not contain ';' separating directory and command): " + botInit);
+			if (semicolon < 0) throw new RuntimeException(
+			    "Invalid bot torrent (does not contain ';' separating directory and command): " + botInit);
 			String dir = cmd.substring(0, semicolon);
 			String process = cmd.substring(semicolon+1);			
-			return new ProcessRobot(playerId, dir, process);
+			return new ProcessRobot(player, dir, process);
 		}
 		if (botInit.startsWith("process:")) {
 			String cmd = botInit.substring(8);
-			return new ProcessRobot(playerId, cmd);
+			return new ProcessRobot(player, cmd);
 		}
 		if (botInit.startsWith("internal:")) {
 			String botFQCN = botInit.substring(9);
-			return new InternalRobot(playerId, botFQCN);
+			return new InternalRobot(player, botFQCN);
 		}
 		if (botInit.startsWith("human")) {
 			config.visualize = true;
-			return new HumanRobot(playerId);
+			return new HumanRobot();
 		}
-		throw new RuntimeException("Invalid init string for player '" + playerId + "', must start either with 'process:' or 'internal:' or 'human', passed value was: " + botInit);
+		throw new RuntimeException("Invalid init string for player '" + player +
+		        "', must start either with 'process:' or 'internal:' or 'human', passed value was: " + botInit);
 	}
 
 	private GameResult finish(GameMap map, Robot[] bots) throws InterruptedException
@@ -191,19 +191,14 @@ public class RunGame
 
 	private void sendSetupMapInfo(Robot bot, GameMap initMap)
 	{
-		String setupSuperRegionsString, setupRegionsString, setupNeighborsString;
-		setupSuperRegionsString = getSuperRegionsString(initMap);
-		setupRegionsString = getRegionsString(initMap);
-		setupNeighborsString = getNeighborsString(initMap);
-		
-		bot.writeInfo(setupSuperRegionsString);
-		bot.writeInfo(setupRegionsString);
-		bot.writeInfo(setupNeighborsString);
+		bot.writeInfo(getSuperRegionsString(initMap));
+		bot.writeInfo(getRegionsString(initMap));
+		bot.writeInfo(getNeighborsString(initMap));
 	}
 	
 	private String getSuperRegionsString(GameMap map)
 	{
-		String superRegionsString = "setup_map super_regions";
+		String superRegionsString = "setup_map continents";
 		for(ContinentData superRegion : map.continents)
 		{
 			int id = superRegion.getId();
@@ -265,23 +260,20 @@ public class RunGame
 		result.config = config;
 		
 		for (RegionData region : map.regions) {
-			if (region.ownedByPlayer(config.playerId1)) {
+			if (region.ownedByPlayer(1)) {
 				++result.player1Regions;
 				result.player1Armies += region.getArmies();
 			}
-			if (region.ownedByPlayer(config.playerId2)) {
+			if (region.ownedByPlayer(2)) {
 				++result.player2Regions;
 				result.player2Armies += region.getArmies();
 			}
 		}
 		
-		if (game.winningPlayer() != null) {
-			if (config.playerId1.equals(game.winningPlayer().getId())) {
-				result.winner = Team.PLAYER_1;
-			} else
-			if (config.playerId2.equals(game.winningPlayer().getId())) {
-				result.winner = Team.PLAYER_2;
-			}
+		if (game.winningPlayer() == 1) {
+			result.winner = Team.PLAYER_1;
+		} else if (game.winningPlayer() == 2) {
+			result.winner = Team.PLAYER_2;
 		} else {
 			result.winner = null;
 		}

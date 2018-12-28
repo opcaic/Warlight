@@ -42,17 +42,17 @@ public class ContinentData {
 	}
 	
 	/**
-	 * @return A string with the name of the player that fully owns this SuperRegion
+	 * @return The player that fully owns this continent, or 0 if none
 	 */
-	public String ownedByPlayer()
+	public int owner()
 	{
-		String playerName = subRegions.get(0).getPlayerName();
+		int player = subRegions.get(0).getOwner();
 		for(RegionData region : subRegions)
 		{
-			if (!playerName.equals(region.getPlayerName()))
-				return null;
+			if (player != region.getOwner())
+				return 0;
 		}
-		return playerName;
+		return player;
 	}
 	
 	/**

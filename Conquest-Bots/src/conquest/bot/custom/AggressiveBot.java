@@ -8,16 +8,11 @@ import conquest.bot.fight.FightSimulation.FightAttackersResults;
 import conquest.bot.fight.FightSimulation.FightDefendersResults;
 import conquest.bot.map.RegionBFS;
 import conquest.bot.map.RegionBFS.*;
-import conquest.bot.state.ChooseCommand;
-import conquest.bot.state.GameBot;
-import conquest.bot.state.MoveCommand;
-import conquest.bot.state.PlaceCommand;
-import conquest.bot.state.RegionState;
+import conquest.bot.state.*;
 import conquest.engine.Config;
 import conquest.engine.GameResult;
 import conquest.engine.RunGame;
 import conquest.game.FightMode;
-import conquest.game.Player;
 import conquest.game.world.Continent;
 import conquest.game.world.Region;
 import conquest.utils.Util;
@@ -25,7 +20,6 @@ import conquest.view.GUI;
 
 public class AggressiveBot extends GameBot 
 {
-	
 	FightAttackersResults aRes;
 	FightDefendersResults dRes;
 	
@@ -77,10 +71,12 @@ public class AggressiveBot extends GameBot
 	
 	@Override
 	public List<PlaceCommand> placeArmies(long timeout) {
+	    PlayerState me = state.players[state.me];
+	    System.out.format("AggressiveBot: placing %d armies\n", me.placeArmies);
 		List<PlaceCommand> result = new ArrayList<PlaceCommand>();
 		
 		// CLONE REGIONS OWNED BY ME
-		List<RegionState> mine = new ArrayList<RegionState>(state.me.regions.values());
+		List<RegionState> mine = new ArrayList<RegionState>(me.regions.values());
 		
 		// SORT THEM ACCORDING TO THEIR SCORE
 		Collections.sort(mine, new Comparator<RegionState>() {
@@ -94,19 +90,20 @@ public class AggressiveBot extends GameBot
 
 		});
 		
-		// DO NOT ADD SOLDIER TO REGIONS THAT HAS SCORE 0 (not perspective)
+		// DO NOT ADD SOLDIER TO REGIONS THAT HAVE SCORE 0 (not perspective)
 		int i = 0;
 		while (i < mine.size() && getRegionScore(mine.get(i)) > 0) ++i;
 		while (i < mine.size()) mine.remove(i);
 
 		// DISTRIBUTE ARMIES
-		int armiesLeft = state.me.placeArmies;
+		int armiesLeft = me.placeArmies;
 		
 		int index = 0;
 		
 		while (armiesLeft > 0) {
-			result.add(new PlaceCommand(mine.get(index).region, 3));
-			armiesLeft -= 3;
+		    int count = Math.min(3, armiesLeft);
+			result.add(new PlaceCommand(mine.get(index).region, count));
+			armiesLeft -= count;
 			++index;
 			if (index >= mine.size()) index = 0;
 		}
@@ -118,8 +115,8 @@ public class AggressiveBot extends GameBot
 		int result = 0;
 		
 		for (Region reg : o1.region.getNeighbours()) {
-			result += (state.region(reg).owned(Player.NEUTRAL) ? 1 : 0) * 5;
-			result += (state.region(reg).owned(Player.OPPONENT) ? 1 : 0) * 2;
+			result += (state.region(reg).owned(0) ? 1 : 0) * 5;
+			result += (state.region(reg).owned(state.opp) ? 1 : 0) * 2;
 		}
 		
 		return result;
@@ -132,12 +129,13 @@ public class AggressiveBot extends GameBot
 	@Override
 	public List<MoveCommand> moveArmies(long timeout) {
 		List<MoveCommand> result = new ArrayList<MoveCommand>();
+		Collection<RegionState> regions = state.players[state.me].regions.values();
 		
 		// CAPTURE ALL REGIONS WE CAN
-		for (RegionState from : state.me.regions.values()) {
+		for (RegionState from : regions) {
 			for (RegionState to : from.neighbours) {
 				// DO NOT ATTACK OWN REGIONS
-				if (to.owned(Player.ME)) continue;
+				if (to.owned(state.me)) continue;
 				
 				// IF YOU HAVE ENOUGH ARMY TO WIN WITH 70%
 				if (shouldAttack(from, to, 0.7)) {
@@ -148,7 +146,7 @@ public class AggressiveBot extends GameBot
 		}
 		
 		// MOVE LEFT OVERS CLOSER TO THE FRONT
-		for (RegionState from : state.me.regions.values()) {
+		for (RegionState from : regions) {
 			if (hasOnlyMyNeighbours(from) && from.armies > 1) {
 				result.add(moveToFront(from));
 			}
@@ -159,7 +157,7 @@ public class AggressiveBot extends GameBot
 	
 	private boolean hasOnlyMyNeighbours(RegionState from) {
 		for (RegionState region : from.neighbours) {			
-			if (!region.owned(Player.ME)) return false;
+			if (!region.owned(state.me)) return false;
 		}
 		return true;
 	}

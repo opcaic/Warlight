@@ -30,23 +30,21 @@ public class GameState implements Cloneable {
 	public ContinentState[] continents;
 	
 	/**
-	 * Player state can be found under index 'Player.id'.
-	 * 
-	 * Player indices as 1-based! [0] is null!
+	 * Player state for each player (0 = neutral, 1 = player 1, 2 = player 2)
 	 * 
 	 * @return
 	 */
 	public PlayerState[] players;
 	
 	/**
-	 * My state.
+	 * The player whose turn it is to move.
 	 */
-	public PlayerState me;
+	public int me;
 	
 	/**
-	 * Opponent state.
+	 * The other player.
 	 */
-	public PlayerState opp;
+	public int opp;
 	
 	public GameState(GameState state) {
 		reset(state);
@@ -90,25 +88,15 @@ public class GameState implements Cloneable {
 		}
 		
 		// INIT PLAYER STATES
-		players = new PlayerState[Player.values().length+1];
-		for (int i = 1; i <= Player.values().length; ++i) {
-			players[i] = new PlayerState(Player.values()[i-1]);
+		players = new PlayerState[3];
+		for (int i = 0; i <= 2; ++i) {
+			players[i] = new PlayerState(i);
 		}
-		
-		// INIT PLAYERS
-		this.me  = players[Player.ME.id];
-		this.opp = players[Player.OPPONENT.id];
 	}
 	
 	ConquestGame fromBotState(BotState state) {
-	    PlayerInfo[] pi = new PlayerInfo[2];
-	    for (int i = 1 ; i <= 2 ; ++i) {
-	        String name = (i == state.getMyPlayerNumber() ? state.getMyPlayerName() : state.getOpponentPlayerName());
-	        pi[i - 1] = new PlayerInfo(name, "Player " + i);
-	    }
-	                
 	    return new ConquestGame(
-	        new GameConfig(), state.getMap(), pi,
+	        new GameConfig(), state.getMap(), null,
 	        state.getRoundNumber(), state.getMyPlayerNumber(), state.getPickableStartingRegions());
 	}
 	
@@ -124,12 +112,12 @@ public class GameState implements Cloneable {
 			// REGION
 			RegionState regionState = region(region);
 			regionState.armies = gameStateCompact.armiesAt(region);
-			regionState.owner = player(gameStateCompact.ownedBy(region));
+			regionState.owner = players[gameStateCompact.ownedBy(region)];
 			
 			// CONTINENT
 			ContinentState continentState = continent(regionState.region);
 			continentState.regions.put(regionState.region, regionState);
-			continentState.owned[regionState.owner.player.id] += 1;
+			continentState.owned[regionState.owner.player] += 1;
 			
 			// PLAYER STATE
 			PlayerState playerState = regionState.owner;
@@ -141,21 +129,18 @@ public class GameState implements Cloneable {
 		for (Continent continent : Continent.values()) {
 			ContinentState continentState = continent(continent);
 			boolean isNeutral = true;
-			for (Player player : Player.values()) {
-				if (continentState.owned[player.id] == continentState.regions.size()) {
+			for (int player = 0 ; player <= 2 ; ++player) {
+				if (continentState.owned[player] == continentState.regions.size()) {
 					continentState.owner = player;
 					PlayerState playerState = player(player);
 					playerState.continents.put(continent, continentState);		
-					if (player != Player.NEUTRAL) {
-						playerState.placeArmies += continent.reward;
-					}
-					isNeutral = player == Player.NEUTRAL;
+					isNeutral = player == 0;
 					break;
 				}
 			}
 			if (isNeutral) {
-				continentState.owner = Player.NEUTRAL;
-				player(Player.NEUTRAL).continents.put(continent, continentState);
+				continentState.owner = 0;
+				player(0).continents.put(continent, continentState);
 			}
 		}
 	}
@@ -170,17 +155,17 @@ public class GameState implements Cloneable {
 		game = fromBotState(state);
 
 		// FILL IN STATES
-		for (RegionData data : state.getMap().regions) {
+		for (RegionData rd : state.getMap().regions) {
 			// REGION
-			RegionState regionState = region(data.getRegion());
-			regionState.armies = data.getArmies();
-			Player owner = getRegionOwner(state, data.getPlayerName());
+			RegionState regionState = region(rd.getRegion());
+			regionState.armies = rd.getArmies();
+			int owner = rd.getOwner();
 			regionState.owner = player(owner);
 			
 			// CONTINENT
 			ContinentState continentState = continent(regionState.region);
 			continentState.regions.put(regionState.region, regionState);
-			continentState.owned[regionState.owner.player.id] += 1;
+			continentState.owned[regionState.owner.player] += 1;
 			
 			// PLAYER STATE
 			PlayerState playerState = regionState.owner;
@@ -192,23 +177,26 @@ public class GameState implements Cloneable {
 		for (Continent continent : Continent.values()) {
 			ContinentState continentState = continent(continent);
 			boolean isNeutral = true;
-			for (Player player : Player.values()) {
-				if (continentState.owned[player.id] == continentState.regions.size()) {
+			for (int player = 0 ; player <= 2 ; ++player) {
+				if (continentState.owned[player] == continentState.regions.size()) {
 					continentState.owner = player;
 					PlayerState playerState = player(player);
 					playerState.continents.put(continent, continentState);		
-					if (player != Player.NEUTRAL) {
-						playerState.placeArmies += continent.reward;
-					}
-					isNeutral = player == Player.NEUTRAL;
+					isNeutral = player == 0;
 					break;
 				}
 			}
 			if (isNeutral) {
-				continentState.owner = Player.NEUTRAL;
-				player(Player.NEUTRAL).continents.put(continent, continentState);
+				continentState.owner = 0;
+				player(0).continents.put(continent, continentState);
 			}
 		}
+		
+		for (int p = 1 ; p <= 2 ; ++p)
+		    players[p].placeArmies = game.armiesPerTurn(p);
+		
+        me  = state.getMyPlayerNumber();
+        opp = 3 - me;
 	}
 	
 	/**
@@ -230,7 +218,7 @@ public class GameState implements Cloneable {
 			// CONTINENT
 			ContinentState continentState = continent(regionState.region);
 			continentState.regions.put(regionState.region, regionState);
-			continentState.owned[regionState.owner.player.id] += 1;
+			continentState.owned[regionState.owner.player] += 1;
 			
 			// PLAYER STATE
 			PlayerState playerState = regionState.owner;
@@ -242,21 +230,18 @@ public class GameState implements Cloneable {
 		for (Continent continent : Continent.values()) {
 			ContinentState continentState = continent(continent);
 			boolean isNeutral = true;
-			for (Player player : Player.values()) {
-				if (continentState.owned[player.id] == continentState.regions.size()) {
+			for (int player = 0 ; player <= 2 ; ++player) {
+				if (continentState.owned[player] == continentState.regions.size()) {
 					continentState.owner = player;
 					PlayerState playerState = player(player);
 					playerState.continents.put(continent, continentState);		
-					if (player != Player.NEUTRAL) {
-						playerState.placeArmies += continent.reward;
-					}
-					isNeutral = player == Player.NEUTRAL;
+					isNeutral = player == 0;
 					break;
 				}
 			}
 			if (isNeutral) {
-				continentState.owner = Player.NEUTRAL;
-				player(Player.NEUTRAL).continents.put(continent, continentState);
+				continentState.owner = 0;
+				player(0).continents.put(continent, continentState);
 			}
 		}
 	}
@@ -277,25 +262,22 @@ public class GameState implements Cloneable {
 		Set<Continent> regionOwnershipChanged = new HashSet<Continent>();
 		
 		// UPDATE REGION STATES
-		for (RegionData data : state.getMap().regions) {
-			// REGION
-			RegionState regionState = region(data.getRegion());
-			// CONTINENT
+		for (RegionData rd : state.getMap().regions) {
+			RegionState regionState = region(rd.getRegion());
 			ContinentState continentState = continent(regionState.region);
-			// PLAYER STATE
 			PlayerState oldOwnerState = regionState.owner;
 			
-			regionState.armies = data.getArmies();
+			regionState.armies = rd.getArmies();
 			
-			Player newOwner = getRegionOwner(state, data.getPlayerName());
+			int newOwner = rd.getOwner();
 			PlayerState newOwnerState = player(newOwner);
 			
 			if (newOwner != regionState.owner.player) {
 				// OWNER CHANGED
 				regionOwnershipChanged.add(regionState.region.continent);
 				
-				continentState.owned[regionState.owner.player.id] -= 1;
-				continentState.owned[newOwner.id] += 1;
+				continentState.owned[regionState.owner.player] -= 1;
+				continentState.owned[newOwner] += 1;
 				
 				oldOwnerState.regions.remove(regionState.region);
 				newOwnerState.regions.put(regionState.region, regionState);
@@ -312,6 +294,8 @@ public class GameState implements Cloneable {
 			updateContinentOwnership(continentState);
 		}
 
+		for (int p = 1 ; p <= 2 ; ++p)
+            players[p].placeArmies = game.armiesPerTurn(p);
 	}
 	
 	protected void updateContinentOwnership(Continent continent) {
@@ -319,13 +303,13 @@ public class GameState implements Cloneable {
 	}
 	
 	protected void updateContinentOwnership(ContinentState continentState) {
-		Player newOwner = Player.NEUTRAL;
+		int newOwner = 0;
 		
-		if (continentState.owned[Player.ME.id] == continentState.regions.size()) {
-			newOwner = Player.ME;
+		if (continentState.owned[1] == continentState.regions.size()) {
+			newOwner = 1;
 		} else
-		if (continentState.owned[Player.OPPONENT.id] == continentState.regions.size()) {
-			newOwner = Player.OPPONENT;
+		if (continentState.owned[2] == continentState.regions.size()) {
+			newOwner = 2;
 		}
 		
 		PlayerState newOwnerState = player(newOwner);
@@ -337,9 +321,6 @@ public class GameState implements Cloneable {
 			oldOwnerState.continents.remove(continentState.continent);
 			newOwnerState.continents.put(continentState.continent, continentState);
 			
-			if (oldOwnerState.player != Player.NEUTRAL) oldOwnerState.placeArmies -= continentState.continent.reward;
-			if (newOwnerState.player != Player.NEUTRAL) newOwnerState.placeArmies += continentState.continent.reward;					
-						
 			continentState.owner = newOwnerState.player;
 		}
 	}
@@ -356,47 +337,12 @@ public class GameState implements Cloneable {
 		return continents[continent.id];
 	}
 	
-	public PlayerState player(Player player) {
-		return players[player.id];
-	}
-	
-	/**
-	 * ME becomes OPPONENT and vice versa, OPPONENT becomes ME.
-	 */
-	public void swapPlayers() {
-		PlayerState newMe = opp;
-		PlayerState newOpp = me;
-		
-		newMe.player  = Player.swapPlayer(newMe.player);
-		newOpp.player = Player.swapPlayer(newOpp.player);
-		
-		this.me = newMe;
-		this.opp = newOpp;
-		
-		players[Player.ME.id] = newMe;
-		players[Player.OPPONENT.id] = newOpp;
-		
-		for (int i = 1; i < Continent.LAST_ID; ++i) {
-			continents[i].swapPlayer();			
-		}
-		/* NO NEED TO DO THAT, region only contains reference to PlayerState, which we have already swapPlayer() for.
-		for (int i = 1; i < Region.LAST_ID; ++i) {
-			regions[i].swapPlayer();			
-		}
-		*/
+	public PlayerState player(int player) {
+		return players[player];
 	}
 	
 	@Override
 	public String toString() {
 		return "GameState[" + me + "|" + opp + "]";
-	}
-	
-	// =====
-	// UTILS
-	// =====
-	
-	public static Player getRegionOwner(BotState botState, String playerName) {
-		return botState.getMyPlayerName().equals(playerName) ? Player.ME : (botState.getOpponentPlayerName().equals(playerName) ? Player.OPPONENT : Player.NEUTRAL); 
-	}
-	
+	}	
 }

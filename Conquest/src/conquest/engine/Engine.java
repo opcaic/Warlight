@@ -35,7 +35,7 @@ public class Engine {
 	private Robot[] robots;
 	private long timeoutMillis;
 	private RobotParser parser;
-	private ArrayList<Move> opponentMoves;
+	private ArrayList<ArrayList<Move>> opponentMoves;
 	private GUI gui;
 	
 	public Engine(ConquestGame game, Robot[] robots, GUI gui, long timeoutMillis)
@@ -48,18 +48,16 @@ public class Engine {
 		this.timeoutMillis = timeoutMillis;		
 		
 		parser = new RobotParser();
-		opponentMoves = new ArrayList<Move>();
-	}
-	
-	PlayerInfo player(int i) {
-	    return game.player(i);
+		opponentMoves = new ArrayList<ArrayList<Move>>();
+		for (int i = 0 ; i <= 1 ; ++i)
+		    opponentMoves.add(new ArrayList<Move>());
 	}
 	
 	Robot robot(int i) {
 	    return robots[i - 1];
 	}
 	
-    private List<PlaceArmiesMove> placeArmiesMoves(String input, PlayerInfo player) {
+    private List<PlaceArmiesMove> placeArmiesMoves(String input, int player) {
         ArrayList<PlaceArmiesMove> moves = new ArrayList<PlaceArmiesMove>();
         
         for (Move move : parser.parseMoves(input, player))
@@ -71,7 +69,7 @@ public class Engine {
         return moves;
     }
 
-    private List<AttackTransferMove> attackTransferMoves(String input, PlayerInfo player) {
+    private List<AttackTransferMove> attackTransferMoves(String input, int player) {
         ArrayList<AttackTransferMove> moves = new ArrayList<AttackTransferMove>();
         
         for (Move move : parser.parseMoves(input, player))
@@ -92,12 +90,12 @@ public class Engine {
 		
 		for (int i = 1 ; i <= 2 ; ++i) {
     		List<PlaceArmiesMove> placeMoves =
-    		    placeArmiesMoves(robot(i).getPlaceArmiesMoves(timeoutMillis), player(i));
+    		    placeArmiesMoves(robot(i).getPlaceArmiesMoves(timeoutMillis), i);
     		
-    		game.placeArmies(placeMoves, opponentMoves);
+    		game.placeArmies(placeMoves, opponentMoves.get(i - 1));
     
     		for (int j = 1 ; j <= 2 ; ++j)
-    		    sendUpdateMapInfo(player(j), robot(j));
+    		    sendUpdateMapInfo(j, robot(j));
     		
     		if (gui != null && !(robot(i) instanceof HumanRobot)) {
     	        List<PlaceArmiesMove> legalMoves = new ArrayList<PlaceArmiesMove>();
@@ -110,9 +108,9 @@ public class Engine {
     		}
     		
     		List<AttackTransferMove> moves =
-    		    attackTransferMoves(robot(i).getAttackTransferMoves(timeoutMillis), player(i));
+    		    attackTransferMoves(robot(i).getAttackTransferMoves(timeoutMillis), i);
     		
-    		game.attackTransfer(moves, opponentMoves);
+    		game.attackTransfer(moves, opponentMoves.get(i - 1));
     		
     		if (game.isDone())
     		    break;
@@ -136,7 +134,7 @@ public class Engine {
 		for (int i = 1 ; i <= ConquestGame.nrOfStartingRegions ; ++i)
     	    for (int p = 1 ; p <= 2 ; ++p) {
         		Region region = parser.parseStartingRegion(
-        		    robot(p).getStartingRegion(timeoutMillis, pickableRegions), player(p));
+        		    robot(p).getStartingRegion(timeoutMillis, pickableRegions));
         		
         		//if the bot did not correctly return a starting region, get some random ones
         		if (!game.pickableRegions.contains(region)) {
@@ -162,21 +160,15 @@ public class Engine {
 	public void sendAllInfo()
 	{
 	    for (int i = 1 ; i <= 2 ; ++i) {
-	        sendStartingArmiesInfo(player(i), robot(i));
-	        sendUpdateMapInfo(player(i), robot(i));
-	        sendOpponentMovesInfo(player(i), robot(i));
+	        sendUpdateMapInfo(i, robot(i));
+	        sendOpponentMovesInfo(i, robot(i));
+	        opponentMoves.get(i - 1).clear();
+            robot(i).writeInfo("next_round");
 	    }
-		opponentMoves.clear();
 	}
 		
-	//inform the player about how much armies he can place at the start next round
-	private void sendStartingArmiesInfo(PlayerInfo player, Robot bot)
-	{
-		bot.writeInfo("settings starting_armies " + player.getArmiesPerTurn());
-	}
-	
 	//inform the player about how his visible map looks now
-	private void sendUpdateMapInfo(PlayerInfo player, Robot bot)
+	private void sendUpdateMapInfo(int player, Robot bot)
 	{
 		ArrayList<RegionData> visibleRegions;
 		if (game.config.fullyObservableGame) {
@@ -188,21 +180,20 @@ public class Engine {
 		for(RegionData region : visibleRegions)
 		{
 			int id = region.getId();
-			String playerName = region.getPlayerName();
+			int owner = region.getOwner();
 			int armies = region.getArmies();
 			
-			updateMapString = updateMapString.concat(" " + id + " " + playerName + " " + armies);
+			updateMapString = updateMapString.concat(" " + id + " " + owner + " " + armies);
 		}
 		bot.writeInfo(updateMapString);
 	}
 
-	private void sendOpponentMovesInfo(PlayerInfo player, Robot bot)
+	private void sendOpponentMovesInfo(int player, Robot bot)
 	{
 		String opponentMovesString = "opponent_moves ";
 
-		for(Move move : opponentMoves)
-		    if (!move.getPlayerName().equals(player.getId()) &&  // move was by other player
-			    move.getIllegalMove().equals(""))
+		for(Move move : opponentMoves.get((3 - player) - 1))
+		    if (move.getIllegalMove().equals(""))
 			{
 				if (move instanceof PlaceArmiesMove) {
 					PlaceArmiesMove plm = (PlaceArmiesMove) move;

@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import conquest.game.Player;
 import conquest.game.Team;
 import conquest.tournament.utils.CSV;
 import conquest.tournament.utils.CSV.CSVRow;
@@ -45,14 +44,14 @@ public class ConquestTable {
 		public int armies;
 		public double armiesAvg;
 		
-		public void addGame(int rounds, Player winner, int regions, int armies) {
+		public void addGame(int rounds, int winner, int regions, int armies) {
 			++games;
 			
 			this.rounds += rounds;
 			switch (winner) {
-			case ME: ++wins; break;
-			case NEUTRAL: ++draws; break;
-			case OPPONENT: ++loses; break;
+			case 1: ++wins; break;
+			case 0: ++draws; break;
+			case 2: ++loses; break;
 			default: throw new RuntimeException("Unhandled winner = " + winner);
 			}
 
@@ -106,13 +105,13 @@ public class ConquestTable {
 			matchLosesAvg = 0;
 		}
 		
-		public void addMatch(Player winner) {
+		public void addMatch(int winner) {
 			++matches;
 			
 			switch (winner) {
-			case ME:       ++matchWins; break;
-			case NEUTRAL:  ++matchDraws; break;
-			case OPPONENT: ++matchLoses; break;			
+			case 1:       ++matchWins; break;
+			case 0:  ++matchDraws; break;
+			case 2: ++matchLoses; break;			
 			}
 			
 			matchWinsAvg  = ((double)matchWins)  / ((double)matches);
@@ -142,7 +141,7 @@ public class ConquestTable {
 			this.bot2Id = bot2Id;
 		}
 
-		public void addGame(int rounds, Player winner, int regions, int armies) {
+		public void addGame(int rounds, int winner, int regions, int armies) {
 			super.addGame(rounds, winner, regions, armies);
 			
 			if (wins > loses) result = Team.PLAYER_1;
@@ -190,15 +189,15 @@ public class ConquestTable {
 			
 		};
 		
-		public void addGame(String bot1Id, String bot2Id, Team winner, int rounds, int bot1Regions, int bot1Armies, int bot2Regions, int bot2Armies) {
+		public void addGame(String bot1Id, String bot2Id, Team winner, int rounds,
+		                    int bot1Regions, int bot1Armies, int bot2Regions, int bot2Armies) {
 			
-			Player bot1Win;
-			Player bot2Win;
+			int bot1Win, bot2Win;
 			
 			switch (winner) {
-			case NEUTRAL:  bot1Win = Player.NEUTRAL;  bot2Win = Player.NEUTRAL;  break;
-			case PLAYER_1: bot1Win = Player.ME;       bot2Win = Player.OPPONENT; break;
-			case PLAYER_2: bot1Win = Player.OPPONENT; bot2Win = Player.ME;       break;
+			case NEUTRAL:  bot1Win = 0; bot2Win = 0; break;
+			case PLAYER_1: bot1Win = 1; bot2Win = 2; break;
+			case PLAYER_2: bot1Win = 2; bot2Win = 1; break;
 			default: throw new RuntimeException("Unhandled winner = " + winner);
 			}
 			
@@ -224,13 +223,12 @@ public class ConquestTable {
 				for (String botId2 : matches.get(botId1).keySet()) {
 					MatchSummary match = matches.get(botId1).get(botId2);
 					
-					Player bot1Win;
-					Player bot2Win;
+					int bot1Win, bot2Win;
 					
 					switch (match.result) {
-					case NEUTRAL:  bot1Win = Player.NEUTRAL;  bot2Win = Player.NEUTRAL;  break;
-					case PLAYER_1: bot1Win = Player.ME;       bot2Win = Player.OPPONENT; break;
-					case PLAYER_2: bot1Win = Player.OPPONENT; bot2Win = Player.ME;       break;
+					case NEUTRAL:  bot1Win = 0; bot2Win = 0; break;
+					case PLAYER_1: bot1Win = 1; bot2Win = 2; break;
+					case PLAYER_2: bot1Win = 2; bot2Win = 1; break;
 					default: throw new RuntimeException("Unhandled match.result = " + match.result);
 					} 
 					

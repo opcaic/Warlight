@@ -25,12 +25,7 @@ import conquest.game.ContinentData;
 import conquest.game.world.Continent;
 import conquest.game.world.Region;
 
-
 public class BotState {
-	
-	private String myName = "";
-	private String opponentName = "";
-	
 	// This map is known from the start, contains all the regions and how they are connected,
 	// doesn't change after initialization
 	private final GameMap fullMap = new GameMap(); 
@@ -41,8 +36,6 @@ public class BotState {
 	//2 randomly chosen regions from each continent are given, which the bot can choose to start with
 	private ArrayList<Region> pickableStartingRegions; 
 	
-	private int startingArmies; //number of armies the player can place on map
-	
 	private int roundNumber;
 	private int playerNumber;
 	
@@ -52,27 +45,14 @@ public class BotState {
 		roundNumber = 0;
 	}
 	
-	/**
-	 * Useful to pretend "you are an opponent" for the purpose of computing the GameState from the perspective of your opponent.
-	 */
-	public void swapNames() {
-		String name = myName;
-		myName = opponentName;
-		opponentName = name;
-	}
-	
 	public void updateSettings(String key, String value)
 	{
-		if(key.equals("your_bot")) //bot's own name
-			myName = value;
-		else if(key.equals("opponent_bot")) //opponent's name
-			opponentName = value;
-		else if(key.equals("starting_armies")) 
-		{
-			startingArmies = Integer.parseInt(value);
-			roundNumber++; //next round
-		} else if (key.equals("your_player_number"))
+		if (key.equals("your_player_number"))
 		    playerNumber = Integer.parseInt(value);
+	}
+	
+	public void nextRound() {
+	    roundNumber++;
 	}
 	
 	//initial map is given to the bot with all the information except for player and armies info
@@ -80,7 +60,7 @@ public class BotState {
 	{
 		int i, regionId, continentId, reward;
 		
-		if(mapInput[1].equals("super_regions"))
+		if(mapInput[1].equals("continents"))
 		{
 			for(i=2; i<mapInput.length; i++)
 			{
@@ -159,10 +139,10 @@ public class BotState {
 		{
 			try {
 				RegionData region = visibleMap.getRegion(Integer.parseInt(mapInput[i]));
-				String playerName = mapInput[i+1];
+				int owner = Integer.parseInt(mapInput[i+1]);
 				int armies = Integer.parseInt(mapInput[i+2]);
 				
-				region.setPlayerName(playerName);
+				region.setOwner(owner);
 				region.setArmies(armies);
 				i += 2;
 			}
@@ -174,22 +154,10 @@ public class BotState {
 		
 		//remove regions which are unknown.
 		for(RegionData region : visibleMap.regions)
-			if(region.getPlayerName().equals("unknown"))
+			if(region.getOwner() == 0)
 				unknownRegions.add(region);
 		for(RegionData unknownRegion : unknownRegions)
 			visibleMap.getRegions().remove(unknownRegion);				
-	}
-	
-	public String getMyPlayerName(){
-		return myName;
-	}
-	
-	public String getOpponentPlayerName(){
-		return opponentName;
-	}
-	
-	public int getStartingArmies(){
-		return startingArmies;
 	}
 	
 	public int getRoundNumber(){

@@ -120,7 +120,7 @@ public class ReplayHandler implements IHandler {
 	}
 
 	@Override
-	public void setGameLog(GameLog log, String playerName, boolean logToConsole) {
+	public void setGameLog(GameLog log, int player, boolean logToConsole) {
 	}
 
 }

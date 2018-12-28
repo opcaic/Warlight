@@ -13,8 +13,6 @@ import conquest.game.world.Region;
 import conquest.utils.Util;
 import conquest.view.GUI;
 
-/**
- */
 public class MyBot extends GameBot
 {
 	Random rand = new Random();
@@ -48,11 +46,13 @@ public class MyBot extends GameBot
 	
 	@Override
 	public List<PlaceCommand> placeArmies(long timeout) {
-		List<Region> mine = new ArrayList<Region>(state.me.regions.keySet());
+	    PlayerState me = state.players[state.me];
+		List<Region> mine = new ArrayList<Region>(me.regions.keySet());
 		int numRegions = mine.size();
 		
+		System.out.format("mybot: placing %d armies\n", me.placeArmies); 
 		int[] count = new int[numRegions];
-		for (int i = 0 ; i < state.me.placeArmies ; ++i) {
+		for (int i = 0 ; i < me.placeArmies ; ++i) {
 			int r = rand.nextInt(numRegions);
 			count[r]++;
 		}
@@ -70,7 +70,7 @@ public class MyBot extends GameBot
 	public List<MoveCommand> moveArmies(long timeout) {
 		List<MoveCommand> ret = new ArrayList<MoveCommand>();
 		
-		for (RegionState rs : state.me.regions.values()) {
+		for (RegionState rs : state.players[state.me].regions.values()) {
 			int count = rand.nextInt(rs.armies);
 			if (count > 0) {
 				List<Region> neighbors = rs.region.getNeighbours();

@@ -25,13 +25,11 @@ import conquest.game.world.Region;
  */
 
 public class PlaceArmiesMove extends Move {
-	
 	private Region region;
 	private int armies;
 	
-	public PlaceArmiesMove(String playerName, Region region, int armies)
+	public PlaceArmiesMove(Region region, int armies)
 	{
-		super.setPlayerName(playerName);
 		this.region = region;
 		this.armies = armies;
 	}
@@ -62,9 +60,9 @@ public class PlaceArmiesMove extends Move {
 	 */
 	public String getString() {
 		if(getIllegalMove().equals(""))
-			return getPlayerName() + " place_armies " + region.id + " " + armies;
+			return "place_armies " + region.id + " " + armies;
 		else
-			return getPlayerName() + " illegal_move " + getIllegalMove();
+			return "illegal_move " + getIllegalMove();
 				
 	}
 	

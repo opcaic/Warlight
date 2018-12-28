@@ -1,6 +1,5 @@
 package conquest.bot.state;
 
-import conquest.game.Player;
 import conquest.game.world.Region;
 
 public class RegionState {
@@ -18,7 +17,7 @@ public class RegionState {
 	/**
 	 * How many armies are in this {@link #region}.
 	 */
-	public int armies;		
+	public int armies;
 	
 	/**
 	 * What neighbours this {@link #region} has.
@@ -52,27 +51,14 @@ public class RegionState {
 	 * @param player
 	 * @return
 	 */
-	public boolean owned(Player player) {
+	public boolean owned(int player) {
 		return owner != null && owner.player == player;
-	}
-	
-	/**
-	 * Is {@link #region} owned by me ({@link Player#ME}) ?
-	 * @return
-	 */
-	public boolean isMine() {
-		return owned(Player.ME);
 	}
 	
 	@Override
 	public String toString() {
-		return (region == null ? "RegionState" : region.name()) + "[" + (owner == null ? "null" : owner.player.name()) + "|" + armies + "]";
+		return (region == null ? "RegionState" : region.name()) +
+		    "[" + (owner == null ? "null" : owner.player) + "|" + armies + "]";
 	}
-
-	/*
-	public void swapPlayer() {
-		// NOTHING TO DO...
-	}
-	*/
 	
 }
