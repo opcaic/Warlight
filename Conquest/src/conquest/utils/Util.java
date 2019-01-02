@@ -4,6 +4,6 @@ import java.io.File;
 
 public class Util {
 	public static File file(String path) {
-		return new File(path.replaceAll("/", File.separator));
+		return new File(path.replace('/', File.separatorChar));
 	}
 }
