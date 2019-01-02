@@ -9,14 +9,9 @@ import conquest.game.move.PlaceArmiesMove;
 import conquest.game.world.Region;
 
 public class HumanRobot implements Robot {
-
 	private RobotConfig config;
-	private int startingArmies;
 	private boolean running = true;;
 	
-	public HumanRobot() {
-	}
-
 	@Override
 	public void setup(RobotConfig config) {
 		this.config = config;
@@ -45,7 +40,7 @@ public class HumanRobot implements Robot {
 			System.out.println(config.player + "-Human --> getPlaceArmiesMoves()");
 		}
 		
-		List<PlaceArmiesMove> commands = config.gui.placeArmiesHuman(config.team, startingArmies);
+		List<PlaceArmiesMove> commands = config.gui.placeArmiesHuman(config.team);
 		
 		String result = "";
 		
@@ -83,14 +78,6 @@ public class HumanRobot implements Robot {
 
 	@Override
 	public void writeInfo(String info) {
-		String[] keys = info.split(" ");
-		String key = keys[0];
-		if (!key.equals("settings")) return;
-		key = keys[1];
-		if(key.equals("starting_armies")) 
-		{
-			startingArmies = Integer.parseInt(keys[2]);
-		}
 	}
 
 	@Override

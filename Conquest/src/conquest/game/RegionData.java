@@ -40,7 +40,7 @@ public class RegionData {
 		this.owner = 0;
 		this.armies = 0;
 		if (superRegion != null) {
-			superRegion.addSubRegion(this);
+			superRegion.addRegion(this);
 		}
 	}
 	
@@ -53,7 +53,7 @@ public class RegionData {
 		this.owner = owner;
 		this.armies = armies;
 		
-		superRegion.addSubRegion(this);
+		superRegion.addRegion(this);
 	}
 	
 	public void addNeighbor(RegionData neighbor)
@@ -112,7 +112,7 @@ public class RegionData {
 	}
 
 	/**
-	 * @return The SuperRegion this Region is part of
+	 * @return The continent this Region is part of
 	 */
 	public ContinentData getContinentData() {
 		return continent;
@@ -126,7 +126,7 @@ public class RegionData {
 	}
 	
 	/**
-	 * @return A string with the name of the player that owns this region
+	 * @return The player that owns this region
 	 */
 	public int getOwner() {
 		return owner;

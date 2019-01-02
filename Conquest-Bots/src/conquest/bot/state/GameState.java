@@ -1,7 +1,6 @@
 package conquest.bot.state;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import conquest.bot.BotState;
 import conquest.game.*;
@@ -46,204 +45,116 @@ public class GameState implements Cloneable {
 	 */
 	public int opp;
 	
-	public GameState(GameState state) {
-		reset(state);
+	public GameState(ConquestGame game) {
+		this.game = game;
+		reset();
+		update();
 	}
 	
 	public GameState(BotState state) {
-		reset(state);		
+		this(state.toConquestGame());
 	}
 	
-	public GameState(GameStateCompact gameStateCompact) {
-		reset(gameStateCompact);
+	public GameState(GameStateCompact state) {
+		this(state.game);
 	}
 	
 	@Override
 	public GameState clone() {
-		return new GameState(this);
+		return new GameState(game);
 	}
 	
 	/**
 	 * Recreates all STATE objects.
 	 */
 	private void reset() {
-		// INIT CONTINENTS
-		continents = new ContinentState[Continent.values().length+1];
-		for (int i = 1; i <= Continent.values().length; ++i) {
-			continents[i] = new ContinentState(Continent.values()[i-1]);
+		regions = new RegionState[Region.LAST_ID + 1];
+		for (int i = 1; i <= Region.LAST_ID; ++i) {
+			Region region = Region.forId(i);
+			regions[i] = new RegionState(region);
+			regions[i].neighbours = new RegionState[region.getNeighbours().size()];
 		}
-		
-		// INIT REGIONS
-		regions = new RegionState[Region.values().length+1];
-		for (int i = 1; i <= Region.values().length; ++i) {
-			regions[i] = new RegionState(Region.values()[i-1]);
-		}
-		
-		// INIT REGION NEIGHBOURS
-		for (int i = 1; i <= Region.values().length; ++i) {
-			regions[i].neighbours = new RegionState[Region.values()[i-1].getNeighbours().size()];
-			for (int j = 0; j < Region.values()[i-1].getNeighbours().size(); ++j) {				
-				regions[i].neighbours[j] = region(Region.values()[i-1].getNeighbours().get(j));
+
+		// fill in neighbours
+		for (int i = 1; i <= Region.LAST_ID; ++i) {
+			List<Region> neighbours = Region.forId(i).getNeighbours();
+			for (int j = 0; j < neighbours.size(); ++j) {				
+				regions[i].neighbours[j] = region(neighbours.get(j));
 			}			
 		}
 		
-		// INIT PLAYER STATES
+		continents = new ContinentState[Continent.LAST_ID + 1];
+		for (int i = 1; i <= Continent.LAST_ID; ++i) {
+			Continent c = Continent.forId(i);
+			continents[i] = new ContinentState(c);
+			
+			for (Region r : c.getRegions())
+				continents[i].regions.put(r, regions[r.id]);
+		}
+		
 		players = new PlayerState[3];
 		for (int i = 0; i <= 2; ++i) {
 			players[i] = new PlayerState(i);
 		}
 	}
 	
-	ConquestGame fromBotState(BotState state) {
-	    return new ConquestGame(
-	        new GameConfig(), state.getMap(), null,
-	        state.getRoundNumber(), state.getMyPlayerNumber(), state.getPickableStartingRegions());
-	}
-	
-	/**
-	 * Fully (re)creates the state out of the {@link GameStateCompact}, throwing out all existing objects it has.
-	 * @param gameStateCompact
-	 */
-	private void reset(GameStateCompact gameStateCompact) {
-		reset();
-
-		// FILL IN STATES
-		for (Region region : Region.values()) {
-			// REGION
-			RegionState regionState = region(region);
-			regionState.armies = gameStateCompact.armiesAt(region);
-			regionState.owner = players[gameStateCompact.ownedBy(region)];
+	// Update all objects based on the underlying ConquestGame.
+	void update() {
+		GameMap map = game.getMap();
+		
+		for (int p = 0 ; p <= 2 ; ++p) {
+			PlayerState ps = players[p];
 			
-			// CONTINENT
-			ContinentState continentState = continent(regionState.region);
-			continentState.regions.put(regionState.region, regionState);
-			continentState.owned[regionState.owner.player] += 1;
+			Iterator<Region> regions = ps.regions.keySet().iterator();
+			while (regions.hasNext()) {
+				Region r = regions.next();
+				if (map.getRegion(r.id).getOwner() != p)
+					regions.remove();  // no longer owned by this player
+			}
 			
-			// PLAYER STATE
-			PlayerState playerState = regionState.owner;
-			playerState.regions.put(regionState.region, regionState);
-			playerState.totalArmies += regionState.armies;
+			Iterator<Continent> continents = ps.continents.keySet().iterator();
+			while (continents.hasNext()) {
+				Continent c = continents.next();
+				if (map.getContinent(c.id).owner() != p)
+					continents.remove();  // no longer owned by this player
+			}
+			
+			ps.totalArmies = 0;
+			ps.placeArmies = game.armiesPerTurn(p);
 		}
 		
-		// UPDATE CONTINENT OWNERSHIPS & PLACE ARMIES
-		for (Continent continent : Continent.values()) {
-			ContinentState continentState = continent(continent);
-			boolean isNeutral = true;
-			for (int player = 0 ; player <= 2 ; ++player) {
-				if (continentState.owned[player] == continentState.regions.size()) {
-					continentState.owner = player;
-					PlayerState playerState = player(player);
-					playerState.continents.put(continent, continentState);		
-					isNeutral = player == 0;
-					break;
-				}
-			}
-			if (isNeutral) {
-				continentState.owner = 0;
-				player(0).continents.put(continent, continentState);
-			}
-		}
-	}
-
-	/**
-	 * Fully (re)creates the state out of the {@link BotState}, throwing out all existing objects it has.
-	 * @param state
-	 */
-	private void reset(BotState state) {
-		reset();
-		
-		game = fromBotState(state);
-
-		// FILL IN STATES
-		for (RegionData rd : state.getMap().regions) {
-			// REGION
-			RegionState regionState = region(rd.getRegion());
-			regionState.armies = rd.getArmies();
+		for (int i = 1 ; i <= Region.LAST_ID ; ++i) {
+			Region r = Region.forId(i);
+			RegionData rd = map.getRegion(i);
 			int owner = rd.getOwner();
-			regionState.owner = player(owner);
+			RegionState rs = regions[i];
+			rs.owner = players[owner];
+			rs.armies = rd.getArmies();
 			
-			// CONTINENT
-			ContinentState continentState = continent(regionState.region);
-			continentState.regions.put(regionState.region, regionState);
-			continentState.owned[regionState.owner.player] += 1;
+			if (!players[owner].regions.containsKey(r))
+				players[owner].regions.put(r, rs);
 			
-			// PLAYER STATE
-			PlayerState playerState = regionState.owner;
-			playerState.regions.put(regionState.region, regionState);
-			playerState.totalArmies += regionState.armies;
+			players[owner].totalArmies += rd.getArmies();
 		}
 		
-		// UPDATE CONTINENT OWNERSHIPS & PLACE ARMIES
-		for (Continent continent : Continent.values()) {
-			ContinentState continentState = continent(continent);
-			boolean isNeutral = true;
-			for (int player = 0 ; player <= 2 ; ++player) {
-				if (continentState.owned[player] == continentState.regions.size()) {
-					continentState.owner = player;
-					PlayerState playerState = player(player);
-					playerState.continents.put(continent, continentState);		
-					isNeutral = player == 0;
-					break;
-				}
-			}
-			if (isNeutral) {
-				continentState.owner = 0;
-				player(0).continents.put(continent, continentState);
-			}
-		}
-		
-		for (int p = 1 ; p <= 2 ; ++p)
-		    players[p].placeArmies = game.armiesPerTurn(p);
-		
-        me  = state.getMyPlayerNumber();
-        opp = 3 - me;
-	}
-	
-	/**
-	 * Fully (re)creates the state out of the {@link GameState}, throwing out all existing objects it has.
-	 * @param gameState
-	 */
-	private void reset(GameState gameState) {
-		reset();
-		
-		game = gameState.game.clone();
-
-		// FILL IN STATES
-		for (Region region : Region.values()) {
-			// REGION
-			RegionState regionState = region(region);
-			regionState.armies = gameState.region(region).armies;
-			regionState.owner = player(gameState.region(region).owner.player);
+		for (int i = 1 ; i <= Continent.LAST_ID ; ++i) {
+			Continent c = Continent.forId(i);
+			ContinentData cd = map.getContinent(i);
+			int owner = cd.owner();
+			ContinentState cs = continents[i];
+			cs.owner = owner;
 			
-			// CONTINENT
-			ContinentState continentState = continent(regionState.region);
-			continentState.regions.put(regionState.region, regionState);
-			continentState.owned[regionState.owner.player] += 1;
+			for (int j = 0 ; j < 3 ; ++j)
+				cs.owned[j] = 0;
+			for (RegionData rd : cd.getRegions())
+				cs.owned[rd.getOwner()] += 1;
 			
-			// PLAYER STATE
-			PlayerState playerState = regionState.owner;
-			playerState.regions.put(regionState.region, regionState);
-			playerState.totalArmies += regionState.armies;
+			if (!players[owner].continents.containsKey(c))
+				players[owner].continents.put(c, cs);
 		}
 		
-		// UPDATE CONTINENT OWNERSHIPS & PLACE ARMIES
-		for (Continent continent : Continent.values()) {
-			ContinentState continentState = continent(continent);
-			boolean isNeutral = true;
-			for (int player = 0 ; player <= 2 ; ++player) {
-				if (continentState.owned[player] == continentState.regions.size()) {
-					continentState.owner = player;
-					PlayerState playerState = player(player);
-					playerState.continents.put(continent, continentState);		
-					isNeutral = player == 0;
-					break;
-				}
-			}
-			if (isNeutral) {
-				continentState.owner = 0;
-				player(0).continents.put(continent, continentState);
-			}
-		}
+		me = game.getTurn();
+		opp = 3 - me;
 	}
 	
 	/**
@@ -251,78 +162,8 @@ public class GameState implements Cloneable {
 	 * @param state
 	 */
 	public void update(BotState state) {
-	    game = fromBotState(state);
-	    
-		// RESET TOTAL ARMIES & PLACE ARMIES
-		for (int i = 1; i < players.length; ++i) {
-			PlayerState player = players[i];
-			player.totalArmies = 0;
-		}
-		
-		Set<Continent> regionOwnershipChanged = new HashSet<Continent>();
-		
-		// UPDATE REGION STATES
-		for (RegionData rd : state.getMap().regions) {
-			RegionState regionState = region(rd.getRegion());
-			ContinentState continentState = continent(regionState.region);
-			PlayerState oldOwnerState = regionState.owner;
-			
-			regionState.armies = rd.getArmies();
-			
-			int newOwner = rd.getOwner();
-			PlayerState newOwnerState = player(newOwner);
-			
-			if (newOwner != regionState.owner.player) {
-				// OWNER CHANGED
-				regionOwnershipChanged.add(regionState.region.continent);
-				
-				continentState.owned[regionState.owner.player] -= 1;
-				continentState.owned[newOwner] += 1;
-				
-				oldOwnerState.regions.remove(regionState.region);
-				newOwnerState.regions.put(regionState.region, regionState);
-				
-				regionState.owner = newOwnerState;
-			}
-			
-			newOwnerState.totalArmies += regionState.armies;
-		}
-		
-		// UPDATE CONTINENT OWNERSHIPS & PLACE ARMIES
-		for (Continent continent : regionOwnershipChanged) {
-			ContinentState continentState = continent(continent);
-			updateContinentOwnership(continentState);
-		}
-
-		for (int p = 1 ; p <= 2 ; ++p)
-            players[p].placeArmies = game.armiesPerTurn(p);
-	}
-	
-	protected void updateContinentOwnership(Continent continent) {
-		updateContinentOwnership(continent(continent));
-	}
-	
-	protected void updateContinentOwnership(ContinentState continentState) {
-		int newOwner = 0;
-		
-		if (continentState.owned[1] == continentState.regions.size()) {
-			newOwner = 1;
-		} else
-		if (continentState.owned[2] == continentState.regions.size()) {
-			newOwner = 2;
-		}
-		
-		PlayerState newOwnerState = player(newOwner);
-		
-		if (continentState.owner != newOwner) {
-			// CONTINENT OWNER HAS CHANGED!
-			PlayerState oldOwnerState = player(continentState.owner);
-			
-			oldOwnerState.continents.remove(continentState.continent);
-			newOwnerState.continents.put(continentState.continent, continentState);
-			
-			continentState.owner = newOwnerState.player;
-		}
+	    game = state.toConquestGame();
+	    update();
 	}
 	
 	public RegionState region(Region region) {
@@ -344,5 +185,5 @@ public class GameState implements Cloneable {
 	@Override
 	public String toString() {
 		return "GameState[" + me + "|" + opp + "]";
-	}	
+	}
 }

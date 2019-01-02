@@ -666,8 +666,6 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 	
 	private CountDownLatch placeArmiesAction;
 	
-	private String placeArmiesPlayerName;
-	
 	private int armiesLeft;
 	
 	private List<Region> armyRegions;
@@ -676,7 +674,7 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 	
 	private Button placeArmiesFinishedButton;
 		
-	public List<PlaceArmiesMove> placeArmiesHuman(Team team, int startingArmies) {
+	public List<PlaceArmiesMove> placeArmiesHuman(Team team) {
 		this.requestFocusInWindow();
 		
 		List<Region> availableRegions = new ArrayList<Region>();
@@ -686,18 +684,17 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 				availableRegions.add(Region.values()[i]);
 			}			
 		}
-		return placeArmiesHuman(startingArmies, availableRegions);
+		return placeArmiesHuman(availableRegions);
 	}
 	
-	public List<PlaceArmiesMove> placeArmiesHuman(int totalArmies, List<Region> availableRegions) {
+	public List<PlaceArmiesMove> placeArmiesHuman(List<Region> availableRegions) {
 		this.armyRegions = availableRegions;
-		
+		armiesLeft = game.armiesPerTurn(game.getTurn());
+				
 		placeArmiesAction = new CountDownLatch(1);
 		
-		actionTxt.setText(botName(game.getTurn()) + ": place " + totalArmies +
-				          (totalArmies == 1 ? "army" : " armies"));
-		
-		this.armiesLeft = totalArmies;		
+		actionTxt.setText(botName(game.getTurn()) + ": place " + armiesLeft +
+				          (armiesLeft == 1 ? "army" : " armies"));
 		
 		armyRegionButtons = new ArrayList<TriButton>();
 		

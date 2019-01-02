@@ -78,7 +78,7 @@ public class AggressiveBot extends GameBot
 		// CLONE REGIONS OWNED BY ME
 		List<RegionState> mine = new ArrayList<RegionState>(me.regions.values());
 		
-		// SORT THEM ACCORDING TO THEIR SCORE
+		// SORT THEM IN DECREASING ORDER BY SCORE
 		Collections.sort(mine, new Comparator<RegionState>() {
 
 			@Override

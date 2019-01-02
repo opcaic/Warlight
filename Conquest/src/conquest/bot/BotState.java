@@ -21,7 +21,9 @@ import java.util.ArrayList;
 
 import conquest.game.GameMap;
 import conquest.game.RegionData;
+import conquest.game.ConquestGame;
 import conquest.game.ContinentData;
+import conquest.game.GameConfig;
 import conquest.game.world.Continent;
 import conquest.game.world.Region;
 
@@ -150,14 +152,6 @@ public class BotState {
 				System.err.println("Unable to parse Map Update " + e.getMessage());
 			}
 		}
-		ArrayList<RegionData> unknownRegions = new ArrayList<RegionData>();
-		
-		//remove regions which are unknown.
-		for(RegionData region : visibleMap.regions)
-			if(region.getOwner() == 0)
-				unknownRegions.add(region);
-		for(RegionData unknownRegion : unknownRegions)
-			visibleMap.getRegions().remove(unknownRegion);				
 	}
 	
 	public int getRoundNumber(){
@@ -184,4 +178,9 @@ public class BotState {
 		return pickableStartingRegions;
 	}
 
+	public ConquestGame toConquestGame() {
+	    return new ConquestGame(
+	        new GameConfig(), visibleMap, null, roundNumber, playerNumber, pickableStartingRegions);
+	}
+	
 }

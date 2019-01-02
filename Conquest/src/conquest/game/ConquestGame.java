@@ -87,7 +87,7 @@ public class ConquestGame implements Cloneable {
         return winningPlayer() > 0 || round > config.maxGameRounds;
     }
     
-    //calculate how many armies each player is able to place on the map each round
+    //calculate how many armies a player is able to place on the map each round
     public int armiesPerTurn(int player)
     {
         int armies = config.startingArmies;

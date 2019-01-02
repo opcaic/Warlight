@@ -24,8 +24,8 @@ import conquest.game.world.Region;
 
 public class GameMap implements Cloneable {
 	
-	public ArrayList<RegionData> regions;
-	public ArrayList<ContinentData> continents;
+	public ArrayList<RegionData> regions;  // maps (id - 1) -> RegionData
+	public ArrayList<ContinentData> continents;  // maps (id - 1) -> ContinentData
 	
 	public GameMap()
 	{
@@ -33,24 +33,14 @@ public class GameMap implements Cloneable {
 		this.continents = new ArrayList<ContinentData>();
 	}
 	
-	public GameMap(ArrayList<RegionData> regions, ArrayList<ContinentData> continents)
-	{
-		this.regions = regions;
-		this.continents = continents;
-	}
-
 	/**
 	 * add a Region to the map
 	 * @param region : Region to be added
 	 */
 	public void add(RegionData region)
 	{
-		for(RegionData r : regions)
-			if(r.getId() == region.getId())
-			{
-				System.err.println("Region cannot be added: id already exists.");
-				return;
-			}
+		if (region.getId() != regions.size() + 1)
+			throw new Error("regions out of order");
 		regions.add(region);
 	}
 	
@@ -60,12 +50,8 @@ public class GameMap implements Cloneable {
 	 */
 	public void add(ContinentData continent)
 	{
-		for(ContinentData s : continents)
-			if(s.getId() == continent.getId())
-			{
-				System.err.println("Continent cannot be added: id already exists.");
-				return;
-			}
+		if (continent.getId() != continents.size() + 1)
+			throw new Error("continents out of order");
 		continents.add(continent);
 	}
 	
@@ -115,9 +101,9 @@ public class GameMap implements Cloneable {
 	 */
 	public RegionData getRegion(int id)
 	{
-		for(RegionData region : regions)
-			if(region.getId() == id)
-				return region;
+		if (1 <= id && id <= regions.size())
+		    return regions.get(id - 1);
+		
 		System.err.println("Could not find region with id " + id);
 		return null;
 	}
@@ -132,9 +118,9 @@ public class GameMap implements Cloneable {
 	 */
 	public ContinentData getContinent(int id)
 	{
-		for(ContinentData continent : continents)
-			if(continent.getId() == id)
-				return continent;
+		if (1 <= id && id <= continents.size())
+			return continents.get(id - 1);
+
 		System.err.println("Could not find continent with id " + id);
 		return null;
 	}
