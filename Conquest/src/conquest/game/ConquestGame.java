@@ -78,8 +78,9 @@ public class ConquestGame implements Cloneable {
     public int winningPlayer()
     {
         for (int i = 1 ; i <= 2 ; ++i)
-            if (map.ownedRegionsByPlayer(i).isEmpty())
+            if (map.numberRegionsOwned(i) == 0)
             return 3 - i;
+        
         return 0;
     }
     
@@ -179,6 +180,9 @@ public class ConquestGame implements Cloneable {
     }
     
     public void chooseRegion(Region region) {
+    	if (round > 0)
+    		throw new Error("cannot choose regions after game has begun");
+    	
         if (!pickableRegions.contains(region))
             throw new Error("starting region is not pickable");
         
@@ -188,7 +192,10 @@ public class ConquestGame implements Cloneable {
     }
     
     public void placeArmies(List<PlaceArmiesMove> moves, List<Move> opponentMoves)
-    {   
+    {
+    	if (round < 1)
+    		throw new Error("cannot place armies before choosing starting regions");
+
         int left = armiesPerTurn(turn); 
                 
         for(PlaceArmiesMove move : moves)
@@ -209,7 +216,7 @@ public class ConquestGame implements Cloneable {
                 left -= armies;
                 region.setArmies(region.getArmies() + armies);
 
-                if (region.isVisible(3 - turn))
+                if (opponentMoves != null && region.isVisible(3 - turn))
                     opponentMoves.add(move);
             }
         }
@@ -388,6 +395,9 @@ public class ConquestGame implements Cloneable {
     }
     
     public void attackTransfer(List<AttackTransferMove> moves, List<Move> opponentMoves) {
+    	if (round < 1)
+    		throw new Error("cannot attack/transfer before choosing starting regions");
+
         validateAttackTransfers(moves);
         
         for (AttackTransferMove move : moves) {
@@ -400,7 +410,7 @@ public class ConquestGame implements Cloneable {
             move.setArmies(Math.min(move.getArmies(), fromRegion.getArmies() - 1));
 
             int other = 3 - turn;
-            if (fromRegion.isVisible(other) || toRegion.isVisible(other))
+            if (opponentMoves != null && (fromRegion.isVisible(other) || toRegion.isVisible(other)) )
                 opponentMoves.add(move);
            
             if(toRegion.ownedByPlayer(turn)) //transfer

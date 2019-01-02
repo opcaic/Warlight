@@ -4,6 +4,7 @@ import java.util.*;
 
 import conquest.bot.BotState;
 import conquest.game.*;
+import conquest.game.move.*;
 import conquest.game.world.Continent;
 import conquest.game.world.Region;
 
@@ -49,6 +50,10 @@ public class GameState implements Cloneable {
 		this.game = game;
 		reset();
 		update();
+	}
+	
+	public GameState() {
+		this(new ConquestGame());
 	}
 	
 	public GameState(BotState state) {
@@ -180,6 +185,33 @@ public class GameState implements Cloneable {
 	
 	public PlayerState player(int player) {
 		return players[player];
+	}
+	
+	public boolean isDone() {
+		return game.isDone();
+	}
+	
+	public int winningPlayer() {
+		return game.winningPlayer();
+	}
+	
+	public void apply(ChooseCommand command) {
+		game.chooseRegion(command.region);
+		update();
+	}
+	
+	public void apply(PlaceMoveCommands commands) {
+		List<PlaceArmiesMove> placeMoves = new ArrayList<PlaceArmiesMove>();
+		for (PlaceCommand pc : commands.placeCommands)
+			placeMoves.add(new PlaceArmiesMove(pc.region, pc.armies));
+		game.placeArmies(placeMoves, null);
+		
+		List<AttackTransferMove> attackTransferMoves = new ArrayList<AttackTransferMove>();
+		for (MoveCommand mc : commands.moveCommands)
+			attackTransferMoves.add(new AttackTransferMove(mc.from, mc.to, mc.armies));
+		game.attackTransfer(attackTransferMoves, null);
+		
+		update();
 	}
 	
 	@Override

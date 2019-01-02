@@ -135,6 +135,16 @@ public class GameMap implements Cloneable {
 		return mapString;
 	}
 	
+	public int numberRegionsOwned(int player) {
+		int n = 0;
+		
+		for (RegionData r: regions)
+			if (r.getOwner() == player)
+				n += 1;
+		
+		return n;
+	}
+	
 	//return all regions owned by given player
 	public ArrayList<RegionData> ownedRegionsByPlayer(int player)
 	{
