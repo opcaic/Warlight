@@ -12,7 +12,7 @@ public class RegionState {
 	/**
 	 * Who owns this {@link #region}.
 	 */
-	public PlayerState owner;
+	public int owner;
 	
 	/**
 	 * How many armies are in this {@link #region}.
@@ -37,7 +37,7 @@ public class RegionState {
 		RegionState other = (RegionState)obj;
 		
 		if (region != other.region) return false;
-		if (owner.player != other.owner.player) return false;
+		if (owner != other.owner) return false;
 		if (armies != other.armies) return false;
 		
 		// neighbours should be the same...
@@ -52,13 +52,12 @@ public class RegionState {
 	 * @return
 	 */
 	public boolean owned(int player) {
-		return owner != null && owner.player == player;
+		return owner == player;
 	}
 	
 	@Override
 	public String toString() {
-		return (region == null ? "RegionState" : region.name()) +
-		    "[" + (owner == null ? "null" : owner.player) + "|" + armies + "]";
+		return (region == null ? "RegionState" : region.name()) + "[" + owner + "|" + armies + "]";
 	}
 	
 }

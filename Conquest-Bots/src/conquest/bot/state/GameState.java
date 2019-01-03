@@ -133,7 +133,7 @@ public class GameState implements Cloneable {
 			RegionData rd = map.getRegion(i);
 			int owner = rd.getOwner();
 			RegionState rs = regions[i];
-			rs.owner = players[owner];
+			rs.owner = owner;
 			rs.armies = rd.getArmies();
 			
 			if (!players[owner].regions.containsKey(r))
