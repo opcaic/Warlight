@@ -91,7 +91,7 @@ public class ConquestGame implements Cloneable {
     }
     
     public boolean isDone() {
-        return winningPlayer() > 0 || round > config.maxGameRounds;
+        return round > 0 && (winningPlayer() > 0 || round > config.maxGameRounds);
     }
     
     public List<Region> getPickableRegions() {

@@ -174,7 +174,7 @@ public class BotState {
 	 * @return
 	 */
 	public GameMap getMap(){
-		return visibleMap;
+		return visibleMap != null ? visibleMap : fullMap;
 	}
 	
 	public GameMap getFullMap(){
@@ -187,7 +187,7 @@ public class BotState {
 
 	public ConquestGame toConquestGame() {
 	    return new ConquestGame(
-	        new GameConfig(), visibleMap, null, roundNumber, playerNumber, phase,
+	        new GameConfig(), getMap(), null, roundNumber, playerNumber, phase,
 	        pickableStartingRegions);
 	}
 	

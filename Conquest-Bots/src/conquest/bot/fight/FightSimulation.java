@@ -148,7 +148,9 @@ public class FightSimulation {
 					} catch (Exception e1) {						
 					}
 				}
-				throw new RuntimeException("Failed to load FightAttackersResults from: " + file.getAbsolutePath(), e);
+				String error = "Failed to load FightAttackersResults from: " + file.getAbsolutePath();
+				System.err.println(error);
+				throw new RuntimeException(error, e);
 			}		
 			return result;
 		}

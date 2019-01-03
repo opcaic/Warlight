@@ -32,6 +32,8 @@ public abstract class GameBot implements Bot {
 	
 	@Override
 	public final Region getStartingRegion(BotState state, Long timeOut) {
+		updateState(state);
+		
 		ChooseCommand cmd = chooseRegion(state.getPickableStartingRegions(),
 		                                 timeOut == null ? Long.MAX_VALUE : timeOut);
 
