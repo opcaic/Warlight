@@ -2,7 +2,7 @@ package conquest.tournament.run;
 
 import java.util.Random;
 
-import conquest.engine.RunGame.Config;
+import conquest.engine.Config;
 
 
 public class ConquestFightRoundGenerator {
@@ -30,7 +30,7 @@ public class ConquestFightRoundGenerator {
 		for (int i = 0; i < games; ++i) {
 			Config config = prototypeOptions.clone();
 			
-			config.engine.seed = seeds[i];
+			config.game.seed = seeds[i];
 
 			configs[i] = config;
 		}

@@ -16,7 +16,7 @@
 //    file that was distributed with this source code.
 
 package conquest.game;
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 import conquest.game.world.Continent;
 
@@ -25,55 +25,55 @@ public class ContinentData {
 	private Continent continent;
 	private int id;
 	private int armiesReward;
-	private LinkedList<RegionData> subRegions;
+	private ArrayList<RegionData> regions;
 	
 	public ContinentData(Continent continent, int id, int armiesReward)
 	{
 		this.continent = continent;
 		this.id = id;
 		this.armiesReward = armiesReward;
-		subRegions = new LinkedList<RegionData>();
+		regions = new ArrayList<RegionData>();
 	}
 	
-	public void addSubRegion(RegionData subRegion)
+	public void addRegion(RegionData region)
 	{
-		if(!subRegions.contains(subRegion))
-			subRegions.add(subRegion);
+		if(!regions.contains(region))
+			regions.add(region);
 	}
 	
 	/**
-	 * @return A string with the name of the player that fully owns this SuperRegion
+	 * @return The player that fully owns this continent, or 0 if none
 	 */
-	public String ownedByPlayer()
+	public int owner()
 	{
-		String playerName = subRegions.getFirst().getPlayerName();
-		for(RegionData region : subRegions)
+		int player = regions.get(0).getOwner();
+		for(RegionData region : regions)
 		{
-			if (!playerName.equals(region.getPlayerName()))
-				return null;
+			if (player != region.getOwner())
+				return 0;
 		}
-		return playerName;
+		return player;
 	}
 	
 	/**
-	 * @return The id of this SuperRegion
+	 * @return The id of this continent
 	 */
 	public int getId() {
 		return id;
 	}
 	
 	/**
-	 * @return The number of armies a Player is rewarded when he fully owns this SuperRegion
+	 * @return The number of armies a Player is rewarded when he fully owns this continent
 	 */
 	public int getArmiesReward() {
 		return armiesReward;
 	}
 	
 	/**
-	 * @return A list with the Regions that are part of this SuperRegion
+	 * @return A list with the Regions that are part of this continent
 	 */
-	public LinkedList<RegionData> getSubRegions() {
-		return subRegions;
+	public ArrayList<RegionData> getRegions() {
+		return regions;
 	}
 
 	public Continent getContinent() {

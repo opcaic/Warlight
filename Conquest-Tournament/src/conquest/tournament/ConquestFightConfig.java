@@ -1,6 +1,6 @@
 package conquest.tournament;
 
-import conquest.engine.RunGame.Config;
+import conquest.engine.Config;
 
 public class ConquestFightConfig {
 	

@@ -17,40 +17,30 @@
 
 package conquest.game;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 import conquest.game.world.Continent;
 import conquest.game.world.Region;
 
-public class GameMap {
+public class GameMap implements Cloneable {
 	
-	public LinkedList<RegionData> regions;
-	public LinkedList<ContinentData> continents;
+	public ArrayList<RegionData> regions;  // maps (id - 1) -> RegionData
+	public ArrayList<ContinentData> continents;  // maps (id - 1) -> ContinentData
 	
 	public GameMap()
 	{
-		this.regions = new LinkedList<RegionData>();
-		this.continents = new LinkedList<ContinentData>();
+		this.regions = new ArrayList<RegionData>();
+		this.continents = new ArrayList<ContinentData>();
 	}
 	
-	public GameMap(LinkedList<RegionData> regions, LinkedList<ContinentData> continents)
-	{
-		this.regions = regions;
-		this.continents = continents;
-	}
-
 	/**
 	 * add a Region to the map
 	 * @param region : Region to be added
 	 */
 	public void add(RegionData region)
 	{
-		for(RegionData r : regions)
-			if(r.getId() == region.getId())
-			{
-				System.err.println("Region cannot be added: id already exists.");
-				return;
-			}
+		if (region.getId() != regions.size() + 1)
+			throw new Error("regions out of order");
 		regions.add(region);
 	}
 	
@@ -60,19 +50,16 @@ public class GameMap {
 	 */
 	public void add(ContinentData continent)
 	{
-		for(ContinentData s : continents)
-			if(s.getId() == continent.getId())
-			{
-				System.err.println("Continent cannot be added: id already exists.");
-				return;
-			}
+		if (continent.getId() != continents.size() + 1)
+			throw new Error("continents out of order");
 		continents.add(continent);
 	}
 	
 	/**
 	 * @return : a new Map object exactly the same as this one
 	 */
-	public GameMap getMapCopy() {
+	@Override
+	public GameMap clone() {
 		GameMap newMap = new GameMap();
 		for(ContinentData sr : continents) //copy continents
 		{
@@ -81,7 +68,8 @@ public class GameMap {
 		}
 		for(RegionData r : regions) //copy regions
 		{
-			RegionData newRegion = new RegionData(Region.forId(r.getId()), r.getId(), newMap.getContinent(r.getContinentData().getId()), r.getPlayerName(), r.getArmies());
+			RegionData newRegion = new RegionData(Region.forId(r.getId()), r.getId(),
+			        newMap.getContinent(r.getContinentData().getId()), r.getOwner(), r.getArmies());
 			newMap.add(newRegion);
 		}
 		for(RegionData r : regions) //add neighbors to copied regions
@@ -96,14 +84,14 @@ public class GameMap {
 	/**
 	 * @return : the list of all Regions in this map
 	 */
-	public LinkedList<RegionData> getRegions() {
+	public ArrayList<RegionData> getRegions() {
 		return regions;
 	}
 	
 	/**
 	 * @return : the list of all Continents in this map
 	 */
-	public LinkedList<ContinentData> getContinents() {
+	public ArrayList<ContinentData> getContinents() {
 		return continents;
 	}
 	
@@ -113,11 +101,15 @@ public class GameMap {
 	 */
 	public RegionData getRegion(int id)
 	{
-		for(RegionData region : regions)
-			if(region.getId() == id)
-				return region;
+		if (1 <= id && id <= regions.size())
+		    return regions.get(id - 1);
+		
 		System.err.println("Could not find region with id " + id);
 		return null;
+	}
+	
+	public RegionData getRegionData(Region r) {
+	    return getRegion(r.id);
 	}
 	
 	/**
@@ -126,9 +118,9 @@ public class GameMap {
 	 */
 	public ContinentData getContinent(int id)
 	{
-		for(ContinentData continent : continents)
-			if(continent.getId() == id)
-				return continent;
+		if (1 <= id && id <= continents.size())
+			return continents.get(id - 1);
+
 		System.err.println("Could not find continent with id " + id);
 		return null;
 	}
@@ -138,18 +130,28 @@ public class GameMap {
 		String mapString = "";
 		for(RegionData region : regions)
 		{
-			mapString = mapString.concat(region.getId() + ";" + region.getPlayerName() + ";" + region.getArmies() + " ");
+			mapString = mapString.concat(region.getId() + ";" + region.getOwner() + ";" + region.getArmies() + " ");
 		}
 		return mapString;
 	}
 	
+	public int numberRegionsOwned(int player) {
+		int n = 0;
+		
+		for (RegionData r: regions)
+			if (r.getOwner() == player)
+				n += 1;
+		
+		return n;
+	}
+	
 	//return all regions owned by given player
-	public LinkedList<RegionData> ownedRegionsByPlayer(EnginePlayer player)
+	public ArrayList<RegionData> ownedRegionsByPlayer(int player)
 	{
-		LinkedList<RegionData> ownedRegions = new LinkedList<RegionData>();
+		ArrayList<RegionData> ownedRegions = new ArrayList<RegionData>();
 		
 		for(RegionData region : this.getRegions())
-			if(region.getPlayerName().equals(player.getId()))
+			if(region.getOwner() == player)
 				ownedRegions.add(region);
 
 		return ownedRegions;
@@ -157,10 +159,10 @@ public class GameMap {
 	
 	//fog of war
 	//return all regions visible to given player
-	public LinkedList<RegionData> visibleRegionsForPlayer(EnginePlayer player)
+	public ArrayList<RegionData> visibleRegionsForPlayer(int player)
 	{
-		LinkedList<RegionData> visibleRegions = new LinkedList<RegionData>();
-		LinkedList<RegionData> ownedRegions = ownedRegionsByPlayer(player);
+		ArrayList<RegionData> visibleRegions = new ArrayList<RegionData>();
+		ArrayList<RegionData> ownedRegions = ownedRegionsByPlayer(player);
 		
 		visibleRegions.addAll(ownedRegions);
 		
@@ -170,22 +172,6 @@ public class GameMap {
 					visibleRegions.add(neighbor);
 
 		return visibleRegions;
-	}
-	
-	public GameMap getVisibleMapCopyForPlayer(EnginePlayer player) {
-		GameMap visibleMap = getMapCopy();
-		LinkedList<RegionData> visibleRegions = visibleRegionsForPlayer(player);
-		
-		for(RegionData region : regions)
-		{
-			if(!visibleRegions.contains(region)){
-				RegionData unknownRegion = visibleMap.getRegion(region.getId());
-				unknownRegion.setPlayerName("unknown");
-				unknownRegion.setArmies(0);
-			}
-		}
-		
-		return visibleMap;		
 	}
 	
 }

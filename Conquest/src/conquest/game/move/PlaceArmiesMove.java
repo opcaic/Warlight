@@ -16,7 +16,8 @@
 //    file that was distributed with this source code.
 
 package conquest.game.move;
-import conquest.game.RegionData;
+
+import conquest.game.world.Region;
 
 /**
  * This Move is used in the first part of each round. It represents what Region is increased
@@ -24,14 +25,11 @@ import conquest.game.RegionData;
  */
 
 public class PlaceArmiesMove extends Move {
-	
-	private RegionData region;
+	private Region region;
 	private int armies;
 	
-	//geen misbruik maken van playerName aub, alleen je eigen botnaam invullen
-	public PlaceArmiesMove(String playerName, RegionData region, int armies)
+	public PlaceArmiesMove(Region region, int armies)
 	{
-		super.setPlayerName(playerName);
 		this.region = region;
 		this.armies = armies;
 	}
@@ -46,7 +44,7 @@ public class PlaceArmiesMove extends Move {
 	/**
 	 * @return The Region this Move will be placing armies on
 	 */
-	public RegionData getRegion() {
+	public Region getRegion() {
 		return region;
 	}
 	
@@ -62,9 +60,9 @@ public class PlaceArmiesMove extends Move {
 	 */
 	public String getString() {
 		if(getIllegalMove().equals(""))
-			return getPlayerName() + " place_armies " + region.getId() + " " + armies;
+			return "place_armies " + region.id + " " + armies;
 		else
-			return getPlayerName() + " illegal_move " + getIllegalMove();
+			return "illegal_move " + getIllegalMove();
 				
 	}
 	

@@ -20,16 +20,15 @@ package conquest.engine;
 import java.util.ArrayList;
 
 import conquest.engine.replay.GameLog;
-import conquest.game.RegionData;
 import conquest.game.Team;
 import conquest.view.GUI;
-
+import conquest.game.world.Region;
 
 public interface Robot {
 	
 	public static class RobotConfig {
 		
-		public final String playerId;
+		public final int player;
 		
 		public final String playerName;
 		
@@ -43,10 +42,10 @@ public interface Robot {
 		
 		public final GUI gui;
 
-		public RobotConfig(String playerId, String playerName, Team team, long timeoutMillis,
+		public RobotConfig(int player, String playerName, Team team, long timeoutMillis,
 				           GameLog gameLog, boolean logToConsole, GUI gui) {
 			super();
-			this.playerId = playerId;
+			this.player = player;
 			this.playerName = playerName;
 			this.team = team;
 			this.timeoutMillis = timeoutMillis;
@@ -57,7 +56,7 @@ public interface Robot {
 		
 	}
 	
-	public String getRobotPlayerId();
+	public int getRobotPlayer();
 	
 	public String getRobotPlayerName();
 
@@ -65,7 +64,7 @@ public interface Robot {
 	
 	//public void writeMove(Move move);
 	
-	public String getPreferredStartingArmies(long timeOut, ArrayList<RegionData> pickableRegions);
+	public String getStartingRegion(long timeOut, ArrayList<Region> pickableRegions);
 	
 	public String getPlaceArmiesMoves(long timeOut);
 	

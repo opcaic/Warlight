@@ -6,16 +6,13 @@ import java.util.*;
 import conquest.bot.BotParser;
 import conquest.bot.fight.FightSimulation.FightAttackersResults;
 import conquest.bot.state.*;
-import conquest.bot.state.GameState.RegionState;
-import conquest.engine.Engine.FightMode;
+import conquest.engine.Config;
 import conquest.engine.RunGame;
-import conquest.engine.RunGame.Config;
+import conquest.game.FightMode;
 import conquest.game.world.Region;
 import conquest.utils.Util;
 import conquest.view.GUI;
 
-/**
- */
 public class MyBot extends GameBot
 {
 	Random rand = new Random();
@@ -37,17 +34,11 @@ public class MyBot extends GameBot
 	// This is a dummy implemementation that moves randomly.
 	//
 	
-	// Return 6 starting regions in order of preference.
+	// Choose a starting region.
 	
 	@Override
-	public List<ChooseCommand> chooseRegions(List<Region> choosable, long timeout) {
-		List<Region> l = new ArrayList<Region>(choosable);	// make a copy
-		Collections.shuffle(l);  // shuffle it randomly
-		
-		List<ChooseCommand> ret = new ArrayList<ChooseCommand>();
-		for (int i = 0 ; i < 6 ; ++i)
-			ret.add(new ChooseCommand(l.get(i)));
-		return ret;
+	public ChooseCommand chooseRegion(List<Region> choosable, long timeout) {
+		return new ChooseCommand(choosable.get(rand.nextInt(choosable.size())));
 	}
 
 	// Decide where to place armies this turn.
@@ -55,11 +46,13 @@ public class MyBot extends GameBot
 	
 	@Override
 	public List<PlaceCommand> placeArmies(long timeout) {
-		List<Region> mine = new ArrayList<Region>(state.me.regions.keySet());
+	    PlayerState me = state.players[state.me];
+		List<Region> mine = new ArrayList<Region>(me.regions.keySet());
 		int numRegions = mine.size();
 		
+		System.out.format("mybot: placing %d armies\n", me.placeArmies); 
 		int[] count = new int[numRegions];
-		for (int i = 0 ; i < state.me.placeArmies ; ++i) {
+		for (int i = 0 ; i < me.placeArmies ; ++i) {
 			int r = rand.nextInt(numRegions);
 			count[r]++;
 		}
@@ -77,7 +70,7 @@ public class MyBot extends GameBot
 	public List<MoveCommand> moveArmies(long timeout) {
 		List<MoveCommand> ret = new ArrayList<MoveCommand>();
 		
-		for (RegionState rs : state.me.regions.values()) {
+		for (RegionState rs : state.players[state.me].regions.values()) {
 			int count = rand.nextInt(rs.armies);
 			if (count > 0) {
 				List<Region> neighbors = rs.region.getNeighbours();
@@ -96,11 +89,11 @@ public class MyBot extends GameBot
 		config.bot2Init = "internal:conquest.bot.custom.AggressiveBot";
 		//config.bot2Init = "human";
 		
-		config.engine.botCommandTimeoutMillis = 20 * 1000;
+		config.botCommandTimeoutMillis = 20 * 1000;
 		
-		config.engine.maxGameRounds = 200;
+		config.game.maxGameRounds = 200;
 		
-		config.engine.fight = FightMode.CONTINUAL_1_1_A60_D70;
+		config.game.fight = FightMode.CONTINUAL_1_1_A60_D70;
 		
 		config.visualize = true;
 		

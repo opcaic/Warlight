@@ -1,8 +1,8 @@
 package conquest.tournament.run;
 
+import conquest.engine.Config;
+import conquest.engine.GameResult;
 import conquest.engine.RunGame;
-import conquest.engine.RunGame.Config;
-import conquest.engine.RunGame.GameResult;
 import conquest.game.Team;
 
 

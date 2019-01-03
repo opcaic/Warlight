@@ -20,52 +20,48 @@ package conquest.bot;
 import java.util.ArrayList;
 
 import conquest.game.GameMap;
+import conquest.game.Phase;
 import conquest.game.RegionData;
+import conquest.game.ConquestGame;
 import conquest.game.ContinentData;
+import conquest.game.GameConfig;
 import conquest.game.world.Continent;
 import conquest.game.world.Region;
 
-
 public class BotState {
+	// This map is known from the start, contains all the regions and how they are connected,
+	// doesn't change after initialization
+	private final GameMap fullMap = new GameMap(); 
 	
-	private String myName = "";
-	private String opponentName = "";
+	// This map represents everything the player can see, updated at the end of each round.
+	private GameMap visibleMap; 
 	
-	private final GameMap fullMap = new GameMap(); // This map is known from the start, contains all the regions and how they are connected, doesn't change after initialization
-	private GameMap visibleMap; // This map represents everything the player can see, updated at the end of each round.
-	
-	private ArrayList<RegionData> pickableStartingRegions; //2 randomly chosen regions from each continent are given, which the bot can chose to start with
-	
-	private int startingArmies; //number of armies the player can place on map
+	//2 randomly chosen regions from each continent are given, which the bot can choose to start with
+	private ArrayList<Region> pickableStartingRegions; 
 	
 	private int roundNumber;
+	private int playerNumber;
+	private Phase phase;
 	
 	public BotState()
 	{
-		pickableStartingRegions = new ArrayList<RegionData>();
+		pickableStartingRegions = new ArrayList<Region>();
 		roundNumber = 0;
-	}
-	
-	/**
-	 * Useful to pretend "you are an opponent" for the purpose of computing the GameState from the perspective of your opponent.
-	 */
-	public void swapNames() {
-		String name = myName;
-		myName = opponentName;
-		opponentName = name;
+		phase = Phase.STARTING_REGIONS;
 	}
 	
 	public void updateSettings(String key, String value)
 	{
-		if(key.equals("your_bot")) //bot's own name
-			myName = value;
-		else if(key.equals("opponent_bot")) //opponent's name
-			opponentName = value;
-		else if(key.equals("starting_armies")) 
-		{
-			startingArmies = Integer.parseInt(value);
-			roundNumber++; //next round
-		}
+		if (key.equals("your_player_number"))
+		    playerNumber = Integer.parseInt(value);
+	}
+	
+	public void nextRound() {
+	    roundNumber++;
+	}
+	
+	public void setPhase(Phase phase) {
+		this.phase = phase;
 	}
 	
 	//initial map is given to the bot with all the information except for player and armies info
@@ -73,7 +69,7 @@ public class BotState {
 	{
 		int i, regionId, continentId, reward;
 		
-		if(mapInput[1].equals("super_regions"))
+		if(mapInput[1].equals("continents"))
 		{
 			for(i=2; i<mapInput.length; i++)
 			{
@@ -128,12 +124,14 @@ public class BotState {
 	//regions from wich a player is able to pick his preferred starting regions
 	public void setPickableStartingRegions(String[] mapInput)
 	{
+	    pickableStartingRegions = new ArrayList<Region>();
+	    
 		for(int i=2; i<mapInput.length; i++)
 		{
 			int regionId;
 			try {
 				regionId = Integer.parseInt(mapInput[i]);
-				RegionData pickableRegion = fullMap.getRegion(regionId);
+				Region pickableRegion = Region.forId(regionId);
 				pickableStartingRegions.add(pickableRegion);
 			}
 			catch(Exception e) {
@@ -145,15 +143,15 @@ public class BotState {
 	//visible regions are given to the bot with player and armies info
 	public void updateMap(String[] mapInput)
 	{
-		visibleMap = fullMap.getMapCopy();
+		visibleMap = fullMap.clone();
 		for(int i=1; i<mapInput.length; i++)
 		{
 			try {
 				RegionData region = visibleMap.getRegion(Integer.parseInt(mapInput[i]));
-				String playerName = mapInput[i+1];
+				int owner = Integer.parseInt(mapInput[i+1]);
 				int armies = Integer.parseInt(mapInput[i+2]);
 				
-				region.setPlayerName(playerName);
+				region.setOwner(owner);
 				region.setArmies(armies);
 				i += 2;
 			}
@@ -161,30 +159,14 @@ public class BotState {
 				System.err.println("Unable to parse Map Update " + e.getMessage());
 			}
 		}
-		ArrayList<RegionData> unknownRegions = new ArrayList<RegionData>();
-		
-		//remove regions which are unknown.
-		for(RegionData region : visibleMap.regions)
-			if(region.getPlayerName().equals("unknown"))
-				unknownRegions.add(region);
-		for(RegionData unknownRegion : unknownRegions)
-			visibleMap.getRegions().remove(unknownRegion);				
-	}
-	
-	public String getMyPlayerName(){
-		return myName;
-	}
-	
-	public String getOpponentPlayerName(){
-		return opponentName;
-	}
-	
-	public int getStartingArmies(){
-		return startingArmies;
 	}
 	
 	public int getRoundNumber(){
 		return roundNumber;
+	}
+	
+	public int getMyPlayerNumber() {
+	    return playerNumber;
 	}
 	
 	/**
@@ -199,8 +181,14 @@ public class BotState {
 		return fullMap;
 	}
 	
-	public ArrayList<RegionData> getPickableStartingRegions(){
+	public ArrayList<Region> getPickableStartingRegions(){
 		return pickableStartingRegions;
 	}
 
+	public ConquestGame toConquestGame() {
+	    return new ConquestGame(
+	        new GameConfig(), visibleMap, null, roundNumber, playerNumber, phase,
+	        pickableStartingRegions);
+	}
+	
 }

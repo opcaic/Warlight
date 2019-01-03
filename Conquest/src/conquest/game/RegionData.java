@@ -16,7 +16,7 @@
 //    file that was distributed with this source code.
 package conquest.game;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 import conquest.game.world.Continent;
 import conquest.game.world.Region;
@@ -26,34 +26,34 @@ public class RegionData {
 	
 	private Region region;
 	private int id;
-	private LinkedList<RegionData> neighbors;
+	private ArrayList<RegionData> neighbors;
 	private ContinentData continent;
 	private int armies;
-	private String playerName;
+	private int owner;
 	
 	public RegionData(Region region, int id, ContinentData superRegion)
 	{
 		this.region = region;
 		this.id = id;
 		this.continent = superRegion;
-		this.neighbors = new LinkedList<RegionData>();
-		this.playerName = "unknown";
+		this.neighbors = new ArrayList<RegionData>();
+		this.owner = 0;
 		this.armies = 0;
 		if (superRegion != null) {
-			superRegion.addSubRegion(this);
+			superRegion.addRegion(this);
 		}
 	}
 	
-	public RegionData(Region region, int id, ContinentData superRegion, String playerName, int armies)
+	public RegionData(Region region, int id, ContinentData superRegion, int owner, int armies)
 	{
 		this.region = region;
 		this.id = id;
 		this.continent = superRegion;
-		this.neighbors = new LinkedList<RegionData>();
-		this.playerName = playerName;
+		this.neighbors = new ArrayList<RegionData>();
+		this.owner = owner;
 		this.armies = armies;
 		
-		superRegion.addSubRegion(this);
+		superRegion.addRegion(this);
 	}
 	
 	public void addNeighbor(RegionData neighbor)
@@ -71,20 +71,16 @@ public class RegionData {
 	 */
 	public boolean isNeighbor(RegionData region)
 	{
-		if(neighbors.contains(region))
-			return true;
-		return false;
+		return neighbors.contains(region);
 	}
 
 	/**
-	 * @param playerName A string with a player's name
-	 * @return True if this region is owned by given playerName, false otherwise
+	 * @param player
+	 * @return True if this region is owned by the given player, false otherwise
 	 */
-	public boolean ownedByPlayer(String playerName)
+	public boolean ownedByPlayer(int player)
 	{
-		if(playerName.equals(this.playerName))
-			return true;
-		return false;
+		return owner == player;
 	}
 	
 	/**
@@ -95,10 +91,10 @@ public class RegionData {
 	}
 	
 	/**
-	 * @param playerName Sets the Name of the player that this Region belongs to
+	 * @param playerName Sets the player that this Region belongs to
 	 */
-	public void setPlayerName(String playerName) {
-		this.playerName = playerName;
+	public void setOwner(int owner) {
+		this.owner = owner;
 	}
 	
 	/**
@@ -111,12 +107,12 @@ public class RegionData {
 	/**
 	 * @return A list of this Region's neighboring Regions
 	 */
-	public LinkedList<RegionData> getNeighbors() {
+	public ArrayList<RegionData> getNeighbors() {
 		return neighbors;
 	}
 
 	/**
-	 * @return The SuperRegion this Region is part of
+	 * @return The continent this Region is part of
 	 */
 	public ContinentData getContinentData() {
 		return continent;
@@ -130,10 +126,14 @@ public class RegionData {
 	}
 	
 	/**
-	 * @return A string with the name of the player that owns this region
+	 * @return The player that owns this region
 	 */
-	public String getPlayerName() {
-			return playerName;
+	public int getOwner() {
+		return owner;
+	}
+	
+	public boolean isNeutral() {
+	    return owner == 0;
 	}
 
 	public Region getRegion() {
@@ -144,8 +144,19 @@ public class RegionData {
 		return region.continent;
 	}
 	
+    public boolean isVisible(int player) {
+        if (ownedByPlayer(player))
+            return true;
+        
+        for (RegionData s : getNeighbors())
+            if (s.ownedByPlayer(player))
+                return true;
+        
+        return false;
+    }
+	
 	@Override
 	public String toString() {
-		return region.name() + "[" + playerName + "|" + armies + "]";
+		return region.name() + "[" + owner + "|" + armies + "]";
 	}
 }

@@ -8,7 +8,7 @@ import com.martiansoftware.jsap.JSAP;
 import com.martiansoftware.jsap.JSAPException;
 import com.martiansoftware.jsap.JSAPResult;
 
-import conquest.engine.RunGame.Config;
+import conquest.engine.Config;
 
 public class ConquestFightConsole {
 	

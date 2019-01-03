@@ -21,13 +21,7 @@ import java.awt.Point;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.TreeMap;
 
-import conquest.bot.external.JavaBot;
-import conquest.engine.Engine.EngineConfig;
 import conquest.engine.Robot.RobotConfig;
 import conquest.engine.replay.FileGameLog;
 import conquest.engine.replay.GameLog;
@@ -36,183 +30,15 @@ import conquest.engine.robot.HumanRobot;
 import conquest.engine.robot.IORobot;
 import conquest.engine.robot.InternalRobot;
 import conquest.engine.robot.ProcessRobot;
-import conquest.game.ContinentData;
-import conquest.game.GameMap;
-import conquest.game.EnginePlayer;
-import conquest.game.RegionData;
-import conquest.game.Team;
-import conquest.game.move.MoveResult;
-import conquest.game.world.Continent;
-import conquest.game.world.Region;
+import conquest.game.*;
 import conquest.view.GUI;
 
 public class RunGame
 {
-	
-	public static class Config implements Cloneable {
-		
-		public String gameId = "GAME";
-		
-		/**
-		 * Used by ENGINE as PLAYER IDENTIFIER of the player 1
-		 * BETTER NOT TO ALTER AT ALL...
-		 */
-		public String playerId1 = "PLR1";
-		/**
-		 * Used by ENGINE as PLAYER IDENTIFIER of the player 2
-		 * BETTER NOT TO ALTER AT ALL...
-		 */
-		public String playerId2 = "PLR2";
-		
-		/**
-		 * Human-readable name of player 1 to display during visualization or to report into CSV.
-		 */
-		public String player1Name = "Bot1";
-		/**
-		 * Human-readable name of player 2 to display during visualization or to report into CSV.
-		 */
-		public String player2Name = "Bot2";
-		
-		public String bot1Init;
-		public String bot2Init;
-		
-		public boolean visualize = true;
-		
-		public Boolean visualizeContinual = null;
-		
-		public Integer visualizeContinualFrameTimeMillis = null;
-		
-		public boolean logToConsole = true;
-		
-		public File replayLog = null;
-		
-		public EngineConfig engine = new EngineConfig();
-		
-		public String asString() {
-			return gameId + ";" + playerId1 + ";" + playerId2 + ";" + player1Name + ";" + player2Name + ";" +
-		           visualize + ";" + visualizeContinual + ";" + visualizeContinualFrameTimeMillis + ";" +
-				   logToConsole + ";" + engine.asString();
-		}
-		
-		@Override
-		public Config clone() {
-			Config result = fromString(asString());
-			
-			result.replayLog = replayLog;
-			result.bot1Init = bot1Init;
-			result.bot2Init = bot2Init;
-			
-			return result;
-		}
-		
-		public String getCSVHeader() {
-			return "ID;PlayerName1;PlayerName2;" + engine.getCSVHeader();
-		}
-		
-		public String getCSV() {
-			return gameId + ";" + player1Name + ";" + player2Name + ";" + engine.getCSV();
-		}
-		
-		public static Config fromString(String line) {
-			
-			String[] parts = line.split(";");
-			
-			Config result = new Config();
-
-			result.gameId = parts[0];
-			result.playerId1 = parts[1];
-			result.playerId2 = parts[2];
-			result.player1Name = parts[3];
-			result.player2Name = parts[4];
-			result.visualize = Boolean.parseBoolean(parts[5]);
-			result.visualizeContinual = (parts[6].toLowerCase().equals("null") ? null : Boolean.parseBoolean(parts[6]));
-			result.visualizeContinualFrameTimeMillis = (parts[7].toLowerCase().equals("null") ? null : Integer.parseInt(parts[7]));
-			result.logToConsole = Boolean.parseBoolean(parts[8]);
-			
-			int engineConfigStart = 0;
-			for (int i = 0; i < 9; ++i) {
-				engineConfigStart = line.indexOf(";", engineConfigStart);
-				++engineConfigStart;
-			}
-			
-			result.engine = EngineConfig.fromString(line.substring(engineConfigStart));
-			
-			return result;
-		}
-		
-	}
-	
-	public static class GameResult {
-		
-		public Config config;
-		
-		public int player1Regions;
-		public int player1Armies;
-		
-		public int player2Regions;
-		public int player2Armies;
-		
-		public Team winner = null;
-		
-		/**
-		 * Number of the round the game ended.
-		 */
-		public int round;
-
-		public String getWinnerId() {
-			if (winner == null) return "NONE";
-			switch (winner) {
-			case NEUTRAL: return "NONE";
-			case PLAYER_1: return config == null ? "Player1" : config.playerId1;
-			case PLAYER_2: return config == null ? "Player2" : config.playerId2;
-			}
-			return null;
-		}
-		
-		public String getWinnerName() {
-			if (winner == null) return "NONE";
-			switch (winner) {
-			case NEUTRAL: return "NONE";
-			case PLAYER_1: return config == null ? "Bot1" : config.player1Name;
-			case PLAYER_2: return config == null ? "Bot2" : config.player2Name;
-			}
-			return null;
-		}
-		
-		public int getWinnerRegions() {
-			return winner == Team.PLAYER_1 ? player1Regions : player2Regions;
-		}
-		
-		public int getWinnerArmies() {
-			return winner == Team.PLAYER_1 ? player1Armies : player2Armies;
-		}
-
-		public String asString() {
-			return getWinnerId() + ";" + player1Regions + ";" + player1Armies + ";" + player2Regions + ";" + player2Armies + ";" + round;
-		}
-		
-		public String getHumanString() {
-			return "Winner: " + getWinnerId() + "[" + getWinnerName() + "] in round " + round + "\nPlayer1: " + player1Regions + " regions / " + player1Armies + " armies\nPlayer2: " + player2Regions + " regions / " + player2Armies + " armies";
-		}
-		
-		public String getCSVHeader() {
-			return "winnerName;winner;winnerId;player1Regions;player1Armies;player2Regions;player2Armies;round;" + config.getCSVHeader();
-		}
-		
-		public String getCSV() {
-			return getWinnerName() + ";" + (winner == null || winner == Team.NEUTRAL ? "NONE" : winner) + ";" + getWinnerId() + ";" + player1Regions + ";" + player1Armies + ";" + player2Regions + ";" + player2Armies + ";" + round + ";" + config.getCSV();
-		}
-		
-	}
-	
 	Config config;
 	
-	LinkedList<MoveResult> fullPlayedGame;
-	LinkedList<MoveResult> player1PlayedGame;
-	LinkedList<MoveResult> player2PlayedGame;
-	int gameIndex = 1;
-
 	Engine engine;
+	ConquestGame game;
 	
 	public RunGame(Config config)
 	{
@@ -225,19 +51,18 @@ public class RunGame
 			
 			ReplayHandler replay = new ReplayHandler(replayFile);
 			
-			this.config.engine = replay.getConfig().engine;
+			this.config.game = replay.getConfig().game;
 			
-			EnginePlayer player1, player2;
-			Robot robot1, robot2;
+			String[] playerNames = new String[2];
+			Robot[] robots = new Robot[2];
 			
-			//setup the bots: bot1, bot2
-			robot1 = new IORobot(replay);
-			robot2 = new IORobot(replay);
+			robots[0] = new IORobot(replay);
+			robots[1] = new IORobot(replay);
 					
-			player1 = new EnginePlayer(config.playerId1, config.player1Name, robot1, config.engine.startingArmies);
-			player2 = new EnginePlayer(config.playerId2, config.player2Name, robot2, config.engine.startingArmies);
+			playerNames[0] = config.player1Name;
+			playerNames[1] = config.player2Name;
 			
-			return go(null, player1, player2, robot1, robot2);
+			return go(null, playerNames, robots);
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to replay the game.", e);
 		}
@@ -253,90 +78,72 @@ public class RunGame
 			
 			System.out.println("starting game " + config.gameId);
 			
-			EnginePlayer player1, player2;
-			Robot robot1, robot2;
+			String[] playerNames = new String[2];
+			Robot[] robots = new Robot[2];
 			
-			//setup the bots: bot1, bot2
-			robot1 = setupRobot(config.playerId1, config.bot1Init);
-			robot2 = setupRobot(config.playerId2, config.bot2Init);
+			robots[0] = setupRobot(1, config.bot1Init);
+			robots[1] = setupRobot(2, config.bot2Init);
 					
-			player1 = new EnginePlayer(config.playerId1, config.player1Name, robot1, config.engine.startingArmies);
-			player2 = new EnginePlayer(config.playerId2, config.player2Name, robot2, config.engine.startingArmies);
+			playerNames[0] = config.player1Name;
+			playerNames[1] = config.player2Name;
 						
-			return go(log, player1, player2, robot1, robot2);
+			return go(log, playerNames, robots);
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to run/finish the game.", e);
 		}
 	}
 
-	private GameResult go(GameLog log, EnginePlayer player1, EnginePlayer player2, Robot robot1, Robot robot2) throws InterruptedException {
-		
-		//setup the map
-		GameMap initMap, map;
-		
-		initMap = makeInitMap();
-		map = setupMap(initMap);
+	private GameResult go(GameLog log, String[] playerNames, Robot[] robots) throws InterruptedException {
+        game = new ConquestGame(config.game, playerNames);
 
-		// setup GUI
-		GUI gui = null;
+        GUI gui;
 		if (config.visualize) {
-			gui = new GUI(config.playerId1, config.playerId2, robot1.getRobotPlayerId(), robot2.getRobotPlayerId());
+			gui = new GUI(game);
 			if (config.visualizeContinual != null) {
 				gui.setContinual(config.visualizeContinual);
 			}
 			if (config.visualizeContinualFrameTimeMillis != null) {
 				gui.setContinualFrameTime(config.visualizeContinualFrameTimeMillis);
 			}
-		}
+			game.setGUI(gui);
+		} else gui = null;
 		
 		//start the engine
-		this.engine = new Engine(map, player1, player2, gui, config.engine);
+		this.engine = new Engine(game, robots, gui, config.botCommandTimeoutMillis);
 		
 		if (log != null) {
 			log.start(config);
 		}
 		
-		// setup robots
-		RobotConfig robot1Cfg =
-			new RobotConfig(player1.getId(), player1.getName(), Team.PLAYER_1,
-				            config.engine.botCommandTimeoutMillis, log, config.logToConsole, gui);
-		
-		RobotConfig robot2Cfg =
-			new RobotConfig(player2.getId(), player2.getName(), Team.PLAYER_2,
-					        config.engine.botCommandTimeoutMillis, log, config.logToConsole, gui);
-				
-		robot1.setup(robot1Cfg);
-		robot2.setup(robot2Cfg);
+		for (int i = 1 ; i <= 2 ; ++i) {
+		    RobotConfig robotCfg =
+		            new RobotConfig(i, playerNames[i - 1], i == 1 ? Team.PLAYER_1 : Team.PLAYER_2,
+		                    config.botCommandTimeoutMillis, log, config.logToConsole, gui);
+		    robots[i - 1].setup(robotCfg);
+		}
 		
 		if (gui != null) {
-			gui.setPlayerNames(player1.getBot().getRobotPlayerName(), player2.getBot().getRobotPlayerName());
+			gui.setPlayerNames(robots[0].getRobotPlayerName(), robots[1].getRobotPlayerName());
 		}		
 				
 		//send the bots the info they need to start
-		robot1.writeInfo("settings your_bot " + player1.getId());
-		robot1.writeInfo("settings opponent_bot " + player2.getId());
-		robot2.writeInfo("settings your_bot " + player2.getId());
-		robot2.writeInfo("settings opponent_bot " + player1.getId());
-		sendSetupMapInfo(player1.getBot(), initMap);
-		sendSetupMapInfo(player2.getBot(), initMap);
-		this.engine.distributeStartingRegions(); //decide the player's starting regions
-		this.engine.recalculateStartingArmies(); //calculate how much armies the players get at the start of the round (depending on owned SuperRegions)
-		this.engine.sendAllInfo();
+		for (int i = 0 ; i < 2 ; ++i) {
+		    robots[i].writeInfo("settings your_player_number " + (i + 1));
+		    sendSetupMapInfo(robots[i], game.getMap());
+		}
+		engine.distributeStartingRegions(); //decide the player's starting regions
+		engine.sendAllInfo();
 		
 		//play the game
-		while(this.engine.winningPlayer() == null && this.engine.getRoundNr() <= config.engine.maxGameRounds)
+		while(!game.isDone())
 		{
 			if (log != null) {
-				log.logComment("Engine", "Round " + this.engine.getRoundNr());
+				log.logComment(0, "Round " + game.getRoundNumber());
 			}
-			this.engine.playRound();
+			engine.playRound();
 		}
 
-		fullPlayedGame = this.engine.getFullPlayedGame();
-		player1PlayedGame = this.engine.getPlayer1PlayedGame();
-		player2PlayedGame = this.engine.getPlayer2PlayedGame();
-
-		GameResult result = finish(map, robot1, robot2);
+		GameResult result = finish(game.getMap(), robots);
 		
 		if (log != null) {
 			log.finish(result);
@@ -345,254 +152,53 @@ public class RunGame
 		return result;
 	}
 
-	private Robot setupRobot(String playerId, String botInit) throws IOException {
+	private Robot setupRobot(int player, String botInit) throws IOException {
 		if (botInit.startsWith("dir;process:")) {
 			String cmd = botInit.substring(12);
 			int semicolon = cmd.indexOf(";");
-			if (semicolon < 0) throw new RuntimeException("Invalid bot torrent (does not contain ';' separating directory and commmend): " + botInit);
+			if (semicolon < 0) throw new RuntimeException(
+			    "Invalid bot torrent (does not contain ';' separating directory and command): " + botInit);
 			String dir = cmd.substring(0, semicolon);
 			String process = cmd.substring(semicolon+1);			
-			return new ProcessRobot(playerId, dir, process);
+			return new ProcessRobot(player, dir, process);
 		}
 		if (botInit.startsWith("process:")) {
 			String cmd = botInit.substring(8);
-			return new ProcessRobot(playerId, cmd);
+			return new ProcessRobot(player, cmd);
 		}
 		if (botInit.startsWith("internal:")) {
 			String botFQCN = botInit.substring(9);
-			return new InternalRobot(playerId, botFQCN);
+			return new InternalRobot(player, botFQCN);
 		}
 		if (botInit.startsWith("human")) {
 			config.visualize = true;
-			return new HumanRobot(playerId);
+			return new HumanRobot();
 		}
-		throw new RuntimeException("Invalid init string for player '" + playerId + "', must start either with 'process:' or 'internal:' or 'human', passed value was: " + botInit);
+		throw new RuntimeException("Invalid init string for player '" + player +
+		        "', must start either with 'process:' or 'internal:' or 'human', passed value was: " + botInit);
 	}
 
-	//aanpassen en een QPlayer class maken? met eigen finish
-	private GameResult finish(GameMap map, Robot bot1, Robot bot2) throws InterruptedException
+	private GameResult finish(GameMap map, Robot[] bots) throws InterruptedException
 	{
 		System.out.println("GAME FINISHED: stopping bots...");
-		try {
-			bot1.finish();
-		} catch (Exception e) {			
-		}
+		for (Robot r : bots)
+    		try {
+    			r.finish();
+    		} catch (Exception e) { }
 		
-		try {
-			bot2.finish();
-		} catch (Exception e) {			
-		}
-		
-		return this.saveGame(map, bot1, bot2);        
+		return this.saveGame(map);        
 	}
 
-	private GameMap makeInitMap()
-	{
-		GameMap map = new GameMap();
-		
-		// INIT SUPER REGIONS
-
-//		ORIGINAL CODE		
-//		SuperRegion northAmerica = new SuperRegion(1, 5);
-//		SuperRegion southAmerica = new SuperRegion(2, 2);
-//		SuperRegion europe       = new SuperRegion(3, 5);
-//		SuperRegion afrika       = new SuperRegion(4, 3);
-//		SuperRegion azia         = new SuperRegion(5, 7);
-//		SuperRegion australia    = new SuperRegion(6, 2);
-		
-		Map<Continent, ContinentData> continents = new TreeMap<Continent, ContinentData>(new Comparator<Continent>() {
-			@Override
-			public int compare(Continent o1, Continent o2) {
-				return o1.id - o2.id;
-			}			
-		});
-		
-		for (Continent continent : Continent.values()) {
-			ContinentData continentData = new ContinentData(continent, continent.id, continent.reward);
-			continents.put(continent, continentData);
-		}
-		
-		// INIT REGIONS
-
-//		ORIGINAL CODE
-//		Region region1 = new Region(1, northAmerica);
-//		Region region2 = new Region(2, northAmerica);
-//		Region region3 = new Region(3, northAmerica);
-//		Region region4 = new Region(4, northAmerica);
-//		Region region5 = new Region(5, northAmerica);
-//		Region region6 = new Region(6, northAmerica);
-//		Region region7 = new Region(7, northAmerica);
-//		Region region8 = new Region(8, northAmerica);
-//		Region region9 = new Region(9, northAmerica);
-//		
-//		Region region10 = new Region(10, southAmerica);
-//		Region region11 = new Region(11, southAmerica);
-//		Region region12 = new Region(12, southAmerica);
-//		Region region13 = new Region(13, southAmerica);
-//		
-//		Region region14 = new Region(14, europe);
-//		Region region15 = new Region(15, europe);
-//		Region region16 = new Region(16, europe);
-//		Region region17 = new Region(17, europe);
-//		Region region18 = new Region(18, europe);
-//		Region region19 = new Region(19, europe);
-//		Region region20 = new Region(20, europe);
-//		
-//		Region region21 = new Region(21, afrika);
-//		Region region22 = new Region(22, afrika);
-//		Region region23 = new Region(23, afrika);
-//		Region region24 = new Region(24, afrika);
-//		Region region25 = new Region(25, afrika);
-//		Region region26 = new Region(26, afrika);
-//		
-//		Region region27 = new Region(27, azia);
-//		Region region28 = new Region(28, azia);
-//		Region region29 = new Region(29, azia);
-//		Region region30 = new Region(30, azia);
-//		Region region31 = new Region(31, azia);
-//		Region region32 = new Region(32, azia);
-//		Region region33 = new Region(33, azia);
-//		Region region34 = new Region(34, azia);
-//		Region region35 = new Region(35, azia);
-//		Region region36 = new Region(36, azia);
-//		Region region37 = new Region(37, azia);
-//		Region region38 = new Region(38, azia);
-//		
-//		Region region39 = new Region(39, australia);
-//		Region region40 = new Region(40, australia);
-//		Region region41 = new Region(41, australia);
-//		Region region42 = new Region(42, australia);
-		
-		Map<Region, RegionData> regions = new TreeMap<Region, RegionData>(new Comparator<Region>() {
-			@Override
-			public int compare(Region o1, Region o2) {
-				return o1.id - o2.id;
-			}
-		});
-		
-		for (Region region : Region.values()) {
-			RegionData regionData = new RegionData(region, region.id, continents.get(region.continent));
-			regions.put(region, regionData);
-		}
-		
-		// INIT NEIGHBOURS
-		
-//		ORIGINAL CODE
-//		region1.addNeighbor(region2);  region1.addNeighbor(region4);  region1.addNeighbor(region30);
-//		region2.addNeighbor(region4);  region2.addNeighbor(region3);  region2.addNeighbor(region5);
-//		region3.addNeighbor(region5);  region3.addNeighbor(region6);  region3.addNeighbor(region14);
-//		region4.addNeighbor(region5);  region4.addNeighbor(region7);
-//		region5.addNeighbor(region6);  region5.addNeighbor(region7);  region5.addNeighbor(region8);  
-//		region6.addNeighbor(region8);
-//		region7.addNeighbor(region8);  region7.addNeighbor(region9);
-//		region8.addNeighbor(region9);
-//		region9.addNeighbor(region10);
-//		region10.addNeighbor(region11);region10.addNeighbor(region12);
-//		region11.addNeighbor(region12);region11.addNeighbor(region13);
-//		region12.addNeighbor(region13);region12.addNeighbor(region21);
-//		region14.addNeighbor(region15);region14.addNeighbor(region16);
-//		region15.addNeighbor(region16);region15.addNeighbor(region18);
-//		region15.addNeighbor(region19);region16.addNeighbor(region17);
-//		region17.addNeighbor(region19);region17.addNeighbor(region20);region17.addNeighbor(region27);region17.addNeighbor(region32);region17.addNeighbor(region36);
-//		region18.addNeighbor(region19);region18.addNeighbor(region20);region18.addNeighbor(region21);
-//		region19.addNeighbor(region20);
-//		region20.addNeighbor(region21);region20.addNeighbor(region22);region20.addNeighbor(region36);
-//		region21.addNeighbor(region22);region21.addNeighbor(region23);region21.addNeighbor(region24);
-//		region22.addNeighbor(region23);region22.addNeighbor(region36);
-//		region23.addNeighbor(region24);region23.addNeighbor(region25);region23.addNeighbor(region26);region23.addNeighbor(region36);
-//		region24.addNeighbor(region25);
-//		region25.addNeighbor(region26);
-//		region27.addNeighbor(region28);region27.addNeighbor(region32);region27.addNeighbor(region33);		
-//		region28.addNeighbor(region29);region28.addNeighbor(region31);region28.addNeighbor(region33);region28.addNeighbor(region34);
-//		region29.addNeighbor(region30);region29.addNeighbor(region31);
-//		region30.addNeighbor(region31);region30.addNeighbor(region34);region30.addNeighbor(region35);
-//		region31.addNeighbor(region34);
-//		region32.addNeighbor(region33);region32.addNeighbor(region36);region32.addNeighbor(region37);
-//		region33.addNeighbor(region34);region33.addNeighbor(region37);region33.addNeighbor(region38);
-//		region34.addNeighbor(region35);
-//		region36.addNeighbor(region37);
-//		region37.addNeighbor(region38);
-//		region38.addNeighbor(region39);
-//		region39.addNeighbor(region40);region39.addNeighbor(region41);
-//		region40.addNeighbor(region41);region40.addNeighbor(region42);
-//		region41.addNeighbor(region42);
-		
-		for (Region regionName : Region.values()) {
-			RegionData region = regions.get(regionName);
-			for (Region neighbour : regionName.getForwardNeighbours()) {
-				region.addNeighbor(regions.get(neighbour));
-			}
-		}
-		
-		// ADD REGIONS TO THE MAP
-		
-//		ORIGINAL CODE		
-//		map.add(region1); map.add(region2); map.add(region3);
-//		map.add(region4); map.add(region5); map.add(region6);
-//		map.add(region7); map.add(region8); map.add(region9);
-//		map.add(region10); map.add(region11); map.add(region12);
-//		map.add(region13); map.add(region14); map.add(region15);
-//		map.add(region16); map.add(region17); map.add(region18);
-//		map.add(region19); map.add(region20); map.add(region21);
-//		map.add(region22); map.add(region23); map.add(region24);
-//		map.add(region25); map.add(region26); map.add(region27);
-//		map.add(region28); map.add(region29); map.add(region30);
-//		map.add(region31); map.add(region32); map.add(region33);
-//		map.add(region34); map.add(region35); map.add(region36);
-//		map.add(region37); map.add(region38); map.add(region39);
-//		map.add(region40); map.add(region41); map.add(region42);
-		
-		for (RegionData region : regions.values()) {
-			map.add(region);
-		}
-		
-		// ADD SUPER REGIONS TO THE MAP
-
-//		ORIGINAL CODE	
-//		map.add(northAmerica);
-//		map.add(southAmerica);
-//		map.add(europe);
-//		map.add(afrika);
-//		map.add(azia);
-//		map.add(australia);
-		
-		for (ContinentData superRegion : continents.values()) {
-			map.add(superRegion);
-		}
-
-		return map;
-	}
-	
-	//Make every region neutral with 2 armies to start with
-	private GameMap setupMap(GameMap initMap)
-	{
-		GameMap map = initMap;
-		for(RegionData region : map.regions)
-		{
-			region.setPlayerName("neutral");
-			region.setArmies(2);
-		}
-		return map;
-	}
-	
 	private void sendSetupMapInfo(Robot bot, GameMap initMap)
 	{
-		String setupSuperRegionsString, setupRegionsString, setupNeighborsString;
-		setupSuperRegionsString = getSuperRegionsString(initMap);
-		setupRegionsString = getRegionsString(initMap);
-		setupNeighborsString = getNeighborsString(initMap);
-		
-		bot.writeInfo(setupSuperRegionsString);
-		// System.out.println(setupSuperRegionsString);
-		bot.writeInfo(setupRegionsString);
-		// System.out.println(setupRegionsString);
-		bot.writeInfo(setupNeighborsString);
-		// System.out.println(setupNeighborsString);
+		bot.writeInfo(getSuperRegionsString(initMap));
+		bot.writeInfo(getRegionsString(initMap));
+		bot.writeInfo(getNeighborsString(initMap));
 	}
 	
 	private String getSuperRegionsString(GameMap map)
 	{
-		String superRegionsString = "setup_map super_regions";
+		String superRegionsString = "setup_map continents";
 		for(ContinentData superRegion : map.continents)
 		{
 			int id = superRegion.getId();
@@ -614,7 +220,6 @@ public class RunGame
 		return regionsString;
 	}
 	
-	//beetje inefficiente methode, maar kan niet sneller wss
 	private String getNeighborsString(GameMap map)
 	{
 		String neighborsString = "setup_map neighbors";
@@ -648,42 +253,39 @@ public class RunGame
 		return true;
 	}
 
-	public GameResult saveGame(GameMap map, Robot bot1, Robot bot2) {
+	public GameResult saveGame(GameMap map) {
 
 		GameResult result = new GameResult();
 		
 		result.config = config;
 		
 		for (RegionData region : map.regions) {
-			if (region.ownedByPlayer(config.playerId1)) {
+			if (region.ownedByPlayer(1)) {
 				++result.player1Regions;
 				result.player1Armies += region.getArmies();
 			}
-			if (region.ownedByPlayer(config.playerId2)) {
+			if (region.ownedByPlayer(2)) {
 				++result.player2Regions;
 				result.player2Armies += region.getArmies();
 			}
 		}
 		
-		if (engine.winningPlayer() != null) {
-			if (config.playerId1.equals(engine.winningPlayer().getId())) {
-				result.winner = Team.PLAYER_1;
-			} else
-			if (config.playerId2.equals(engine.winningPlayer().getId())) {
-				result.winner = Team.PLAYER_2;
-			}
+		if (game.winningPlayer() == 1) {
+			result.winner = Team.PLAYER_1;
+		} else if (game.winningPlayer() == 2) {
+			result.winner = Team.PLAYER_2;
 		} else {
 			result.winner = null;
 		}
 		
-		result.round = engine.getRoundNr()-1;
+		result.round = game.getRoundNumber()-1;
 		
 		System.out.println(result.getHumanString());
 		
 		return result;
 	}
 	
-	public static void main(String args[]) throws Exception
+	public static void main(String args[])
 	{	
 		Config config = new Config();
 		
@@ -693,9 +295,9 @@ public class RunGame
 		//config.bot2Init = "process:java -cp bin conquest.bot.BotStarter";
 		//config.bot2Init = "dir;process:c:/my_bot/;java -cp bin conquest.bot.BotStarter";
 		
-		config.engine.botCommandTimeoutMillis = 24*60*60*1000;
+		config.botCommandTimeoutMillis = 24*60*60*1000;
 		
-		config.engine.maxGameRounds = 100;
+		config.game.maxGameRounds = 100;
 		
 		// visualize the map, if turned off, the simulation would run headless 
 		config.visualize = true;

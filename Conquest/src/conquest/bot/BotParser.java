@@ -25,10 +25,10 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 
 import conquest.engine.io.BotStreamReader;
-import conquest.game.RegionData;
+import conquest.game.Phase;
 import conquest.game.move.AttackTransferMove;
 import conquest.game.move.PlaceArmiesMove;
-
+import conquest.game.world.Region;
 
 public class BotParser extends Thread {
 	
@@ -87,19 +87,13 @@ public class BotParser extends Thread {
 		return bot;
 	}
 	
-	public static BotParser runInternal(String playerName, String botFQCN, InputStream input, PrintStream output, File logFile) {
+	public static BotParser runInternal(String botFQCN, InputStream input, PrintStream output) {
 		Bot bot = constructBot(botFQCN);
-		return runInternal(playerName, bot, input, output, logFile);
+		return runInternal(bot, input, output);
 	}
 	
-	public static BotParser runInternal(String playerName, Class botClass, InputStream input, PrintStream output, File logFile) {
-		Bot bot = constructBot(botClass);
-		return runInternal(playerName, bot, input, output, logFile);
-	}
-	
-	public static BotParser runInternal(String playerName, Bot bot, InputStream input, PrintStream output, File logFile) {
+	public static BotParser runInternal(Bot bot, InputStream input, PrintStream output) {
 		BotParser parser = new BotParser(bot, input, output);
-		if (logFile != null) parser.setLogFile(logFile);
 		parser.start();
 		return parser;
 	}
@@ -142,13 +136,12 @@ public class BotParser extends Thread {
 			if(line.length() == 0) { continue; }
 			log("IN : " + line);
 			String[] parts = line.split(" ");
-			if(parts[0].equals("pick_starting_regions")) {
-				//pick which regions you want to start with
+			if(parts[0].equals("pick_starting_region")) {
+				//pick a region you want to start with
+				currentState.setPhase(Phase.STARTING_REGIONS);
 				currentState.setPickableStartingRegions(parts);
-				ArrayList<RegionData> preferredStartingRegions = bot.getPreferredStartingRegions(currentState, Long.valueOf(parts[1]));
-				String output = "";
-				for(RegionData region : preferredStartingRegions)
-					output = output.concat(region.getId() + " ");
+				Region startingRegion = bot.getStartingRegion(currentState, Long.valueOf(parts[1]));
+				String output = startingRegion.id + "";
 				
 				log("OUT: " + output);
 				this.output.println(output);
@@ -157,14 +150,14 @@ public class BotParser extends Thread {
 				String output = "";
 				if(parts[1].equals("place_armies")) 
 				{
-					//place armies
+					currentState.setPhase(Phase.PLACE_ARMIES);
 					ArrayList<PlaceArmiesMove> placeArmiesMoves = bot.getPlaceArmiesMoves(currentState, Long.valueOf(parts[2]));
 					for(PlaceArmiesMove move : placeArmiesMoves)
 						output = output.concat(move.getString() + ",");
 				} 
 				else if(parts[1].equals("attack/transfer")) 
 				{
-					//attack/transfer
+					currentState.setPhase(Phase.ATTACK_TRANSFER);
 					ArrayList<AttackTransferMove> attackTransferMoves = bot.getAttackTransferMoves(currentState, Long.valueOf(parts[2]));
 					for(AttackTransferMove move : attackTransferMoves)
 						output = output.concat(move.getString() + ",");
@@ -183,7 +176,9 @@ public class BotParser extends Thread {
 				currentState.updateMap(parts);
 			} else if(parts[0].equals("opponent_moves")) {
 				// TODO: finish implementation
-			} else {
+			} else if (parts[0].equals("next_round"))
+			    currentState.nextRound();
+			else {
 				log("Unable to parse line: " + line);
 			}
 		}

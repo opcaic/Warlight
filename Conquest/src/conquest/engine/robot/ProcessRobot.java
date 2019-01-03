@@ -22,8 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import conquest.engine.Robot;
-import conquest.game.RegionData;
-
+import conquest.game.world.Region;
 
 public class ProcessRobot implements Robot
 {
@@ -37,18 +36,18 @@ public class ProcessRobot implements Robot
 
 	private RobotConfig config;
 	
-	public ProcessRobot(String playerId, String command) throws IOException
+	public ProcessRobot(int player, String command) throws IOException
 	{
-		this(playerId, "./", command);
+		this(player, "./", command);
 	}
 	
-	public ProcessRobot(String playerId, String dir, String command) throws IOException
+	public ProcessRobot(int player, String dir, String command) throws IOException
 	{		
 		childCommand = command;
 		childDir = new File(dir);
 		child = Runtime.getRuntime().exec(childCommand, null, childDir);
-		System.out.println(playerId + " -> " + command);
-		robot = new IORobot(playerId, child.getOutputStream(), false, child.getInputStream(), child.getErrorStream());
+		System.out.println(player + " -> " + command);
+		robot = new IORobot(player, child.getOutputStream(), false, child.getInputStream(), child.getErrorStream());
 	}
 	
 	@Override
@@ -62,20 +61,24 @@ public class ProcessRobot implements Robot
 //		robot.writeMove(move);
 //	}
 	
+	String botDied() {
+	    return "Bot died out. Executed from '" + childDir.getAbsolutePath() + "' with command '" + childCommand + "'.";
+	}
+	
 	@Override
-	public String getPreferredStartingArmies(long timeOut, ArrayList<RegionData> pickableRegions)
+	public String getStartingRegion(long timeOut, ArrayList<Region> pickableRegions)
 	{
 		if (!isRunning()) {
-			throw new RuntimeException("Bot died out. Executed from '" + childDir.getAbsolutePath() + "' with command '" + childCommand + "'.");
+			throw new RuntimeException(botDied());
 		}
-		return robot.getPreferredStartingArmies(timeOut, pickableRegions);
+		return robot.getStartingRegion(timeOut, pickableRegions);
 	}
 	
 	@Override
 	public String getPlaceArmiesMoves(long timeOut)
 	{
 		if (!isRunning()) {
-			throw new RuntimeException("Bot died out. Executed from '" + childDir.getAbsolutePath() + "' with command '" + childCommand + "'.");
+			throw new RuntimeException(botDied());
 		}
 		return robot.getPlaceArmiesMoves(timeOut);
 	}
@@ -84,11 +87,11 @@ public class ProcessRobot implements Robot
 	public String getAttackTransferMoves(long timeOut)
 	{
 		if (!isRunning()) {
-			throw new RuntimeException("Bot died out. Executed from '" + childDir.getAbsolutePath() + "' with command '" + childCommand + "'.");
+			throw new RuntimeException(botDied());
 		}
 		return robot.getAttackTransferMoves(timeOut);
 	}
-		
+	
 	@Override
 	public void writeInfo(String info){
 		robot.writeInfo(info);
@@ -139,8 +142,8 @@ public class ProcessRobot implements Robot
 	}
 	
 	@Override
-	public String getRobotPlayerId() {
-		return robot.getRobotPlayerId();
+	public int getRobotPlayer() {
+		return robot.getRobotPlayer();
 	}
 	
 	@Override
