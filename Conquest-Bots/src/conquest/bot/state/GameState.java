@@ -187,6 +187,14 @@ public class GameState implements Cloneable {
 		return players[player];
 	}
 	
+	public int getRoundNumber() {
+		return game.getRoundNumber();
+	}
+	
+	public Phase getPhase() {
+		return game.getPhase();
+	}
+	
 	public boolean isDone() {
 		return game.isDone();
 	}
@@ -195,22 +203,26 @@ public class GameState implements Cloneable {
 		return game.winningPlayer();
 	}
 	
-	public void apply(ChooseCommand command) {
+	public void chooseRegion(ChooseCommand command) {
 		game.chooseRegion(command.region);
 		update();
 	}
 	
-	public void apply(PlaceMoveCommands commands) {
+	public void placeArmies(List<PlaceCommand> commands) {
 		List<PlaceArmiesMove> placeMoves = new ArrayList<PlaceArmiesMove>();
-		for (PlaceCommand pc : commands.placeCommands)
+		for (PlaceCommand pc : commands)
 			placeMoves.add(new PlaceArmiesMove(pc.region, pc.armies));
 		game.placeArmies(placeMoves, null);
 		
+		update();
+	}
+	
+	public void moveArmies(List<MoveCommand> commands) {
 		List<AttackTransferMove> attackTransferMoves = new ArrayList<AttackTransferMove>();
-		for (MoveCommand mc : commands.moveCommands)
+		for (MoveCommand mc : commands)
 			attackTransferMoves.add(new AttackTransferMove(mc.from, mc.to, mc.armies));
 		game.attackTransfer(attackTransferMoves, null);
-		
+
 		update();
 	}
 	

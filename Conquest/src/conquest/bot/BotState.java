@@ -20,6 +20,7 @@ package conquest.bot;
 import java.util.ArrayList;
 
 import conquest.game.GameMap;
+import conquest.game.Phase;
 import conquest.game.RegionData;
 import conquest.game.ConquestGame;
 import conquest.game.ContinentData;
@@ -40,11 +41,13 @@ public class BotState {
 	
 	private int roundNumber;
 	private int playerNumber;
+	private Phase phase;
 	
 	public BotState()
 	{
 		pickableStartingRegions = new ArrayList<Region>();
 		roundNumber = 0;
+		phase = Phase.STARTING_REGIONS;
 	}
 	
 	public void updateSettings(String key, String value)
@@ -55,6 +58,10 @@ public class BotState {
 	
 	public void nextRound() {
 	    roundNumber++;
+	}
+	
+	public void setPhase(Phase phase) {
+		this.phase = phase;
 	}
 	
 	//initial map is given to the bot with all the information except for player and armies info
@@ -180,7 +187,8 @@ public class BotState {
 
 	public ConquestGame toConquestGame() {
 	    return new ConquestGame(
-	        new GameConfig(), visibleMap, null, roundNumber, playerNumber, pickableStartingRegions);
+	        new GameConfig(), visibleMap, null, roundNumber, playerNumber, phase,
+	        pickableStartingRegions);
 	}
 	
 }

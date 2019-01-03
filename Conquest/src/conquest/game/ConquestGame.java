@@ -12,6 +12,7 @@ public class ConquestGame implements Cloneable {
     String[] playerNames;
     int round;
     int turn;
+    Phase phase;
     public ArrayList<Region> pickableRegions;
     public Random random;
     GUI gui;
@@ -20,12 +21,13 @@ public class ConquestGame implements Cloneable {
     
     // Create a game that is already in progress.
     public ConquestGame(GameConfig config, GameMap map, String[] playerNames,
-                        int round, int turn, ArrayList<Region> pickableRegions) {
+                        int round, int turn, Phase phase, ArrayList<Region> pickableRegions) {
         this.config = config;
         this.map = map;
         this.playerNames = playerNames != null ? playerNames : new String[] { "Player 1", "Player 2" };
         this.round = round;
         this.turn = turn;
+        this.phase = phase;
         this.pickableRegions = pickableRegions;
         
         if (config.seed < 0) {
@@ -37,8 +39,8 @@ public class ConquestGame implements Cloneable {
     }
     
     // Create a new game with the given configuration.
-    public ConquestGame(GameConfig config, String[] playerName) {
-        this(config, makeInitMap(), playerName, 1, 1, null);
+    public ConquestGame(GameConfig config, String[] playerNames) {
+        this(config, makeInitMap(), playerNames, 0, 1, Phase.STARTING_REGIONS, null);
         initStartingRegions();
     }
     
@@ -57,8 +59,8 @@ public class ConquestGame implements Cloneable {
         // own random number generator, and actions applied to it may have different results
         // than in the original game.
         
-        return new ConquestGame(
-            config, map.clone(), playerNames, round, turn, new ArrayList<Region>(pickableRegions));
+        return new ConquestGame(config, map.clone(), playerNames, round, turn, phase,
+        		                new ArrayList<Region>(pickableRegions));
     }
     
     public GameMap getMap() { return map; }
@@ -69,6 +71,10 @@ public class ConquestGame implements Cloneable {
     
     public int getTurn() {
         return turn;
+    }
+    
+    public Phase getPhase() {
+    	return phase;
     }
     
     public String playerName(int i) {
@@ -180,7 +186,7 @@ public class ConquestGame implements Cloneable {
     }
     
     public void chooseRegion(Region region) {
-    	if (round > 0)
+    	if (phase != Phase.STARTING_REGIONS)
     		throw new Error("cannot choose regions after game has begun");
     	
         if (!pickableRegions.contains(region))
@@ -189,12 +195,17 @@ public class ConquestGame implements Cloneable {
         map.getRegionData(region).setOwner(turn);
         pickableRegions.remove(region);
         turn = 3 - turn;
+        
+        if (map.numberRegionsOwned(turn) == nrOfStartingRegions) {
+        	round = 1;
+        	phase = Phase.PLACE_ARMIES;
+        }
     }
     
     public void placeArmies(List<PlaceArmiesMove> moves, List<Move> opponentMoves)
     {
-    	if (round < 1)
-    		throw new Error("cannot place armies before choosing starting regions");
+    	if (phase != Phase.PLACE_ARMIES)
+    		throw new Error("wrong time to place armies");
 
         int left = armiesPerTurn(turn); 
                 
@@ -220,6 +231,8 @@ public class ConquestGame implements Cloneable {
                     opponentMoves.add(move);
             }
         }
+        
+        phase = Phase.ATTACK_TRANSFER;
     }
     
     public static enum FightSide {
@@ -395,8 +408,8 @@ public class ConquestGame implements Cloneable {
     }
     
     public void attackTransfer(List<AttackTransferMove> moves, List<Move> opponentMoves) {
-    	if (round < 1)
-    		throw new Error("cannot attack/transfer before choosing starting regions");
+    	if (phase != Phase.ATTACK_TRANSFER)
+    		throw new Error("wrong time to attack/transfer");
 
         validateAttackTransfers(moves);
         
@@ -431,6 +444,7 @@ public class ConquestGame implements Cloneable {
         }
         
         turn = 3 - turn;
+        phase = Phase.PLACE_ARMIES;
         if (turn == 1)
             round++;
     }

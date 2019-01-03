@@ -25,6 +25,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 
 import conquest.engine.io.BotStreamReader;
+import conquest.game.Phase;
 import conquest.game.move.AttackTransferMove;
 import conquest.game.move.PlaceArmiesMove;
 import conquest.game.world.Region;
@@ -137,6 +138,7 @@ public class BotParser extends Thread {
 			String[] parts = line.split(" ");
 			if(parts[0].equals("pick_starting_region")) {
 				//pick a region you want to start with
+				currentState.setPhase(Phase.STARTING_REGIONS);
 				currentState.setPickableStartingRegions(parts);
 				Region startingRegion = bot.getStartingRegion(currentState, Long.valueOf(parts[1]));
 				String output = startingRegion.id + "";
@@ -148,14 +150,14 @@ public class BotParser extends Thread {
 				String output = "";
 				if(parts[1].equals("place_armies")) 
 				{
-					//place armies
+					currentState.setPhase(Phase.PLACE_ARMIES);
 					ArrayList<PlaceArmiesMove> placeArmiesMoves = bot.getPlaceArmiesMoves(currentState, Long.valueOf(parts[2]));
 					for(PlaceArmiesMove move : placeArmiesMoves)
 						output = output.concat(move.getString() + ",");
 				} 
 				else if(parts[1].equals("attack/transfer")) 
 				{
-					//attack/transfer
+					currentState.setPhase(Phase.ATTACK_TRANSFER);
 					ArrayList<AttackTransferMove> attackTransferMoves = bot.getAttackTransferMoves(currentState, Long.valueOf(parts[2]));
 					for(AttackTransferMove move : attackTransferMoves)
 						output = output.concat(move.getString() + ",");
