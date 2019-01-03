@@ -94,6 +94,10 @@ public class ConquestGame implements Cloneable {
         return winningPlayer() > 0 || round > config.maxGameRounds;
     }
     
+    public List<Region> getPickableRegions() {
+    	return pickableRegions;
+    }
+    
     //calculate how many armies a player is able to place on the map each round
     public int armiesPerTurn(int player)
     {

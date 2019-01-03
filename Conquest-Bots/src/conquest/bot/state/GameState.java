@@ -203,6 +203,10 @@ public class GameState implements Cloneable {
 		return game.winningPlayer();
 	}
 	
+    public List<Region> getPickableRegions() {
+    	return game.getPickableRegions();
+    }
+	
 	public void chooseRegion(ChooseCommand command) {
 		game.chooseRegion(command.region);
 		update();
