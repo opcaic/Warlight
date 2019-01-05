@@ -37,7 +37,9 @@ public class BotState {
 	private GameMap visibleMap; 
 	
 	//2 randomly chosen regions from each continent are given, which the bot can choose to start with
-	private ArrayList<Region> pickableStartingRegions; 
+	private ArrayList<Region> pickableStartingRegions;
+
+	private int startingArmies; //number of armies the player can place on map
 	
 	private int roundNumber;
 	private int playerNumber;
@@ -54,6 +56,8 @@ public class BotState {
 	{
 		if (key.equals("your_player_number"))
 		    playerNumber = Integer.parseInt(value);
+		else if (key.equals("starting_armies")) 
+		    startingArmies = Integer.parseInt(value);
 	}
 	
 	public void nextRound() {
@@ -159,6 +163,10 @@ public class BotState {
 				System.err.println("Unable to parse Map Update " + e.getMessage());
 			}
 		}
+	}
+	
+	public int getStartingArmies(){
+		return startingArmies;
 	}
 	
 	public int getRoundNumber(){

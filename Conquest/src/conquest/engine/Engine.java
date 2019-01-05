@@ -163,9 +163,18 @@ public class Engine {
 	        sendUpdateMapInfo(i);
 	}
 	
+	//inform the player about how much armies he can place at the start next round
+	private void sendStartingArmiesInfo(int player)
+	{
+		String updateStartingArmiesString = "settings starting_armies " + game.armiesPerTurn(player);
+		robot(player).writeInfo(updateStartingArmiesString);
+	}
+	
 	public void nextRound() {
-	    for (int i = 1 ; i <= 2 ; ++i)
+	    for (int i = 1 ; i <= 2 ; ++i) {
             robot(i).writeInfo("next_round");
+            sendStartingArmiesInfo(i);
+	    }
 	}
 		
 	//inform the player about how his visible map looks now
