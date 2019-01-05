@@ -46,7 +46,7 @@ public class GameState implements Cloneable {
 	 */
 	public int opp;
 	
-	public GameState(ConquestGame game) {
+	GameState(ConquestGame game) {
 		this.game = game;
 		reset();
 		update();
@@ -56,7 +56,7 @@ public class GameState implements Cloneable {
 		this(new ConquestGame());
 	}
 	
-	public GameState(BotState state) {
+	GameState(BotState state) {
 		this(state.toConquestGame());
 	}
 	
@@ -66,7 +66,7 @@ public class GameState implements Cloneable {
 	
 	@Override
 	public GameState clone() {
-		return new GameState(game);
+		return new GameState(game.clone());
 	}
 	
 	/**

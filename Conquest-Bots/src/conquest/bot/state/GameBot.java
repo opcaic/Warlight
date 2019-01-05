@@ -11,20 +11,11 @@ import conquest.game.world.Region;
 import conquest.view.GUI;
 
 public abstract class GameBot implements Bot {
-
     protected BotState botState;
 	
 	protected GameState state;
 	
-	/**
-	 * Overrides bot's internal game {@link #state}.
-	 * @param gameState
-	 */
-	public void enforceState(GameState gameState) {
-		this.state = gameState;
-	}
-	
-	public void updateState(BotState botState) {
+	void updateState(BotState botState) {
 		this.botState = botState;
 		if (this.state == null) this.state = new GameState(botState);
 		else this.state.update(botState);
