@@ -22,9 +22,9 @@ public class GameConfig implements Cloneable {
         
         result.seed = Integer.parseInt(parts[0]);
         result.fullyObservableGame = Boolean.parseBoolean(parts[1]);
-        result.startingArmies = Integer.parseInt(parts[4]);
-        result.maxGameRounds = Integer.parseInt(parts[5]);
-        result.fight = FightMode.valueOf(parts[6]);
+        result.startingArmies = Integer.parseInt(parts[2]);
+        result.maxGameRounds = Integer.parseInt(parts[3]);
+        result.fight = FightMode.valueOf(parts[4]);
 
         return result;
     }

@@ -138,8 +138,6 @@ public class ConquestFightConsole {
 		
 	private static void initJSAP() throws JSAPException {
 		jsap = new JSAP();
-		    	
-    	
         
         FlaggedOption opt1 = new FlaggedOption(ARG_BOT1_NAME_LONG)
 	    	.setStringParser(JSAP.STRING_PARSER)
@@ -441,7 +439,7 @@ public class ConquestFightConsole {
 	public static String[] getTestArgs_1v1() {
 		return new String[] {
 				  "-s", "20"     // seed
-				, "-o", "GAME;PLR1;PLR2;x;x;false;false;200;false;-1;true;5000;5;100;CONTINUAL_1_1_A60_D70"   // game-config
+				, "-o", "GAME;x;x;5000;false;false;200;false;-1;true;5;100;CONTINUAL_1_1_A60_D70"   // game-config
 				, "-g", "10"      // games-count
 				, "-r", "false"   // reverse-games
 				, "-a", "MyBot"                              // bot1-id
@@ -453,30 +451,28 @@ public class ConquestFightConsole {
 				, "-t", "./results/all-results.csv"   // single results file
 		};
 		
-		// game-config:
+		// engine config:
 		//		result.gameId = parts[0];                                        // should be always: GAME
-		//		result.player1Id = parts[1];                                     // should be always: PLR1
-		//		result.player2Id = parts[2];                                     // should be always: PLR2
-		//		result.player1Name = parts[3];                                   // will be auto-changed
-		//		result.player2Name = parts[4];                                   // will be auto-changed
-		//		result.visualize = Boolean.parseBoolean(parts[5]);               // should be always FALSE
-		//      result.visualizeContinual = (parts[6].toLowerCase().equals("null") ? null : Boolean.parseBoolean(parts[6]));
-		//      result.visualizeContinualFrameTimeMillis = (parts[7].toLowerCase().equals("null") ? null : Integer.parseInt(parts[7]));
-		//      result.logToConsole = Boolean.parseBoolean(parts[8]);
+		//		result.player1Name = parts[1];                                   // will be auto-changed
+		//		result.player2Name = parts[2];                                   // will be auto-changed
+		//		result.botCommandTimeoutMillis = Integer.parseInt(parts[3]);
+		//		result.visualize = Boolean.parseBoolean(parts[4]);
+		//		result.visualizeContinual = (parts[5].toLowerCase().equals("null") ? null : Boolean.parseBoolean(parts[5]));
+		//		result.visualizeContinualFrameTimeMillis = (parts[6].toLowerCase().equals("null") ? null : Integer.parseInt(parts[6]));
+		//		result.logToConsole = Boolean.parseBoolean(parts[7]);
 
-		// followed by engine config:
+		// followed by game config:
 		//		result.seed = Integer.parseInt(parts[0]);                        // will be auto-changed according to master seed above
 		//		result.fullyObservableGame = Boolean.parseBoolean(parts[1]);
-		//		result.botCommandTimeoutMillis = Long.parseLong(parts[2]);
-		//		result.startingArmies = Integer.parseInt(parts[3]);
-		//		result.maxGameRounds = Integer.parseInt(parts[4]);
-		//		result.fight = FightMode.valueOf(parts[5]);                      // see FightMode for strings
+		//		result.startingArmies = Integer.parseInt(parts[2]);
+		//		result.maxGameRounds = Integer.parseInt(parts[3]);
+		//		result.fight = FightMode.valueOf(parts[4]);                      // see FightMode for strings
 	}
 	
 	public static String[] getTestArgs_Batch() {
 		return new String[] {
 				  "-s", "20"     // seed
-				, "-o", "GAME;PLR1;PLR2;x;x;false;null;null;false;-1;true;5000;5;100;CONTINUAL_1_1_A60_D70"   // game-config
+				, "-o", "GAME;x;x;5000;false;null;null;false;-1;true;5;100;CONTINUAL_1_1_A60_D70"   // game-config
 				, "-g", "3"      // games-count
 				, "-r", "true"   // reverse-games
 				, "-e", "AggressiveBot"               // bot-id that will perform fights against all other bots within batch property file
