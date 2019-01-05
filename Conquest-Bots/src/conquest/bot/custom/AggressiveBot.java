@@ -133,14 +133,19 @@ public class AggressiveBot extends GameBot
 		
 		// CAPTURE ALL REGIONS WE CAN
 		for (RegionState from : regions) {
+			int available = from.armies - 1;  // 1 army must stay behind
+			
 			for (RegionState to : from.neighbours) {
 				// DO NOT ATTACK OWN REGIONS
 				if (to.owned(state.me)) continue;
 				
 				// IF YOU HAVE ENOUGH ARMY TO WIN WITH 70%
-				if (shouldAttack(from, to, 0.7)) {
+				int need = getRequiredSoldiersToConquerRegion(from, to, 0.7);
+				
+				if (available >= need) {
 					// => ATTACK
-					result.add(attack(from, to, 0.7));
+					result.add(new MoveCommand(from.region, to.region, need));
+					available -= need;
 				}
 			}
 		}
@@ -176,15 +181,6 @@ public class AggressiveBot extends GameBot
 		return Integer.MAX_VALUE;
 	}
 		
-	private boolean shouldAttack(RegionState from, RegionState to, double winProbability) {	
-		return from.armies > getRequiredSoldiersToConquerRegion(from, to, winProbability);
-	}
-	
-	private MoveCommand attack(RegionState from, RegionState to, double winProbability) {
-		MoveCommand result = new MoveCommand(from.region, to.region, getRequiredSoldiersToConquerRegion(from, to, winProbability));
-		return result;
-	}
-	
 	private MoveCommand transfer(RegionState from, RegionState to) {
 		MoveCommand result = new MoveCommand(from.region, to.region, from.armies-1);
 		return result;
