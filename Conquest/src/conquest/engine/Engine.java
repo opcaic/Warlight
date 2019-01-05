@@ -35,7 +35,6 @@ public class Engine {
 	private Robot[] robots;
 	private long timeoutMillis;
 	private RobotParser parser;
-	private ArrayList<ArrayList<Move>> opponentMoves;
 	private GUI gui;
 	
 	public Engine(ConquestGame game, Robot[] robots, GUI gui, long timeoutMillis)
@@ -48,9 +47,6 @@ public class Engine {
 		this.timeoutMillis = timeoutMillis;		
 		
 		parser = new RobotParser();
-		opponentMoves = new ArrayList<ArrayList<Move>>();
-		for (int i = 0 ; i <= 1 ; ++i)
-		    opponentMoves.add(new ArrayList<Move>());
 	}
 	
 	Robot robot(int i) {
@@ -89,13 +85,14 @@ public class Engine {
 		}
 		
 		for (int i = 1 ; i <= 2 ; ++i) {
+			ArrayList<Move> opponentMoves = new ArrayList<Move>();
+			
     		List<PlaceArmiesMove> placeMoves =
     		    placeArmiesMoves(robot(i).getPlaceArmiesMoves(timeoutMillis), i);
     		
-    		game.placeArmies(placeMoves, opponentMoves.get(i - 1));
+    		game.placeArmies(placeMoves, opponentMoves);
     
-    		for (int j = 1 ; j <= 2 ; ++j)
-    		    sendUpdateMapInfo(j, robot(j));
+    		sendUpdateMapInfo(i);
     		
     		if (gui != null && !(robot(i) instanceof HumanRobot)) {
     	        List<PlaceArmiesMove> legalMoves = new ArrayList<PlaceArmiesMove>();
@@ -110,7 +107,11 @@ public class Engine {
     		List<AttackTransferMove> moves =
     		    attackTransferMoves(robot(i).getAttackTransferMoves(timeoutMillis), i);
     		
-    		game.attackTransfer(moves, opponentMoves.get(i - 1));
+    		game.attackTransfer(moves, opponentMoves);
+    		
+    		sendAllInfo();
+    		
+	        sendOpponentMovesInfo(3 - i, opponentMoves);    		
     		
     		if (game.isDone())
     		    break;
@@ -119,8 +120,7 @@ public class Engine {
 		if (gui != null) {
 			gui.updateMap();
 		}
-		
-		sendAllInfo();	
+		nextRound();	
 	}
 	
 	public void distributeStartingRegions()
@@ -159,16 +159,17 @@ public class Engine {
 	
 	public void sendAllInfo()
 	{
-	    for (int i = 1 ; i <= 2 ; ++i) {
-	        sendUpdateMapInfo(i, robot(i));
-	        sendOpponentMovesInfo(i, robot(i));
-	        opponentMoves.get(i - 1).clear();
+	    for (int i = 1 ; i <= 2 ; ++i)
+	        sendUpdateMapInfo(i);
+	}
+	
+	public void nextRound() {
+	    for (int i = 1 ; i <= 2 ; ++i)
             robot(i).writeInfo("next_round");
-	    }
 	}
 		
 	//inform the player about how his visible map looks now
-	private void sendUpdateMapInfo(int player, Robot bot)
+	private void sendUpdateMapInfo(int player)
 	{
 		ArrayList<RegionData> visibleRegions;
 		if (game.config.fullyObservableGame) {
@@ -185,14 +186,14 @@ public class Engine {
 			
 			updateMapString = updateMapString.concat(" " + id + " " + owner + " " + armies);
 		}
-		bot.writeInfo(updateMapString);
+		robot(player).writeInfo(updateMapString);
 	}
 
-	private void sendOpponentMovesInfo(int player, Robot bot)
+	private void sendOpponentMovesInfo(int player, ArrayList<Move> moves)
 	{
 		String opponentMovesString = "opponent_moves ";
 
-		for(Move move : opponentMoves.get((3 - player) - 1))
+		for(Move move : moves)
 		    if (move.getIllegalMove().equals(""))
 			{
 				if (move instanceof PlaceArmiesMove) {
@@ -207,6 +208,6 @@ public class Engine {
 		
 		opponentMovesString = opponentMovesString.substring(0, opponentMovesString.length()-1);
 
-		bot.writeInfo(opponentMovesString);
+		robot(player).writeInfo(opponentMovesString);
 	}
 }

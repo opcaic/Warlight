@@ -131,8 +131,9 @@ public class RunGame
 		    robots[i].writeInfo("settings your_player_number " + (i + 1));
 		    sendSetupMapInfo(robots[i], game.getMap());
 		}
-		engine.distributeStartingRegions(); //decide the player's starting regions
+		engine.distributeStartingRegions(); //decide the players' starting regions
 		engine.sendAllInfo();
+		engine.nextRound();   // advance to round 1
 		
 		//play the game
 		while(!game.isDone())
