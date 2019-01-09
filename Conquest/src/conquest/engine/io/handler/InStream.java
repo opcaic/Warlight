@@ -27,7 +27,7 @@ public class InStream extends Thread
 	InputStream in;
 	Boolean stopping;
 	
-	String[] newLines = new String[] { "\r\n", "\r", "\n"};
+	String[] newLines = new String[] { "\r\n", "\n"};
 	
 	public InStream(String name, InputStream inputStream)
 	{
