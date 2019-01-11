@@ -2,7 +2,7 @@ package conquest.bot.state;
 
 import java.util.List;
 
-public class PlaceMoveAction {
+public class PlaceMoveAction implements Action {
 	public List<PlaceCommand> placeCommands;
 	public List<MoveCommand> moveCommands;
 	
