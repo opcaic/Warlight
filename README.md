@@ -8,13 +8,13 @@ The code here is derived from the [original implementation](http://theaigames.co
 
 ## Quick start
 
-This repository contains .project and .classpath files that define 4 Eclipse projects (Conquest, Conquest-Bots, Conquest-Playground, Conquest-Tournament).  You can import these into Eclipse using Import -> General -> Existing Projects into Workspace.  (It should not be difficult to import the projects into other IDEs such as Intelli/J as well.)
+This repository contains .project and .classpath files that define 4 Eclipse projects (Conquest, Conquest-Bots, Conquest-Playground, Conquest-Tournament).  You can import these into Eclipse using the command Import -> General -> Existing&nbsp;Projects&nbsp;into&nbsp;Workspace.  (It should not be difficult to import the projects into other IDEs such as Intelli/J as well.)
 
-The class `conquest.bot.custom.AggressiveBot` is an example bot that plays the game.  The `main()` method in this class launches a game where you can play interactively against AggressiveBot.  That's a good way to start learning about the game.
+The class `conquest.bot.custom.AggressiveBot` is an example bot that plays the game.  The main() method in this class launches a game where you can play interactively against AggressiveBot.  That's a good way to start learning about the game.
 
 The class `conquest.bot.playground.MyBot` contains a dummy bot that plays randomly.  The main() method in this class launches a game where MyBot plays against AggressiveBot.  Usually MyBot will lose.  You can use MyBot as a starting point for developing your own game-playing agent.
 
-The class `conquest.tournament.ConquestFightConsole` can play a series of games between two bots.  If you uncomment the line "`args = getTestArgs_1v1()`" in the main method there, it will play 10 games of MyBot against AggressiveBot and will report win percentage statistics.  You can use this class to evaluate your bot's performance.
+The class `conquest.tournament.ConquestFightConsole` can play a series of games between two bots.  If you uncomment the line "`args = getTestArgs_1v1()`" in the main() method there, it will play 10 games of MyBot against AggressiveBot and will report win percentage statistics.  You can use this class to evaluate your bot's performance.
 
 ## Game rules
 
@@ -49,7 +49,7 @@ When two bots are playing each other, you can left click the map or press the sp
 
 ## Writing a bot
 
-Use `conquest.bot.playground.MyBot` as a starting point.  Here is [documentation](doc/warlight_api.html) for the most important classes, fields and methods in the Warlight API.
+Use `conquest.bot.playground.MyBot` as a starting point.  Here is [documentation](https://ksvi.mff.cuni.cz/~dingle/2018/ai/warlight_api.html) for the most important classes, fields and methods in the Warlight API.
 
 ## More notes
 
