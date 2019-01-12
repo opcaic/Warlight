@@ -133,6 +133,7 @@ public class Engine {
 		
 		for (int i = 1 ; i <= ConquestGame.nrOfStartingRegions ; ++i)
     	    for (int p = 1 ; p <= 2 ; ++p) {
+    	    	sendUpdateMapInfo(p);
         		Region region = parser.parseStartingRegion(
         		    robot(p).getStartingRegion(timeoutMillis, pickableRegions));
         		
