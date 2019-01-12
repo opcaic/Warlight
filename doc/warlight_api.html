@@ -1,0 +1,236 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title>Warlight API summary</title>
+	<meta name="generator" content="LibreOffice 6.1.2.1 (Linux)"/>
+	<meta name="created" content="00:00:00"/>
+	<meta name="changed" content="2019-01-03T16:10:50.289901078"/>
+	<meta name="created" content="00:00:00">
+	<meta name="created" content="00:00:00">
+	<meta name="created" content="00:00:00">
+	<meta name="created" content="00:00:00">
+	<meta name="created" content="00:00:00">
+	<meta name="created" content="00:00:00">
+	<meta name="created" content="00:00:00">
+	<meta name="created" content="00:00:00">
+	<meta name="created" content="00:00:00">
+	<meta name="created" content="00:00:00">
+	<meta name="created" content="00:00:00">
+	<meta name="created" content="00:00:00">
+	<meta name="created" content="00:00:00">
+	<meta name="created" content="00:00:00">
+	<meta name="created" content="00:00:00">
+	<meta name="created" content="00:00:00">
+	<meta name="created" content="00:00:00">
+	<style type="text/css">
+		h2 { font-family: "Liberation Sans", sans-serif; font-size: 16pt }
+		pre { font-family: monospace, monospace; font-size: 11pt }
+		code { font-family: monospace, monospace; font-size: 11pt }
+	</style>
+</head>
+<body lang="en-US" dir="ltr"><h2>Warlight API summary</h2>
+<p>Here are the most important classes, fields and methods in the
+Warlight API. For more details, read the Javadoc and/or look at the
+source code.</p>
+<p>All fields and methods are public unless noted otherwise.</p>
+<p>Player numbers are as follows: 0 = neutral, 1 = player 1, 2 =
+player 2.</p>
+<h2>map classes</h2>
+<p><code><font color="#000080"><b>enum</b></font></code><code><font color="#000000">
+</font></code><code><font color="#000000"><b>Region</b></font></code></p>
+<ul>
+	<p style="background: transparent">One of the 42 regions on the map.</p>
+	<pre style="margin-bottom: 0.2in; background: transparent"><font color="#000080">final</font><font color="#000000"> Continent continent; </font> <font color="#008800">// the continent containing this region</font></pre>
+</ul>
+<ul>
+	<pre style="margin-bottom: 0.2in; background: transparent"><font color="#000080">final</font><font color="#000000"> String mapName; </font>      <font color="#008800">// e.g. &quot;Peru&quot;</font></pre>
+</ul>
+<ul>
+	<li><pre style="margin-bottom: 0.2in; background: transparent"><code>List&lt;Region&gt; getNeighbours()</code></pre>
+</ul>
+<p><code><font color="#000080"><b>enum</b></font></code><code><font color="#000000">
+</font></code><code><font color="#000000"><b>Continent</b></font></code></p>
+<ul>
+	<p>One of the 7 continents on the map,</p>
+	<pre><font color="#000080">final</font><font color="#000000"> </font><font color="#000080">int</font><font color="#000000"> reward;      </font><font color="#008800">// # of extra armies/turn if you hold this continent</font>
+
+<font color="#000080">final</font><font color="#000000"> String mapName;  </font><font color="#008800">// e.g. &quot;Europe&quot;</font></pre>
+	<li><pre style="margin-bottom: 0.2in"><code><font color="#000000">Set&lt;Region&gt; getRegions()</font></code></pre>
+	<ul>
+		<p>Return a list of all regions in this continent.</p>
+	</ul>
+</ul>
+<h2>game state classes</h2>
+<p><code><font color="#000080"><b>enum</b></font></code><code><font color="#000000">
+</font></code><code><font color="#000000"><b>Phase {
+</b></font></code><code><font color="#000000"><span style="font-weight: normal">STARTING_REGIONS,
+PLACE_ARMIES, ATTACK_TRANSFER</span></font></code><code><font color="#000000">
+</font></code><code><font color="#000000"><b>};</b></font></code></p>
+<p><code><font color="#000080"><b>class</b></font></code><code><font color="#000000">
+</font></code><code><font color="#000000"><b>RegionState</b></font></code></p>
+<ul>
+	<pre><font color="#000080">final</font><font color="#000000"> Region region;</font>
+
+<font color="#000000">int owner;  </font><font color="#008800">// who currently owns this region</font>
+
+<font color="#000080">int</font><font color="#000000"> armies; </font> <font color="#008800">// how many armies are here</font>
+
+RegionState[] neighbours;</pre>
+</ul>
+<p><code><font color="#000080"><b>class</b></font></code><code><font color="#000000">
+</font></code><code><font color="#000000"><b>ContinentState</b></font></code>
+</p>
+<ul>
+	<pre><font color="#000080">final</font><font color="#000000"> Continent continent;</font>
+
+<font color="#000000">int owner;  </font><font color="#008800">// who currently owns this continent</font>
+
+<font color="#000000">Map&lt;Region, RegionState&gt; regions;  </font><font color="#008800">// all regions of this continent and their states</font></pre>
+</ul>
+<p><code><font color="#000080"><b>class</b></font></code><code><font color="#000000">
+</font></code><code><font color="#000000"><b>PlayerState</b></font></code></p>
+<pre style="margin-left: 0.5in"><font color="#000000">int player;  <font color="#008800">// which player this object describes</font></font>
+
+<font color="#000000">Map&lt;Region, RegionState&gt; regions;  </font><font color="#008800">// all regions this player owns</font>
+
+<font color="#000000">Map&lt;Continent, ContinentState&gt; continents;  </font><font color="#008800">// all continents this player owns</font>
+
+<font color="#000080">int</font><font color="#000000"> totalArmies;  </font><font color="#008800">// total armies the player has in all controlled regions</font>
+
+<font color="#000080">int</font><font color="#000000"> placeArmies;  </font><font color="#008800">// number of armies this player can place per round</font></pre><p>
+<code><font color="#000080"><b>class</b></font></code><code><font color="#000000">
+</font></code><code><font color="#000000"><b>GameState</b></font></code></p>
+<ul>
+	<pre><font color="#000000">RegionState[] regions;  </font><font color="#008800">// WARNING: 1-based array; [0] is null</font>
+
+<font color="#000000">ContinentState[] continents;  </font><font color="#008800">// WARNING: 1-based array; [0] is null</font>
+
+<font color="#000000">PlayerState[] players;  </font><font color="#008800">// player state for each player (0 = neutral, 1 = player 1, 2 = player 2)</font>
+
+<font color="#000000">int me;   </font><font color="#008800">// the player whose turn it is to move</font>
+
+<font color="#000000">int opp;  </font><font color="#008800">// the other player</font></pre>
+</ul>
+<ul>
+	<li><pre style="margin-bottom: 0.2in">GameState()</pre>
+	<ul>
+		<p>Return a new game.</p>
+	</ul>
+	<li><pre style="margin-bottom: 0.2in">GameState clone()</pre>
+</ul>
+<ul>
+	<ul>
+		<p>Return a copy of the game state that can be used as a forward
+		model.</p>
+	</ul>
+	<li><pre style="margin-bottom: 0.2in"><code><font color="#000080"><span style="font-weight: normal">int</span></font></code><code><font color="#000000"> getRoundNumber()</font></code></pre>
+	<li><pre style="margin-bottom: 0.2in"><code><font color="#000000">Phase getPhase()</font></code></pre>
+	<li><pre style="margin-bottom: 0.2in"><code><font color="#000000">List&lt;Region&gt; getPickableRegions()</font></code></pre>
+	<li><pre style="margin-bottom: 0.2in"><code><font color="#000080">boolean</font></code><code><font color="#000000"> isDone()</font></code></pre>
+	<li><pre style="margin-bottom: 0.2in"><code><font color="#000080">int</font></code><code><font color="#000000"> winningPlayer()</font></code></pre>
+</ul>
+<h2>bot classes</h2>
+<pre style="margin-bottom: 0.2in"><b><font color="#000080">interface</font><font color="#000000"> Action</font></b></pre>
+<ol>
+	<p>A set of commands that form a player's turn and can be applied to
+	a <code>GameState</code>.</p>
+</ol>
+<ul>
+	<li><p><code><font color="#000080">void</font></code><code><font color="#000000">
+	apply(GameState state)</font></code></p>
+</ul>
+<pre style="margin-bottom: 0.2in"><b><font color="#000080">class</font><font color="#000000"> ChooseCommand </font><font color="#000080">implements</font><font color="#000000"> Action</font></b></pre><p style="margin-left: 0.5in">
+A command to choose a starting region.</p>
+<ul>
+	<li><pre style="margin-bottom: 0.2in"><font color="#000000">ChooseCommand(Region region)</font></pre>
+</ul>
+<pre style="margin-bottom: 0.2in"><b><font color="#000080">class</font><font color="#000000"> PlaceCommand</font></b></pre><p style="margin-left: 0.5in">
+A command to place armies at the beginning of a turn.</p>
+<ul>
+	<li><pre style="margin-bottom: 0.2in"><font color="#000000">PlaceCommand(Region region, </font><font color="#000080">int</font><font color="#000000"> armies)</font></pre>
+</ul>
+<pre style="margin-bottom: 0.2in"><font color="#000080"><b>class</b></font><font color="#000000"> </font><font color="#000000"><b>PlaceAction </b></font><font color="#000080"><b>implements</b></font><font color="#000000"> </font><font color="#000000"><b>Action</b></font></pre><p style="margin-left: 0.5in; margin-bottom: 0.2in; font-weight: normal">
+<font color="#000000">A set of placement commands.</font></p>
+<ul>
+	<li><p style="margin-bottom: 0.2in"><code><font color="#000000"><span style="font-weight: normal">PlaceAction(List&lt;PlaceCommand&gt;
+	commands)</span></font></code></p>
+</ul>
+<pre style="margin-bottom: 0.2in"><b><font color="#000080">class</font><font color="#000000"> MoveCommand</font></b></pre><p style="margin-left: 0.5in">
+A command to move or attack.</p>
+<ul>
+	<li><pre style="margin-bottom: 0.2in"><font color="#000000">MoveCommand(Region from, Region to, </font><font color="#000080">int</font><font color="#000000"> armies)</font></pre>
+</ul>
+<pre style="margin-bottom: 0.2in"><b><font color="#000080">class</font><font color="#000000"> MoveAction </font><font color="#000080">implements</font><font color="#000000"> Action</font></b></pre><p style="margin-left: 0.5in; margin-bottom: 0.2in; font-weight: normal">
+<font color="#000000">A set of movement commands.</font></p>
+<ul>
+	<li><p style="margin-bottom: 0.2in"><code><font color="#000000"><span style="font-weight: normal">MoveAction(List&lt;MoveCommand&gt;
+	commands)</span></font></code></p>
+</ul>
+<pre style="margin-bottom: 0.2in"><b><font color="#000080">class</font><font color="#000000"> PlaceMoveAction </font><font color="#000080">implements</font><font color="#000000"> Action</font></b></pre><p style="margin-left: 0.5in; margin-bottom: 0.2in; font-weight: normal">
+<font color="#000000">An action containing placement and movement
+commands that can be applied all at once.</font></p>
+<ul>
+	<li><p style="margin-bottom: 0.2in"><code><font color="#000000"><span style="font-weight: normal">PlaceMoveAction(List&lt;PlaceCommand&gt;
+	placeCommands, List&lt;MoveCommand&gt; moveCommands)</span></font></code></p>
+</ul>
+<pre style="margin-bottom: 0.2in"><b><font color="#000080">abstract</font><font color="#000000"> </font><font color="#000080">class</font><font color="#000000"> GameBot</font></b></pre>
+<ul>
+	<p>Implement your bot as a subclass of this class.</p>
+	<pre style="margin-bottom: 0.2in"><font color="#000080">protected</font><font color="#000000"> GameState state;</font></pre>
+	<li><p><code><font color="#000080">abstract</font></code><code><font color="#000000">
+	ChooseCommand chooseRegion(List&lt;Region&gt; choosable, </font></code><code><font color="#000080">long</font></code><code><font color="#000000">
+	timeout)</font></code></p>
+</ul>
+<ul>
+	<ul>
+		<p>Called to select a starting region at the beginning of the game.</p>
+	</ul>
+	<li><p><code><font color="#000080">abstract</font></code><code><font color="#000000">
+	List&lt;PlaceCommand&gt; placeArmies(</font></code><code><font color="#000080">long</font></code><code><font color="#000000">
+	timeout)</font></code></p>
+	<ul>
+		<p>Called to ask where you want to place your armies at the
+		beginning of each round.</p>
+	</ul>
+	<li><p><code><font color="#000080">abstract</font></code><code><font color="#000000">
+	List&lt;MoveCommand&gt; moveArmies(</font></code><code><font color="#000080">long</font></code><code><font color="#000000">
+	timeout)</font></code></p>
+	<ul>
+		<p>Called to ask where you would like to move and/or attack in this
+		round.</p>
+	</ul>
+</ul>
+<h2>utility classes</h2>
+<pre style="margin-bottom: 0.2in"><b><font color="#000080">class</font><font color="#000000"> FightAttackersResults</font></b></pre>
+<ul>
+	<li><p><code><font color="#000080">double</font></code><code><font color="#000000">
+	getAttackersWinChance(</font></code><code><font color="#000080">int</font></code><code><font color="#000000">
+	attackers, </font></code><code><font color="#000080">int</font></code><code><font color="#000000">
+	defenders)</font></code></p>
+</ul>
+<ul>
+	<ul>
+		<p>Return the probability that the attackers will win the given
+		battle.</p>
+	</ul>
+	<li><p><code><font color="#000080">double</font></code><code><font color="#000000">
+	getDefendersWinChance(</font></code><code><font color="#000080">int</font></code><code><font color="#000000">
+	attackers, </font></code><code><font color="#000080">int</font></code><code><font color="#000000">
+	defenders)</font></code></p>
+	<li><p><code><font color="#000080">double</font></code><code><font color="#000000">
+	getExpectedAttackersDeaths(</font></code><code><font color="#000080">int</font></code><code><font color="#000000">
+	attackers, </font></code><code><font color="#000080">int</font></code><code><font color="#000000">
+	defenders)</font></code></p>
+	<ul>
+		<p>Return the expected number of attackers that will die in the
+		given attack, averaged across cases where the attack succeeds and
+		also cases where it fails.</p>
+	</ul>
+	<li><p><code><font color="#000080">double</font></code><code><font color="#000000">
+	getExpectedDefendersDeaths(</font></code><code><font color="#000080">int</font></code><code><font color="#000000">
+	attackers, </font></code><code><font color="#000080">int</font></code><code><font color="#000000">
+	defenders)</font></code></p>
+</ul>
+</body>
+</html>
