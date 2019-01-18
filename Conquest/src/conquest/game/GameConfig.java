@@ -13,7 +13,7 @@ public class GameConfig implements Cloneable {
     public int startingArmies = 5;
     public int maxGameRounds = 100;
     
-    public FightMode fight = FightMode.ORIGINAL_A60_D70;
+    public FightMode fight = FightMode.CONTINUAL_1_1_A60_D70;
     
     public static GameConfig fromString(String line) {
         GameConfig result = new GameConfig();
