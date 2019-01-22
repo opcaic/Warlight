@@ -50,8 +50,12 @@ public class RunGame
 			System.out.println("starting replay " + replayFile.getAbsolutePath());
 			
 			ReplayHandler replay = new ReplayHandler(replayFile);
+			Config replayConfig = replay.getConfig();
 			
-			this.config.game = replay.getConfig().game;
+			config.player1Name = replayConfig.player1Name;
+			config.player2Name = replayConfig.player2Name;
+			config.botCommandTimeoutMillis = replayConfig.botCommandTimeoutMillis;
+			config.game = replayConfig.game;
 			
 			String[] playerNames = new String[2];
 			Robot[] robots = new Robot[2];

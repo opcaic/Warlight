@@ -109,7 +109,6 @@ public class Conquest {
 				header();
 				System.out.println();
 				e.printStackTrace();
-				error();
 			}
 		}
 		
@@ -137,7 +136,6 @@ public class Conquest {
 				header();
 				System.out.println();
 				e.printStackTrace();
-				error();
 			}
 		}		
 		
