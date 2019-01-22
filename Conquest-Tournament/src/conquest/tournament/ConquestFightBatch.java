@@ -3,8 +3,7 @@ package conquest.tournament;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.Map.Entry;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * This file takes as input a property file with botId=botInit + {@link ConquestFightConfig} and performs 
@@ -54,9 +53,12 @@ public class ConquestFightBatch {
 	}
 	
 	public void fight(String botId, boolean reverseGames, File tableFile, File resultDirFile, File replayDirFile) {
+		Object[] keys = bots.keySet().toArray();
+		Arrays.sort(keys);
+		
 		if (botId.equals("*")) {	// all vs. all
-			for (Object key1 : bots.keySet())
-				for (Object key2 : bots.keySet()) {
+			for (Object key1 : keys)
+				for (Object key2 : keys) {
 					String botId1 = key1.toString(), botId2 = key2.toString();
 					if (botId1.compareTo(botId2) < 0)
 						fight(botId1, botId2, reverseGames, tableFile, resultDirFile, replayDirFile);
@@ -68,7 +70,7 @@ public class ConquestFightBatch {
 			"Cannot execute fights for '" + botId +
 			"' as it does not have bot init specified within the property file (key does not exist).");
 		
-		for (Object key : bots.keySet()) {
+		for (Object key : keys) {
 			String otherBotId = key.toString();
 			
 			if (!botId.equals(otherBotId))

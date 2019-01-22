@@ -401,8 +401,9 @@ public class ConquestGame implements Cloneable {
                 for (int j = 0 ; j < i ; ++j) {
                     AttackTransferMove n = moves.get(j);
                     if (n.getFromRegion() == move.getFromRegion() && n.getToRegion() == move.getToRegion()) {
-                        move.setIllegalMove(fromRegion.getId() +
-                                " attack/transfer has already attacked/transfered to this region");
+                        move.setIllegalMove(
+                        	"player has already attacked/transfered from region " +
+                                fromRegion.getId() + " to region " + toRegion.getId() + " in this turn");
                         break;
                     }
                 }

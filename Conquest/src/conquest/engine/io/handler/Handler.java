@@ -93,6 +93,9 @@ public class Handler implements IHandler {
 		if (!isRunning()) { return null; }
 		try { in.flush(); } catch(IOException e) {}
 		String line = out.readLine(timeOut);
+		if (line == null)
+			System.err.format("ERROR: readLine from %s returned null\n", name);
+		
 		if (log != null) {
 			log.logBotToEngine(logPlayer, line);
 		}
