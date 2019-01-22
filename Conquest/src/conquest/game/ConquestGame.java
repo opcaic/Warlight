@@ -81,17 +81,27 @@ public class ConquestGame implements Cloneable {
         return playerNames[i - 1];
     }
     
-    public int winningPlayer()
-    {
-        for (int i = 1 ; i <= 2 ; ++i)
-            if (map.numberRegionsOwned(i) == 0)
-            return 3 - i;
+    public int winningPlayer() {
+    	if (round == 0) return 0;
+    	
+    	int regions1 = map.numberRegionsOwned(1), regions2 = map.numberRegionsOwned(2);
+    	if (regions1 == 0) return 2;
+    	if (regions2 == 0) return 1;
+        
+        if (round > config.maxGameRounds) {
+        	if (regions1 > regions2) return 1;
+        	if (regions2 > regions1) return 2;
+        	
+        	int armies1 = map.numberArmiesOwned(1), armies2 = map.numberArmiesOwned(2);
+        	if (armies1 > armies2) return 1;
+        	if (armies2 > armies1) return 2;
+        }
         
         return 0;
     }
     
     public boolean isDone() {
-        return round > 0 && (winningPlayer() > 0 || round > config.maxGameRounds);
+        return round > 0 && (round > config.maxGameRounds || winningPlayer() > 0);
     }
     
     public List<Region> getPickableRegions() {

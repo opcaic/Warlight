@@ -145,6 +145,16 @@ public class GameMap implements Cloneable {
 		return n;
 	}
 	
+	public int numberArmiesOwned(int player) {
+		int n = 0;
+		
+		for (RegionData r: regions)
+			if (r.getOwner() == player)
+				n += r.getArmies();
+		
+		return n;
+	}
+
 	//return all regions owned by given player
 	public ArrayList<RegionData> ownedRegionsByPlayer(int player)
 	{

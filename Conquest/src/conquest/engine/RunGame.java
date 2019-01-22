@@ -264,23 +264,19 @@ public class RunGame
 		GameResult result = new GameResult();
 		
 		result.config = config;
-		
-		for (RegionData region : map.regions) {
-			if (region.ownedByPlayer(1)) {
-				++result.player1Regions;
-				result.player1Armies += region.getArmies();
-			}
-			if (region.ownedByPlayer(2)) {
-				++result.player2Regions;
-				result.player2Armies += region.getArmies();
-			}
-		}
-		
-		if (game.winningPlayer() == 1) {
+		result.player1Regions = map.numberRegionsOwned(1);
+		result.player1Armies = map.numberArmiesOwned(1);
+		result.player2Regions = map.numberRegionsOwned(2);
+		result.player2Armies = map.numberArmiesOwned(2);
+
+		switch (game.winningPlayer()) {
+		case 1: 
 			result.winner = Team.PLAYER_1;
-		} else if (game.winningPlayer() == 2) {
+			break;
+		case 2:
 			result.winner = Team.PLAYER_2;
-		} else {
+			break;
+		default:
 			result.winner = null;
 		}
 		
