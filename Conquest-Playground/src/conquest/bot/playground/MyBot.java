@@ -50,7 +50,6 @@ public class MyBot extends GameBot
 		List<Region> mine = new ArrayList<Region>(me.regions.keySet());
 		int numRegions = mine.size();
 		
-		System.out.format("mybot: placing %d armies\n", me.placeArmies); 
 		int[] count = new int[numRegions];
 		for (int i = 0 ; i < me.placeArmies ; ++i) {
 			int r = rand.nextInt(numRegions);

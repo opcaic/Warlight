@@ -72,7 +72,6 @@ public class AggressiveBot extends GameBot
 	@Override
 	public List<PlaceCommand> placeArmies(long timeout) {
 	    PlayerState me = state.players[state.me];
-	    System.out.format("AggressiveBot: placing %d armies\n", me.placeArmies);
 		List<PlaceCommand> result = new ArrayList<PlaceCommand>();
 		
 		// CLONE REGIONS OWNED BY ME
