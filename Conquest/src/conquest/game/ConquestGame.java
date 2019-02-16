@@ -235,8 +235,10 @@ public class ConquestGame implements Cloneable {
             else if (left <= 0)
                 move.setIllegalMove("no armies left to place");
             else {
-                if(armies > left) //player wants to place more armies than he has left
+                if(armies > left) { //player wants to place more armies than he has left
                     move.setArmies(left); //place all armies he has left
+                    armies = left;
+                }
                 
                 left -= armies;
                 region.setArmies(region.getArmies() + armies);
