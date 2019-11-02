@@ -6,9 +6,6 @@ import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 
 /**
  * Serves for the computation of victory probabilities of #ATTACKERS vs #DEFENDERS fights.

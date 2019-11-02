@@ -3,7 +3,6 @@ package conquest.tournament.run;
 import conquest.engine.Config;
 import conquest.engine.GameResult;
 import conquest.engine.RunGame;
-import conquest.game.Team;
 
 
 public class ConquestFightRound {
