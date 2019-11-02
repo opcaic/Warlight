@@ -34,8 +34,6 @@ public class ProcessRobot implements Robot
 	
 	private IORobot robot;
 
-	private RobotConfig config;
-	
 	public ProcessRobot(int player, String command) throws IOException
 	{
 		this(player, "./", command);

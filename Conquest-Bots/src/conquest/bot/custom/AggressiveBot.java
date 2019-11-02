@@ -244,7 +244,7 @@ public class AggressiveBot extends GameBot
 		config.replayLog = new File("./replay.log");
 		
 		RunGame run = new RunGame(config);
-		GameResult result = run.go();
+		run.go();
 		
 		System.exit(0);
 	}

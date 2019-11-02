@@ -102,13 +102,9 @@ public class RegionBFS<NODE extends BFSNode> {
 	
 	private Map<Region, NODE> nodes = new HashMap<Region, NODE>();
 	
-	private Region start;
-	
 	public void run(Region start, BFSVisitor visitor) {
 		
 		reset();
-		
-		this.start = start; 
 		
 		BFSVisitResult<NODE> firstVisit = visitor.visit(start, 0, null, null);
 		

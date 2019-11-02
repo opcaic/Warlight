@@ -22,7 +22,7 @@ public class Conquest {
 		config.replayLog = new File("./replay.log");
 		
 		RunGame run = new RunGame(config);
-		GameResult result = run.go();
+		run.go();
 		
 		System.exit(0);
 	}
@@ -41,7 +41,7 @@ public class Conquest {
 		config.replayLog = new File("./replay.log");
 		
 		RunGame run = new RunGame(config);
-		GameResult result = run.go();
+		run.go();
 		
 		System.exit(0);
 	}
@@ -55,7 +55,7 @@ public class Conquest {
 		config.visualize = true;
 		
 		RunGame run = new RunGame(config);
-		GameResult result = run.goReplay(new File(replayFile));
+		run.goReplay(new File(replayFile));
 		
 		System.exit(0);
 	}
@@ -129,7 +129,7 @@ public class Conquest {
 				}
 				
 				RunGame run = new RunGame(config);
-				GameResult result = run.go();
+				run.go();
 				
 				System.exit(0);				
 			} catch (Exception e) {

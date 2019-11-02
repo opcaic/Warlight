@@ -5,7 +5,6 @@ import java.awt.Graphics;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
@@ -17,21 +16,14 @@ public class GUINotif extends JPanel {
 	
 	public static final float[] NOTIF_COLOR_HSB = Color.RGBtoHSB(NOTIF_COLOR_RGB[0], NOTIF_COLOR_RGB[1], NOTIF_COLOR_RGB[2], null);
 	
-	private JLayeredPane host;
-	
 	private JLabel txt;
-	private long remainingTime;
 	
 	private Timer timer;
 		
 	public GUINotif(JLayeredPane host, int x, int y, int width, int height) {
 		
-		this.host = host;
-		
 		this.setOpaque(false);
 		this.setBounds(x, y, width, height);
-		
-		BoxLayout layout = new BoxLayout(this, BoxLayout.PAGE_AXIS);
 		
         this.txt = new JLabel("HI!", JLabel.CENTER);
         this.txt.setSize(width, height-11);
@@ -53,7 +45,6 @@ public class GUINotif extends JPanel {
 		
 		System.out.println("GUI --> " + msg);
 		
-		this.remainingTime = System.currentTimeMillis() - timeoutMillis;
 		txt.setText(msg);
 		this.revalidate();
 		this.repaint();

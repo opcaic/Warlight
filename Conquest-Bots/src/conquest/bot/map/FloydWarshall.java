@@ -178,8 +178,6 @@ public class FloydWarshall  {
 	 */
 	@SuppressWarnings("unchecked")
 	private void performFloydWarshall(List<Region> nodes) {
-		long start = System.currentTimeMillis();
-
 		// prepares data structures
 		int size = nodes.size();
 		nodeIndices = new HashMap<Region, Integer>(size);
@@ -237,13 +235,11 @@ public class FloydWarshall  {
 		}
 
 		// Check reachability...
-		int count = 0;
 		for (int i = 0; i < size; i++) {
 			for (int j = 0; j < size; j++) {
 				if (pathMatrix[i][j].getPathCost() == Integer.MAX_VALUE) {
 					// WE'RE PURPOSEFULLY TESTING "FINER" LEVEL HERE!
 					System.out.println("[!!!] Unreachable path from " + nodes.get(i) + " -> " + nodes.get(j));
-					count++;
 				}
 			}
 		}
