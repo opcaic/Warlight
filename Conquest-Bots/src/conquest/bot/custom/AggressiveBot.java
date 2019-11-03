@@ -10,7 +10,6 @@ import conquest.bot.map.RegionBFS;
 import conquest.bot.map.RegionBFS.*;
 import conquest.bot.state.*;
 import conquest.engine.Config;
-import conquest.engine.GameResult;
 import conquest.engine.RunGame;
 import conquest.game.FightMode;
 import conquest.game.world.Continent;

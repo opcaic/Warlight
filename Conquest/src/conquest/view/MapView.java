@@ -13,6 +13,8 @@ import conquest.game.world.Continent;
 
 class MapView extends JLabel {
 	GUI gui;
+
+	private static final long serialVersionUID = 1L;
 	
 	public MapView(GUI gui) { this.gui = gui; }
 	

@@ -50,7 +50,6 @@ public class ProcessRobot implements Robot
 	
 	@Override
 	public void setup(RobotConfig config) {
-		this.config = config;
 		robot.setup(config);
 	}
 		

@@ -7,7 +7,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,15 +18,6 @@ import java.util.Map;
  */
 public class CSV {
 
-	private static class StringComparator implements Comparator<String> {
-
-		@Override
-		public int compare(String o1, String o2) {
-			return o1.compareTo(o2);
-		}
-		
-	}
-	    
     private String delimiter;
     
     public List<String> keys;

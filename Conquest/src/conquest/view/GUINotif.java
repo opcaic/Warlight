@@ -10,9 +10,10 @@ import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 
 public class GUINotif extends JPanel {
+
+	private static final long serialVersionUID = 1L;
 	
 	public static final int[] NOTIF_COLOR_RGB = new int[] { 240, 240, 240 };
-	
 	
 	public static final float[] NOTIF_COLOR_HSB = Color.RGBtoHSB(NOTIF_COLOR_RGB[0], NOTIF_COLOR_RGB[1], NOTIF_COLOR_RGB[2], null);
 	

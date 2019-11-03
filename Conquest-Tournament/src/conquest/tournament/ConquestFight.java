@@ -11,8 +11,6 @@ import conquest.tournament.utils.Sanitize;
 
 public class ConquestFight {
 	
-	private int seed = 0;
-
 	private ConquestFightConfig fightConfig;
 	
 	private File tableFile;

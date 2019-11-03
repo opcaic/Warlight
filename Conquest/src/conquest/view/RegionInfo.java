@@ -24,6 +24,8 @@ public class RegionInfo extends JPanel implements MouseListener {
 	private Color highlight;
 
 	public int armiesPlus = 0;
+
+	private static final long serialVersionUID = 1L;
 	
 	public static final Color
 		Gray = new Color(180, 180, 180),

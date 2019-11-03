@@ -3,7 +3,6 @@ package conquest;
 import java.io.File;
 
 import conquest.engine.Config;
-import conquest.engine.GameResult;
 import conquest.engine.RunGame;
 
 public class Conquest {

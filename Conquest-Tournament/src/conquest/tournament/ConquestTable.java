@@ -162,6 +162,8 @@ public class ConquestTable {
 		
 		public Map<String, BotSummary> bots = new LazyMap<String, BotSummary>() {
 
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			protected BotSummary create(String key) {
 				return new BotSummary(key);
@@ -174,9 +176,13 @@ public class ConquestTable {
 		 */
 		public LazyMap<String, Map<String, MatchSummary>> matches = new LazyMap<String, Map<String, MatchSummary>>() {
 
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			protected Map<String, MatchSummary> create(final String key1) {
 				return new LazyMap<String, MatchSummary>() {
+
+					private static final long serialVersionUID = 1L;
 
 					@Override
 					protected MatchSummary create(final String key2) {						
