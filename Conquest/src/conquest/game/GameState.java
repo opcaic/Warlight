@@ -1,9 +1,8 @@
-package conquest.bot.state;
+package conquest.game;
 
 import java.util.*;
 
 import conquest.bot.BotState;
-import conquest.game.*;
 import conquest.game.move.*;
 import conquest.game.world.Continent;
 import conquest.game.world.Region;
@@ -11,20 +10,12 @@ import conquest.game.world.Region;
 public class GameState implements Cloneable {
     ConquestGame game;
 	
-	GameState(ConquestGame game) {
+	public GameState(ConquestGame game) {
 		this.game = game;
 	}
 	
 	public GameState() {
 		this(new ConquestGame());
-	}
-	
-	GameState(BotState state) {
-		this(state.toConquestGame());
-	}
-	
-	public GameState(GameStateCompact state) {
-		this(state.game);
 	}
 	
 	@Override

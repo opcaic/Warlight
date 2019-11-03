@@ -1,8 +1,8 @@
-package conquest.bot.state;
+package conquest.game.move;
 
 import java.util.List;
 
-import conquest.game.move.PlaceArmiesMove;
+import conquest.game.GameState;
 
 public class PlaceAction implements Action {
 	public List<PlaceArmiesMove> commands;

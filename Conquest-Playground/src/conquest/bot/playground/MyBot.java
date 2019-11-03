@@ -4,8 +4,8 @@ import java.io.File;
 import java.util.*;
 
 import conquest.bot.BotParser;
+import conquest.bot.GameBot;
 import conquest.bot.fight.FightSimulation.FightAttackersResults;
-import conquest.bot.state.*;
 import conquest.engine.Config;
 import conquest.engine.RunGame;
 import conquest.game.*;

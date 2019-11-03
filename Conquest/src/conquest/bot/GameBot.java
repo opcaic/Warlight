@@ -1,10 +1,12 @@
-package conquest.bot.state;
+package conquest.bot;
 
 import java.util.List;
 
 import conquest.bot.Bot;
 import conquest.bot.BotState;
+import conquest.game.GameState;
 import conquest.game.move.AttackTransferMove;
+import conquest.game.move.ChooseCommand;
 import conquest.game.move.PlaceArmiesMove;
 import conquest.game.world.Region;
 import conquest.view.GUI;
@@ -16,7 +18,7 @@ public abstract class GameBot implements Bot {
 	
 	void updateState(BotState botState) {
 		this.botState = botState;
-		if (this.state == null) this.state = new GameState(botState);
+		if (this.state == null) this.state = new GameState(botState.toConquestGame());
 		else this.state.update(botState);
 	}
 	

@@ -49,7 +49,7 @@ When two bots are playing each other, you can left click the map or press the sp
 
 ## Writing a bot
 
-Use `conquest.bot.playground.MyBot` as a starting point.  Here is [documentation](https://ksvi.mff.cuni.cz/~dingle/2018/ai/warlight_api.html) for the most important classes, fields and methods in the Warlight API.
+Use `conquest.bot.playground.MyBot` as a starting point.  Here is [documentation](https://ksvi.mff.cuni.cz/~dingle/2019/ai/warlight_api.html) for the most important classes, fields and methods in the Warlight API.
 
 ## More notes
 
