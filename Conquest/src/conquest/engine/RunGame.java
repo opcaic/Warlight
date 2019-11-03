@@ -38,7 +38,7 @@ public class RunGame
 	Config config;
 	
 	Engine engine;
-	ConquestGame game;
+	GameState game;
 	
 	public RunGame(Config config)
 	{
@@ -98,7 +98,7 @@ public class RunGame
 	}
 
 	private GameResult go(GameLog log, String[] playerNames, Robot[] robots) throws InterruptedException {
-        game = new ConquestGame(config.game, playerNames);
+        game = new GameState(config.game, playerNames);
 
         GUI gui;
 		if (config.visualize) {

@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import conquest.game.GameMap;
 import conquest.game.Phase;
 import conquest.game.RegionData;
-import conquest.game.ConquestGame;
+import conquest.game.GameState;
 import conquest.game.ContinentData;
 import conquest.game.GameConfig;
 import conquest.game.world.Continent;
@@ -193,8 +193,8 @@ public class BotState {
 		return pickableStartingRegions;
 	}
 
-	public ConquestGame toConquestGame() {
-	    return new ConquestGame(
+	public GameState toConquestGame() {
+	    return new GameState(
 	        new GameConfig(), getMap(), null, roundNumber, playerNumber, phase,
 	        pickableStartingRegions);
 	}

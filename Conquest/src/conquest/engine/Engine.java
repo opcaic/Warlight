@@ -30,14 +30,14 @@ import conquest.game.world.Region;
 import conquest.view.GUI;
 
 public class Engine {
-    ConquestGame game;
+    GameState game;
 	
 	private Robot[] robots;
 	private long timeoutMillis;
 	private RobotParser parser;
 	private GUI gui;
 	
-	public Engine(ConquestGame game, Robot[] robots, GUI gui, long timeoutMillis)
+	public Engine(GameState game, Robot[] robots, GUI gui, long timeoutMillis)
 	{
 	    this.game = game;
 	    
@@ -131,7 +131,7 @@ public class Engine {
 			gui.pickableRegions();
 		}
 		
-		for (int i = 1 ; i <= ConquestGame.nrOfStartingRegions ; ++i)
+		for (int i = 1 ; i <= GameState.nrOfStartingRegions ; ++i)
     	    for (int p = 1 ; p <= 2 ; ++p) {
     	    	sendUpdateMapInfo(p);
         		Region region = parser.parseStartingRegion(

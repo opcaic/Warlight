@@ -72,7 +72,7 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		{1055,500}, //42. Eastern Australia
 	};
 	
-	private ConquestGame game;
+	private GameState game;
 	
 	private GUINotif notification;
 	
@@ -100,7 +100,7 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 	
 	public boolean showIds = false;
 	
-	public GUI(ConquestGame game)
+	public GUI(GameState game)
 	{
 		System.out.println("GUI: Click to advance to next round.");
 		System.out.println("GUI: Hold right mouse button to QUICKLY advance through many rounds.");
@@ -485,8 +485,8 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		this.requestFocusInWindow();
 		
 		String toName = move.getToRegion().mapName;
-		actionTxt.setText(botName(game.getTurn()) + " transfers to " + toName);
-		Team player = getTeam(game.getTurn());
+		actionTxt.setText(botName(game.me()) + " transfers to " + toName);
+		Team player = getTeam(game.me());
 		
 		RegionInfo fromRegion = this.regions[move.getFromRegion().id - 1];
 		RegionInfo toRegion = this.regions[move.getToRegion().id - 1];
@@ -543,9 +543,9 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		this.requestFocusInWindow();
 		
 		String toName = move.getToRegion().mapName;
-		actionTxt.setText(botName(game.getTurn()) + " attacks " + toName);
+		actionTxt.setText(botName(game.me()) + " attacks " + toName);
 		
-		Team attacker = getTeam(game.getTurn());
+		Team attacker = getTeam(game.me());
 		RegionInfo fromRegion = this.regions[move.getFromRegion().id - 1];
 		RegionInfo toRegion = this.regions[move.getToRegion().id - 1];
 		int armies = move.getArmies();
@@ -640,7 +640,7 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		
 		chooseRegionAction = new CountDownLatch(1);
 		
-		actionTxt.setText(botName(game.getTurn()) + ": choose a starting region");
+		actionTxt.setText(botName(game.me()) + ": choose a starting region");
 		
 		for (Region region : game.pickableRegions) {
 		    RegionInfo ri = this.regions[region.id-1];
@@ -691,11 +691,11 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 	
 	public List<PlaceArmiesMove> placeArmiesHuman(List<Region> availableRegions) {
 		this.armyRegions = availableRegions;
-		armiesLeft = game.armiesPerTurn(game.getTurn());
+		armiesLeft = game.armiesPerTurn(game.me());
 				
 		placeArmiesAction = new CountDownLatch(1);
 		
-		actionTxt.setText(botName(game.getTurn()) + ": place " + armiesLeft +
+		actionTxt.setText(botName(game.me()) + ": place " + armiesLeft +
 				          (armiesLeft == 1 ? "army" : " armies"));
 		
 		armyRegionButtons = new ArrayList<TriButton>();
@@ -790,7 +790,7 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 			info.setHighlight(false);
 		}
 		
-		actionTxt.setText(botName(game.getTurn()) + ": place " + armiesLeft +
+		actionTxt.setText(botName(game.me()) + ": place " + armiesLeft +
 				(armiesLeft == 1 ? " army" : " armies"));
 		
 		placeArmiesFinishedButton.setVisible(armiesLeft == 0);
@@ -912,7 +912,7 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 		moving = team;
 		moveFrom = null;
 		
-		actionTxt.setText(botName(game.getTurn()) + ": move armies");
+		actionTxt.setText(botName(game.me()) + ": move armies");
 			
 		moveArmiesAction = new CountDownLatch(1);
 		

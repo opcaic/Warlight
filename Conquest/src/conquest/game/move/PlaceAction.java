@@ -10,6 +10,6 @@ public class PlaceAction implements Action {
 	public PlaceAction(List<PlaceArmiesMove> commands) { this.commands = commands; }
 	
 	public void apply(GameState state) {
-		state.placeArmies(commands);
+		state.placeArmies(commands, null);
 	}
 }

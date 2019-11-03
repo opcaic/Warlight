@@ -12,14 +12,10 @@ import conquest.game.world.Region;
 import conquest.view.GUI;
 
 public abstract class GameBot implements Bot {
-    protected BotState botState;
-	
 	protected GameState state;
 	
 	void updateState(BotState botState) {
-		this.botState = botState;
-		if (this.state == null) this.state = new GameState(botState.toConquestGame());
-		else this.state.update(botState);
+		this.state = botState.toConquestGame();
 	}
 	
 	@Override

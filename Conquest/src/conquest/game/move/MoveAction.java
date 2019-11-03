@@ -10,6 +10,6 @@ public class MoveAction implements Action {
 	public MoveAction(List<AttackTransferMove> commands) { this.commands = commands; }
 	
 	public void apply(GameState state) {
-		state.moveArmies(commands);
+		state.attackTransfer(commands, null);
 	}
 }

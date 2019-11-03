@@ -11,6 +11,6 @@ public class ChooseCommand implements Action {
 	}
 	
 	public void apply(GameState state) {
-		state.chooseRegion(this);
+		state.chooseRegion(region);
 	}
 }
