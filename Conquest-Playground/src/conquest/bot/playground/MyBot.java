@@ -20,8 +20,8 @@ public class MyBot extends GameBot
 	FightAttackersResults attackResults;
 	
 	public MyBot() {
-		attackResults = FightAttackersResults.loadFromFile(Util.file(
-				"../Conquest-Bots/FightSimulation-Attackers-A200-D200.obj"));
+		attackResults = FightAttackersResults.loadFromFile(Util.findFile(
+				"Conquest-Bots/FightSimulation-Attackers-A200-D200.obj"));
 	}
 	
 	@Override

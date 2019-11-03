@@ -23,8 +23,8 @@ public class AggressiveBot extends GameBot
 	FightDefendersResults dRes;
 	
 	public AggressiveBot() {
-		aRes = FightAttackersResults.loadFromFile(Util.file("../Conquest-Bots/FightSimulation-Attackers-A200-D200.obj"));
-		dRes = FightDefendersResults.loadFromFile(Util.file("../Conquest-Bots/FightSimulation-Defenders-A200-D200.obj"));
+		aRes = FightAttackersResults.loadFromFile(Util.findFile("Conquest-Bots/FightSimulation-Attackers-A200-D200.obj"));
+		dRes = FightDefendersResults.loadFromFile(Util.findFile("Conquest-Bots/FightSimulation-Defenders-A200-D200.obj"));
 		System.err.println("---==[ AGGRESSIVE BOT INITIALIZED ]==---");
 	}
 	
