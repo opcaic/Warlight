@@ -100,7 +100,9 @@ public class ConquestTableConsole {
 		
 		if (!config.success()) {
 			String error = "Invalid arguments specified.";
-			Iterator errorIter = config.getErrorMessageIterator();
+			
+			@SuppressWarnings("unchecked")
+			Iterator<String> errorIter = config.getErrorMessageIterator();
 			if (!errorIter.hasNext()) {
 				error += "\n-- No details given.";
 			} else {

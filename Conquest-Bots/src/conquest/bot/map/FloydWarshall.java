@@ -258,19 +258,19 @@ public class FloydWarshall  {
 	 * @return
 	 */
 	private List<Region> retrievePathInner(Integer from, Integer to) {
-		PathMatrixRegion Region = pathMatrix[from][to];
-		if (Region.getPathCost() == Integer.MAX_VALUE)
+		PathMatrixRegion<Region> region = pathMatrix[from][to];
+		if (region.getPathCost() == Integer.MAX_VALUE)
 			return null;
-		if (Region.getViaRegion() == null) {
+		if (region.getViaRegion() == null) {
 			return new ArrayList<Region>(0);
 		}
-		if (Region.getViaRegion() == null)
+		if (region.getViaRegion() == null)
 			return new ArrayList<Region>(0);
 
 		List<Region> path = new ArrayList<Region>();
-		path.addAll(retrievePathInner(from, Region.getViaRegion()));
-		path.add(indicesNodes.get(Region.getViaRegion()));
-		path.addAll(retrievePathInner(Region.getViaRegion(), to));
+		path.addAll(retrievePathInner(from, region.getViaRegion()));
+		path.add(indicesNodes.get(region.getViaRegion()));
+		path.addAll(retrievePathInner(region.getViaRegion(), to));
 
 		return path;
 	}
@@ -315,7 +315,7 @@ public class FloydWarshall  {
 	 */
 	public boolean isReachable(Region from, Region to) {
 		if ((from == null) || (to == null)) return false;
-		PathMatrixRegion matrixRegion = getPathMatrixRegion(from, to);
+		PathMatrixRegion<Region> matrixRegion = getPathMatrixRegion(from, to);
 		if (matrixRegion == null) return false;
 		return matrixRegion.getPathCost() != Integer.MAX_VALUE;
 	}
@@ -331,7 +331,7 @@ public class FloydWarshall  {
 	public int getPathCost(Region from, Region to) {
 		if ((from == null) || (to == null))
 			return Integer.MAX_VALUE;
-		PathMatrixRegion matrixRegion = getPathMatrixRegion(from, to);
+		PathMatrixRegion<Region> matrixRegion = getPathMatrixRegion(from, to);
 		if (matrixRegion == null) return Integer.MAX_VALUE;
 		return matrixRegion.getPathCost();
 	}
@@ -349,7 +349,7 @@ public class FloydWarshall  {
 	public List<Region> getPath(Region from, Region to) {
 		if ((from == null) || (to == null))
 			return null;
-		PathMatrixRegion matrixRegion = getPathMatrixRegion(from, to);
+		PathMatrixRegion<Region> matrixRegion = getPathMatrixRegion(from, to);
 		if (matrixRegion == null) return null;
 		if (matrixRegion.getPathCost() == Integer.MAX_VALUE) return null;
 		List<Region> path = matrixRegion.getPath();

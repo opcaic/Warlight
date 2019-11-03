@@ -64,7 +64,7 @@ public class BotParser extends Thread {
 	}
 	
 	public static Bot constructBot(String botFQCN) {
-		Class botClass;
+		Class<?> botClass;
 		try {
 			botClass = Class.forName(botFQCN);
 		} catch (ClassNotFoundException e) {
@@ -73,7 +73,7 @@ public class BotParser extends Thread {
 		return constructBot(botClass);
 	}
 	
-	public static Bot constructBot(Class botClass) {		
+	public static Bot constructBot(Class<?> botClass) {		
 		Object botObj;
 		try {
 			botObj = botClass.getConstructor().newInstance();

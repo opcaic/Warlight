@@ -21,15 +21,18 @@ public abstract class LazyMap<K, V> extends HashMap<K, V> {
     protected abstract V create(K key);
 
     @Override
-    public V get(Object key) {
-        V val = super.get((K)key);
+    public V get(Object k) {
+        @SuppressWarnings("unchecked")
+        K key = (K) k;
+
+        V val = super.get(key);
         if(val == null) {
         	synchronized(this) {
-        		val = super.get((K)key);
+        		val = super.get(key);
         		if (val != null) return val;
-	            val = create((K)key);
+	            val = create(key);
 	            if(val != null) {
-	                put((K)key, val);
+	                put(key, val);
 	            }
         	}
         }

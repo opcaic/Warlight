@@ -60,12 +60,16 @@ public class RegionBFS<NODE extends BFSNode> {
 		 * Return if you want this region to be ignored (not added into map of nodes + not added to BFS queue for further expansion). 
 		 * BFS will continue with a next node from the queue.
 		 */
-		public static final BFSVisitResult IGNORE = new BFSVisitResult(BFSVisitResultType.IGNORE, null);
+		public static <N extends BFSNode> BFSVisitResult<N> ignore() {
+			return new BFSVisitResult<N>(BFSVisitResultType.IGNORE, null);
+		}
 		
 		/**
 		 * Return if you want to terminate BFS right away.
 		 */
-		public static final BFSVisitResult TERMINATE = new BFSVisitResult(BFSVisitResultType.TERMINATE, null);
+		public static <N extends BFSNode> BFSVisitResult<N> terminate() {
+			return new BFSVisitResult<N>(BFSVisitResultType.TERMINATE, null);
+		}
 		
 		public BFSVisitResultType type;
 		
@@ -102,7 +106,7 @@ public class RegionBFS<NODE extends BFSNode> {
 	
 	private Map<Region, NODE> nodes = new HashMap<Region, NODE>();
 	
-	public void run(Region start, BFSVisitor visitor) {
+	public void run(Region start, BFSVisitor<NODE> visitor) {
 		
 		reset();
 		

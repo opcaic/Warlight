@@ -334,6 +334,8 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 				++plr2Regions;
 				plr2Armies += region.getArmies();
 				break;
+			case NEUTRAL:
+				break;
 			}
 		}
 		
