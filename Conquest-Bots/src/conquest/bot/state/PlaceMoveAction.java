@@ -2,11 +2,13 @@ package conquest.bot.state;
 
 import java.util.List;
 
+import conquest.game.move.*;
+
 public class PlaceMoveAction implements Action {
-	public List<PlaceCommand> placeCommands;
-	public List<MoveCommand> moveCommands;
+	public List<PlaceArmiesMove> placeCommands;
+	public List<AttackTransferMove> moveCommands;
 	
-	public PlaceMoveAction(List<PlaceCommand> placeCommands, List<MoveCommand> moveCommands) {
+	public PlaceMoveAction(List<PlaceArmiesMove> placeCommands, List<AttackTransferMove> moveCommands) {
 		this.placeCommands = placeCommands;
 		this.moveCommands = moveCommands;
 	}

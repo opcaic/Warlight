@@ -17,12 +17,11 @@
 
 package conquest.bot;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.util.ArrayList;
+import java.util.List;
 
 import conquest.engine.io.BotStreamReader;
 import conquest.game.Phase;
@@ -151,14 +150,14 @@ public class BotParser extends Thread {
 				if(parts[1].equals("place_armies")) 
 				{
 					currentState.setPhase(Phase.PLACE_ARMIES);
-					ArrayList<PlaceArmiesMove> placeArmiesMoves = bot.getPlaceArmiesMoves(currentState, Long.valueOf(parts[2]));
+					List<PlaceArmiesMove> placeArmiesMoves = bot.getPlaceArmiesMoves(currentState, Long.valueOf(parts[2]));
 					for(PlaceArmiesMove move : placeArmiesMoves)
 						output = output.concat(move.getString() + ",");
 				} 
 				else if(parts[1].equals("attack/transfer")) 
 				{
 					currentState.setPhase(Phase.ATTACK_TRANSFER);
-					ArrayList<AttackTransferMove> attackTransferMoves = bot.getAttackTransferMoves(currentState, Long.valueOf(parts[2]));
+					List<AttackTransferMove> attackTransferMoves = bot.getAttackTransferMoves(currentState, Long.valueOf(parts[2]));
 					for(AttackTransferMove move : attackTransferMoves)
 						output = output.concat(move.getString() + ",");
 				}

@@ -9,6 +9,7 @@ import conquest.bot.state.*;
 import conquest.engine.Config;
 import conquest.engine.RunGame;
 import conquest.game.*;
+import conquest.game.move.*;
 import conquest.game.world.Region;
 import conquest.utils.Util;
 import conquest.view.GUI;
@@ -45,7 +46,7 @@ public class MyBot extends GameBot
 	// state.armiesPerTurn(state.me()) is the number of armies available to place.
 	
 	@Override
-	public List<PlaceCommand> placeArmies(long timeout) {
+	public List<PlaceArmiesMove> placeArmies(long timeout) {
 		int me = state.me();
 		List<RegionData> mine = state.regionsOwnedBy(me);
 		int numRegions = mine.size();
@@ -56,25 +57,25 @@ public class MyBot extends GameBot
 			count[r]++;
 		}
 		
-		List<PlaceCommand> ret = new ArrayList<PlaceCommand>();
+		List<PlaceArmiesMove> ret = new ArrayList<PlaceArmiesMove>();
 		for (int i = 0 ; i < numRegions ; ++i)
 			if (count[i] > 0)
-				ret.add(new PlaceCommand(mine.get(i).getRegion(), count[i]));
+				ret.add(new PlaceArmiesMove(mine.get(i).getRegion(), count[i]));
 		return ret;
 	}
 	
 	// Decide where to move armies this turn.
 	
 	@Override
-	public List<MoveCommand> moveArmies(long timeout) {
-		List<MoveCommand> ret = new ArrayList<MoveCommand>();
+	public List<AttackTransferMove> moveArmies(long timeout) {
+		List<AttackTransferMove> ret = new ArrayList<AttackTransferMove>();
 		
 		for (RegionData rd : state.regionsOwnedBy(state.me())) {
 			int count = rand.nextInt(rd.getArmies());
 			if (count > 0) {
 				List<RegionData> neighbors = rd.getNeighbors();
 				RegionData to = neighbors.get(rand.nextInt(neighbors.size()));
-				ret.add(new MoveCommand(rd, to, count));
+				ret.add(new AttackTransferMove(rd, to, count));
 			}
 		}
 		return ret;		

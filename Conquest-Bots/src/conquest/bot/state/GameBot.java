@@ -1,6 +1,5 @@
 package conquest.bot.state;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import conquest.bot.Bot;
@@ -34,38 +33,22 @@ public abstract class GameBot implements Bot {
 	public abstract ChooseCommand chooseRegion(List<Region> choosable, long timeout);	
 	
 	@Override
-	public ArrayList<PlaceArmiesMove> getPlaceArmiesMoves(BotState state, Long timeOut) {
+	public List<PlaceArmiesMove> getPlaceArmiesMoves(BotState state, Long timeOut) {
 		updateState(state);
 		
-		List<PlaceCommand> cmds = placeArmies(timeOut == null ? Long.MAX_VALUE : timeOut);
-		
-		ArrayList<PlaceArmiesMove> result = new ArrayList<PlaceArmiesMove>(cmds.size());
-		for (PlaceCommand cmd : cmds) {
-			if (cmd == null) continue;
-			result.add(new PlaceArmiesMove(cmd.region, cmd.armies));
-		}
-		
-		return result;
+		return placeArmies(timeOut == null ? Long.MAX_VALUE : timeOut);
 	}
 	
-	public abstract List<PlaceCommand> placeArmies(long timeout);
+	public abstract List<PlaceArmiesMove> placeArmies(long timeout);
 	
 	@Override
-	public ArrayList<AttackTransferMove> getAttackTransferMoves(BotState state, Long timeOut) {
+	public List<AttackTransferMove> getAttackTransferMoves(BotState state, Long timeOut) {
 		updateState(state);
 		
-		List<MoveCommand> cmds = moveArmies(timeOut == null ? Long.MAX_VALUE : timeOut);
-		
-		ArrayList<AttackTransferMove> result = new ArrayList<AttackTransferMove>(cmds.size());
-		for (MoveCommand cmd : cmds) {
-			if (cmd == null) continue;
-			result.add(new AttackTransferMove(cmd.from, cmd.to, cmd.armies));
-		}
-		
-		return result;
+		return moveArmies(timeOut == null ? Long.MAX_VALUE : timeOut);
 	}
 	
-	public abstract List<MoveCommand> moveArmies(long timeout);
+	public abstract List<AttackTransferMove> moveArmies(long timeout);
 
 	@Override
 	public void setGUI(GUI gui) {

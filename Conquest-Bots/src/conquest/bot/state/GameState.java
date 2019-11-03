@@ -92,18 +92,12 @@ public class GameState implements Cloneable {
 		game.chooseRegion(command.region);
 	}
 	
-	public void placeArmies(List<PlaceCommand> commands) {
-		List<PlaceArmiesMove> placeMoves = new ArrayList<PlaceArmiesMove>();
-		for (PlaceCommand pc : commands)
-			placeMoves.add(new PlaceArmiesMove(pc.region, pc.armies));
-		game.placeArmies(placeMoves, null);
+	public void placeArmies(List<PlaceArmiesMove> commands) {
+		game.placeArmies(commands, null);
 	}
 	
-	public void moveArmies(List<MoveCommand> commands) {
-		List<AttackTransferMove> attackTransferMoves = new ArrayList<AttackTransferMove>();
-		for (MoveCommand mc : commands)
-			attackTransferMoves.add(new AttackTransferMove(mc.from, mc.to, mc.armies));
-		game.attackTransfer(attackTransferMoves, null);
+	public void moveArmies(List<AttackTransferMove> commands) {
+		game.attackTransfer(commands, null);
 	}
 	
 	@Override

@@ -16,6 +16,8 @@
 //    file that was distributed with this source code.
 
 package conquest.game.move;
+
+import conquest.game.RegionData;
 import conquest.game.world.Region;
 
 /**
@@ -35,6 +37,10 @@ public class AttackTransferMove extends Move {
 		this.fromRegion = fromRegion;
 		this.toRegion = toRegion;
 		this.armies = armies;
+	}
+
+	public AttackTransferMove(RegionData from, RegionData to, int armies) {
+		this(from.getRegion(), to.getRegion(), armies);
 	}
 	
 	/**

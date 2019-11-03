@@ -12,6 +12,7 @@ import conquest.bot.state.*;
 import conquest.engine.Config;
 import conquest.engine.RunGame;
 import conquest.game.*;
+import conquest.game.move.*;
 import conquest.game.world.Continent;
 import conquest.game.world.Region;
 import conquest.utils.Util;
@@ -69,9 +70,9 @@ public class AggressiveBot extends GameBot
 	// ==============
 	
 	@Override
-	public List<PlaceCommand> placeArmies(long timeout) {
+	public List<PlaceArmiesMove> placeArmies(long timeout) {
 	  int me = state.me();
-		List<PlaceCommand> result = new ArrayList<PlaceCommand>();
+		List<PlaceArmiesMove> result = new ArrayList<PlaceArmiesMove>();
 		
 		// CLONE REGIONS OWNED BY ME
 		List<RegionData> mine = state.regionsOwnedBy(me);
@@ -100,7 +101,7 @@ public class AggressiveBot extends GameBot
 		
 		while (armiesLeft > 0) {
 		    int count = Math.min(3, armiesLeft);
-			result.add(new PlaceCommand(mine.get(index).getRegion(), count));
+			result.add(new PlaceArmiesMove(mine.get(index).getRegion(), count));
 			armiesLeft -= count;
 			++index;
 			if (index >= mine.size()) index = 0;
@@ -125,9 +126,9 @@ public class AggressiveBot extends GameBot
 	// =============
 
 	@Override
-	public List<MoveCommand> moveArmies(long timeout) {
+	public List<AttackTransferMove> moveArmies(long timeout) {
 		int me = state.me();
-		List<MoveCommand> result = new ArrayList<MoveCommand>();
+		List<AttackTransferMove> result = new ArrayList<AttackTransferMove>();
 		Collection<RegionData> regions = state.regionsOwnedBy(me);
 		
 		// CAPTURE ALL REGIONS WE CAN
@@ -143,7 +144,7 @@ public class AggressiveBot extends GameBot
 				
 				if (available >= need) {
 					// => ATTACK
-					result.add(new MoveCommand(from, to, need));
+					result.add(new AttackTransferMove(from, to, need));
 					available -= need;
 				}
 			}
@@ -180,14 +181,14 @@ public class AggressiveBot extends GameBot
 		return Integer.MAX_VALUE;
 	}
 		
-	private MoveCommand transfer(RegionData from, RegionData to) {
-		MoveCommand result = new MoveCommand(from.getRegion(), to.getRegion(), from.getArmies()-1);
+	private AttackTransferMove transfer(RegionData from, RegionData to) {
+		AttackTransferMove result = new AttackTransferMove(from.getRegion(), to.getRegion(), from.getArmies()-1);
 		return result;
 	}
 	
 	private Region moveToFrontRegion;
 	
-	private MoveCommand moveToFront(RegionData from) {
+	private AttackTransferMove moveToFront(RegionData from) {
 		RegionBFS<BFSNode> bfs = new RegionBFS<BFSNode>();
 		moveToFrontRegion = null;
 		bfs.run(from.getRegion(), new BFSVisitor<BFSNode>() {

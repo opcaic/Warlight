@@ -46,7 +46,7 @@ public class BotStarter implements Bot
 	 * @return The list of PlaceArmiesMoves for one round
 	 */
 	@Override
-	public ArrayList<PlaceArmiesMove> getPlaceArmiesMoves(BotState state, Long timeOut) 
+	public List<PlaceArmiesMove> getPlaceArmiesMoves(BotState state, Long timeOut) 
 	{
 		ArrayList<PlaceArmiesMove> placeArmiesMoves = new ArrayList<PlaceArmiesMove>();
 		int me = state.getMyPlayerNumber();
@@ -75,7 +75,7 @@ public class BotStarter implements Bot
 	 * @return The list of PlaceArmiesMoves for one round
 	 */
 	@Override
-	public ArrayList<AttackTransferMove> getAttackTransferMoves(BotState state, Long timeOut) 
+	public List<AttackTransferMove> getAttackTransferMoves(BotState state, Long timeOut) 
 	{
 		ArrayList<AttackTransferMove> attackTransferMoves = new ArrayList<AttackTransferMove>();
 		int me = state.getMyPlayerNumber();
