@@ -21,9 +21,7 @@ import java.util.ArrayList;
 import conquest.game.world.Continent;
 import conquest.game.world.Region;
 
-
 public class RegionData {
-	
 	private Region region;
 	private int id;
 	private ArrayList<RegionData> neighbors;
@@ -31,29 +29,29 @@ public class RegionData {
 	private int armies;
 	private int owner;
 	
-	public RegionData(Region region, int id, ContinentData superRegion)
+	public RegionData(Region region, int id, ContinentData continent)
 	{
 		this.region = region;
 		this.id = id;
-		this.continent = superRegion;
+		this.continent = continent;
 		this.neighbors = new ArrayList<RegionData>();
 		this.owner = 0;
 		this.armies = 0;
-		if (superRegion != null) {
-			superRegion.addRegion(this);
+		if (continent != null) {
+			continent.addRegion(this);
 		}
 	}
 	
-	public RegionData(Region region, int id, ContinentData superRegion, int owner, int armies)
+	public RegionData(Region region, int id, ContinentData continent, int owner, int armies)
 	{
 		this.region = region;
 		this.id = id;
-		this.continent = superRegion;
+		this.continent = continent;
 		this.neighbors = new ArrayList<RegionData>();
 		this.owner = owner;
 		this.armies = armies;
 		
-		superRegion.addRegion(this);
+		continent.addRegion(this);
 	}
 	
 	public void addNeighbor(RegionData neighbor)
@@ -78,7 +76,7 @@ public class RegionData {
 	 * @param player
 	 * @return True if this region is owned by the given player, false otherwise
 	 */
-	public boolean ownedByPlayer(int player)
+	public boolean isOwnedBy(int player)
 	{
 		return owner == player;
 	}
@@ -145,11 +143,11 @@ public class RegionData {
 	}
 	
     public boolean isVisible(int player) {
-        if (ownedByPlayer(player))
+        if (isOwnedBy(player))
             return true;
         
         for (RegionData s : getNeighbors())
-            if (s.ownedByPlayer(player))
+            if (s.isOwnedBy(player))
                 return true;
         
         return false;

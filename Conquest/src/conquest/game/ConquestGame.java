@@ -228,7 +228,7 @@ public class ConquestGame implements Cloneable {
             RegionData region = map.getRegionData(move.getRegion());
             int armies = move.getArmies();
             
-            if (!region.ownedByPlayer(turn))
+            if (!region.isOwnedBy(turn))
                 move.setIllegalMove(region.getId() + " not owned");
             else if (armies < 1)
                 move.setIllegalMove("cannot place less than 1 army");
@@ -400,7 +400,7 @@ public class ConquestGame implements Cloneable {
             RegionData fromRegion = map.getRegionData(move.getFromRegion());
             RegionData toRegion = map.getRegionData(move.getToRegion());
 
-            if (!fromRegion.ownedByPlayer(turn))
+            if (!fromRegion.isOwnedBy(turn))
                 move.setIllegalMove(fromRegion.getId() + " attack/transfer not owned");
             else if (!fromRegion.isNeighbor(toRegion))
                 move.setIllegalMove(toRegion.getId() + " attack/transfer not a neighbor");
@@ -443,7 +443,7 @@ public class ConquestGame implements Cloneable {
             if (opponentMoves != null && (fromRegion.isVisible(other) || toRegion.isVisible(other)) )
                 opponentMoves.add(move);
            
-            if(toRegion.ownedByPlayer(turn)) //transfer
+            if(toRegion.isOwnedBy(turn)) //transfer
             {
                 if (gui != null) {
                     gui.transfer(move);

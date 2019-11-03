@@ -8,7 +8,7 @@ import conquest.bot.fight.FightSimulation.FightAttackersResults;
 import conquest.bot.state.*;
 import conquest.engine.Config;
 import conquest.engine.RunGame;
-import conquest.game.FightMode;
+import conquest.game.*;
 import conquest.game.world.Region;
 import conquest.utils.Util;
 import conquest.view.GUI;
@@ -42,16 +42,16 @@ public class MyBot extends GameBot
 	}
 
 	// Decide where to place armies this turn.
-	// state.me.placeArmies is the number of armies available to place.
+	// state.armiesPerTurn(state.me()) is the number of armies available to place.
 	
 	@Override
 	public List<PlaceCommand> placeArmies(long timeout) {
-	    PlayerState me = state.players[state.me];
-		List<Region> mine = new ArrayList<Region>(me.regions.keySet());
+		int me = state.me();
+		List<RegionData> mine = state.regionsOwnedBy(me);
 		int numRegions = mine.size();
 		
 		int[] count = new int[numRegions];
-		for (int i = 0 ; i < me.placeArmies ; ++i) {
+		for (int i = 0 ; i < state.armiesPerTurn(me) ; ++i) {
 			int r = rand.nextInt(numRegions);
 			count[r]++;
 		}
@@ -59,7 +59,7 @@ public class MyBot extends GameBot
 		List<PlaceCommand> ret = new ArrayList<PlaceCommand>();
 		for (int i = 0 ; i < numRegions ; ++i)
 			if (count[i] > 0)
-				ret.add(new PlaceCommand(mine.get(i), count[i]));
+				ret.add(new PlaceCommand(mine.get(i).getRegion(), count[i]));
 		return ret;
 	}
 	
@@ -69,12 +69,12 @@ public class MyBot extends GameBot
 	public List<MoveCommand> moveArmies(long timeout) {
 		List<MoveCommand> ret = new ArrayList<MoveCommand>();
 		
-		for (RegionState rs : state.players[state.me].regions.values()) {
-			int count = rand.nextInt(rs.armies);
+		for (RegionData rd : state.regionsOwnedBy(state.me())) {
+			int count = rand.nextInt(rd.getArmies());
 			if (count > 0) {
-				List<Region> neighbors = rs.region.getNeighbours();
-				Region to = neighbors.get(rand.nextInt(neighbors.size()));
-				ret.add(new MoveCommand(rs.region, to, count));
+				List<RegionData> neighbors = rd.getNeighbors();
+				RegionData to = neighbors.get(rand.nextInt(neighbors.size()));
+				ret.add(new MoveCommand(rd, to, count));
 			}
 		}
 		return ret;		

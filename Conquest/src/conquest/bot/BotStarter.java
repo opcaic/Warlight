@@ -59,7 +59,7 @@ public class BotStarter implements Bot
 			int r = rand.nextInt(visibleRegions.size());
 			RegionData rd = visibleRegions.get(r);
 			
-			if(rd.ownedByPlayer(me))
+			if(rd.isOwnedBy(me))
 			{
 				placeArmiesMoves.add(new PlaceArmiesMove(rd.getRegion(), Math.min(armiesLeft, armies)));
 				armiesLeft -= armies;
@@ -83,7 +83,7 @@ public class BotStarter implements Bot
 		
 		for(RegionData fromRegion : state.getMap().getRegions())
 		{
-			if(fromRegion.ownedByPlayer(me)) //do an attack
+			if(fromRegion.isOwnedBy(me)) //do an attack
 			{
 				ArrayList<RegionData> possibleToRegions = new ArrayList<RegionData>();
 				possibleToRegions.addAll(fromRegion.getNeighbors());
@@ -94,12 +94,12 @@ public class BotStarter implements Bot
 					int r = (int) (rand*possibleToRegions.size());
 					RegionData toRegion = possibleToRegions.get(r);
 					
-					if(!toRegion.ownedByPlayer(me) && fromRegion.getArmies() > 6) //do an attack
+					if(!toRegion.isOwnedBy(me) && fromRegion.getArmies() > 6) //do an attack
 					{
 						attackTransferMoves.add(new AttackTransferMove(fromRegion.getRegion(), toRegion.getRegion(), armies));
 						break;
 					}
-					else if(toRegion.ownedByPlayer(me) && fromRegion.getArmies() > 1) //do a transfer
+					else if(toRegion.isOwnedBy(me) && fromRegion.getArmies() > 1) //do a transfer
 					{
 						attackTransferMoves.add(new AttackTransferMove(fromRegion.getRegion(), toRegion.getRegion(), armies));
 						break;
