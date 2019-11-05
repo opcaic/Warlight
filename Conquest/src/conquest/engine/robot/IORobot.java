@@ -17,21 +17,23 @@
 
 package conquest.engine.robot;
 
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
+import java.util.*;
 
 import conquest.engine.Robot;
 import conquest.engine.io.handler.Handler;
 import conquest.engine.io.handler.IHandler;
 import conquest.engine.replay.GameLog;
+import conquest.game.move.*;
 import conquest.game.world.Region;
 
 public class IORobot implements Robot
 {
 	IHandler handler;
+
+	int player;
 	
 	int errorCounter;
 	
@@ -40,6 +42,8 @@ public class IORobot implements Robot
 	private GameLog log;
 
 	private RobotConfig config;
+
+	RobotParser parser = new RobotParser();
 	
 	public IORobot(IHandler handler) throws IOException
 	{
@@ -50,6 +54,7 @@ public class IORobot implements Robot
 	public IORobot(int player, OutputStream input, boolean inputAutoFlush,
 	               InputStream output, InputStream error) throws IOException
 	{
+		this.player = player;
 		handler = new Handler("PLR" + player + "-Robot", input, inputAutoFlush, output, error);
 		errorCounter = 0;
 	}
@@ -60,12 +65,8 @@ public class IORobot implements Robot
 		handler.setGameLog(config.gameLog, config.player, config.logToConsole);
 	}
 		
-//	@Override
-//	public void writeMove(Move move) {
-//	}
-	
 	@Override
-	public String getStartingRegion(long timeOut, ArrayList<Region> pickableRegions)
+	public Region getStartingRegion(long timeOut, ArrayList<Region> pickableRegions)
 	{
 		String output = "pick_starting_region " + timeOut;
 		for(Region region : pickableRegions)
@@ -73,19 +74,43 @@ public class IORobot implements Robot
 		
 		handler.writeLine(output);
 		String line = handler.readLine(timeOut);
-		return line;
+		return parser.parseStartingRegion(line);
 	}
+
+	private List<PlaceArmiesMove> placeArmiesMoves(String input) {
+		ArrayList<PlaceArmiesMove> moves = new ArrayList<PlaceArmiesMove>();
+		
+		for (Move move : parser.parseMoves(input, player))
+				if (move instanceof PlaceArmiesMove)
+						moves.add((PlaceArmiesMove) move);
+				else
+						System.err.println("INVALID MOVE: " + move);
+		
+		return moves;
+  }
 	
 	@Override
-	public String getPlaceArmiesMoves(long timeOut)
+	public List<PlaceArmiesMove> getPlaceArmiesMoves(long timeOut)
 	{
-		return getMoves("place_armies", timeOut);
+		return placeArmiesMoves(getMoves("place_armies", timeOut));
 	}
+
+	private List<AttackTransferMove> attackTransferMoves(String input) {
+		ArrayList<AttackTransferMove> moves = new ArrayList<AttackTransferMove>();
+		
+		for (Move move : parser.parseMoves(input, player))
+				if (move instanceof AttackTransferMove)
+						moves.add((AttackTransferMove) move);
+				else
+						System.err.println("INVALID MOVE: " + move);
+		
+		return moves;
+  }
 	
 	@Override
-	public String getAttackTransferMoves(long timeOut)
+	public List<AttackTransferMove> getAttackTransferMoves(long timeOut)
 	{
-		return getMoves("attack/transfer", timeOut);
+		return attackTransferMoves(getMoves("attack/transfer", timeOut));
 	}
 	
 	private String getMoves(String moveType, long timeOut)

@@ -18,62 +18,18 @@ public class HumanRobot implements Robot {
 	}
 
 	@Override
-	public String getStartingRegion(long timeOut, ArrayList<Region> pickableRegions) {
-		if (config.gameLog != null) {
-			System.out.println(config.player + "-Human --> getPreferredStartingArmies()");
-		}
-		
-		Region chosen = config.gui.chooseRegionHuman();
-		
-		String result = chosen.id + "";
-		
-		if (config.gameLog != null) {
-			System.out.println(config.player + "-Human <-- " + result);
-		}
-		
-		return result;
+	public Region getStartingRegion(long timeOut, ArrayList<Region> pickableRegions) {
+		return config.gui.chooseRegionHuman();
 	}
 
 	@Override
-	public String getPlaceArmiesMoves(long timeOut) {
-		if (config.gameLog != null) {
-			System.out.println(config.player + "-Human --> getPlaceArmiesMoves()");
-		}
-		
-		List<PlaceArmiesMove> commands = config.gui.placeArmiesHuman(config.team);
-		
-		String result = "";
-		
-		for (PlaceArmiesMove command : commands) {
-			result += command.getString() + ",";
-		}
-		
-		if (config.gameLog != null) {
-			System.out.println(config.player + "-Human <-- " + result);
-		}
-		
-		return result;
+	public List<PlaceArmiesMove> getPlaceArmiesMoves(long timeOut) {
+		return config.gui.placeArmiesHuman(config.team);
 	}
 
 	@Override
-	public String getAttackTransferMoves(long timeOut) {
-		if (config.gameLog != null) {
-			System.out.println(config.player + "-Human --> getAttackTransferMoves()");
-		}
-		
-		List<AttackTransferMove> commands = config.gui.moveArmiesHuman(config.team);
-		
-		String result = "";
-		
-		for (AttackTransferMove command : commands) {
-			result += command.getString() + ",";
-		}
-		
-		if (config.gameLog != null) {
-			System.out.println(config.player + "-Human <-- " + result);
-		}
-		
-		return result;
+	public List<AttackTransferMove> getAttackTransferMoves(long timeOut) {
+		return config.gui.moveArmiesHuman(config.team);
 	}
 
 	@Override

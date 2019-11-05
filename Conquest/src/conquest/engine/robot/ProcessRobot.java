@@ -19,9 +19,10 @@ package conquest.engine.robot;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.*;
 
 import conquest.engine.Robot;
+import conquest.game.move.*;
 import conquest.game.world.Region;
 
 public class ProcessRobot implements Robot
@@ -63,7 +64,7 @@ public class ProcessRobot implements Robot
 	}
 	
 	@Override
-	public String getStartingRegion(long timeOut, ArrayList<Region> pickableRegions)
+	public Region getStartingRegion(long timeOut, ArrayList<Region> pickableRegions)
 	{
 		if (!isRunning()) {
 			throw new RuntimeException(botDied());
@@ -72,7 +73,7 @@ public class ProcessRobot implements Robot
 	}
 	
 	@Override
-	public String getPlaceArmiesMoves(long timeOut)
+	public List<PlaceArmiesMove> getPlaceArmiesMoves(long timeOut)
 	{
 		if (!isRunning()) {
 			throw new RuntimeException(botDied());
@@ -81,7 +82,7 @@ public class ProcessRobot implements Robot
 	}
 	
 	@Override
-	public String getAttackTransferMoves(long timeOut)
+	public List<AttackTransferMove> getAttackTransferMoves(long timeOut)
 	{
 		if (!isRunning()) {
 			throw new RuntimeException(botDied());

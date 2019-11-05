@@ -1,16 +1,16 @@
 package conquest.engine.robot;
 
-
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.ArrayList;
+import java.util.*;
 
 import conquest.bot.BotParser;
 import conquest.engine.Robot;
 import conquest.engine.io.InputOutputStream;
 import conquest.game.Team;
+import conquest.game.move.*;
 import conquest.game.world.Region;
 
 public class InternalRobot implements Robot {
@@ -96,7 +96,7 @@ public class InternalRobot implements Robot {
 	}
 	
 	@Override
-	public String getStartingRegion(long timeOut, ArrayList<Region> pickableRegions)
+	public Region getStartingRegion(long timeOut, ArrayList<Region> pickableRegions)
 	{
 		if (hijacked) {
 			return humanHijack.getStartingRegion(timeOut, pickableRegions);			
@@ -105,7 +105,7 @@ public class InternalRobot implements Robot {
 	}
 	
 	@Override
-	public String getPlaceArmiesMoves(long timeOut)
+	public List<PlaceArmiesMove> getPlaceArmiesMoves(long timeOut)
 	{
 		if (hijacked) {
 			return humanHijack.getPlaceArmiesMoves(timeOut);		
@@ -114,7 +114,7 @@ public class InternalRobot implements Robot {
 	}
 	
 	@Override
-	public String getAttackTransferMoves(long timeOut)
+	public List<AttackTransferMove> getAttackTransferMoves(long timeOut)
 	{
 		if (hijacked) {
 			return humanHijack.getAttackTransferMoves(timeOut);	
