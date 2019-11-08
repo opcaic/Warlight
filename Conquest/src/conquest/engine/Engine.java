@@ -11,7 +11,7 @@
 //    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
-//	
+//    
 //    For the full copyright and license information, please view the LICENSE
 //    file that was distributed with this source code.
 
@@ -29,129 +29,129 @@ import conquest.view.GUI;
 
 public class Engine {
     GameState game;
-	
-	private Robot[] robots;
-	private long timeoutMillis;
-	private GUI gui;
-	
-	public Engine(GameState game, Robot[] robots, GUI gui, long timeoutMillis)
-	{
-	    this.game = game;
-	    
-		this.gui = gui;
-		
-		this.robots = robots;
-		this.timeoutMillis = timeoutMillis;		
-	}
-	
-	Robot robot(int i) {
-	    return robots[i - 1];
-	}
-	
-	public void playRound()
-	{
-		if (gui != null) {
-			gui.newRound(game.getRoundNumber());
-			gui.updateRegions(game.getMap().regions);
-		}
-		
-		for (int i = 1 ; i <= 2 ; ++i) {
-    		List<PlaceArmiesMove> placeMoves = robot(i).getPlaceArmiesMoves(timeoutMillis);
-    		
-    		game.placeArmies(placeMoves);
     
-    		sendUpdateMapInfo(i);
-    		
-    		if (gui != null && !(robot(i) instanceof HumanRobot)) {
-    	        List<PlaceArmiesMove> legalMoves = new ArrayList<PlaceArmiesMove>();
+    private Robot[] robots;
+    private long timeoutMillis;
+    private GUI gui;
     
-    	        for (PlaceArmiesMove move : placeMoves)
-    	            if (move.getIllegalMove().equals(""))
-    	                legalMoves.add(move);
-                
-    			gui.placeArmies(i, game.getMap().regions, legalMoves);
-    		}
-    		
-    		List<AttackTransferMove> moves = robot(i).getAttackTransferMoves(timeoutMillis);
-    		
-    		game.attackTransfer(moves);
-    		
-    		sendAllInfo();
-    		
-    		if (game.isDone())
-    		    break;
-		}
-		
-		if (gui != null) {
-			gui.updateMap();
-		}
-		nextRound();	
-	}
-	
-	public void distributeStartingRegions()
-	{
-	    ArrayList<Region> pickableRegions = game.pickableRegions;
-	    
-		if (gui != null) {
-			gui.pickableRegions();
-		}
-		
-		for (int i = 1 ; i <= GameState.nrOfStartingRegions ; ++i)
-    	    for (int p = 1 ; p <= 2 ; ++p) {
-    	    	sendUpdateMapInfo(p);
-        		Region region = robot(p).getStartingRegion(timeoutMillis, pickableRegions);
-        		
-        		//if the bot did not correctly return a starting region, get some random ones
-        		if (!game.pickableRegions.contains(region)) {
-        		    System.err.println("invalid starting region; choosing one at random");
-        			region = getRandomStartingRegion();
-        		}
+    public Engine(GameState game, Robot[] robots, GUI gui, long timeoutMillis)
+    {
+        this.game = game;
         
-        		game.chooseRegion(region);
-        		if (gui != null)
-        		    gui.updateMap();
-    	    }
+        this.gui = gui;
+        
+        this.robots = robots;
+        this.timeoutMillis = timeoutMillis;        
+    }
+    
+    Robot robot(int i) {
+        return robots[i - 1];
+    }
+    
+    public void playRound()
+    {
+        if (gui != null) {
+            gui.newRound(game.getRoundNumber());
+            gui.updateRegions(game.getMap().regions);
+        }
+        
+        for (int i = 1 ; i <= 2 ; ++i) {
+            List<PlaceArmiesMove> placeMoves = robot(i).getPlaceArmiesMoves(timeoutMillis);
+            
+            game.placeArmies(placeMoves);
+    
+            sendUpdateMapInfo(i);
+            
+            if (gui != null && !(robot(i) instanceof HumanRobot)) {
+                List<PlaceArmiesMove> legalMoves = new ArrayList<PlaceArmiesMove>();
+    
+                for (PlaceArmiesMove move : placeMoves)
+                    if (move.getIllegalMove().equals(""))
+                        legalMoves.add(move);
+                
+                gui.placeArmies(i, game.getMap().regions, legalMoves);
+            }
+            
+            List<AttackTransferMove> moves = robot(i).getAttackTransferMoves(timeoutMillis);
+            
+            game.attackTransfer(moves);
+            
+            sendAllInfo();
+            
+            if (game.isDone())
+                break;
+        }
+        
+        if (gui != null) {
+            gui.updateMap();
+        }
+        nextRound();    
+    }
+    
+    public void distributeStartingRegions()
+    {
+        ArrayList<Region> pickableRegions = game.pickableRegions;
+        
+        if (gui != null) {
+            gui.pickableRegions();
+        }
+        
+        for (int i = 1 ; i <= GameState.nrOfStartingRegions ; ++i)
+            for (int p = 1 ; p <= 2 ; ++p) {
+                sendUpdateMapInfo(p);
+                Region region = robot(p).getStartingRegion(timeoutMillis, pickableRegions);
+                
+                //if the bot did not correctly return a starting region, get some random ones
+                if (!game.pickableRegions.contains(region)) {
+                    System.err.println("invalid starting region; choosing one at random");
+                    region = getRandomStartingRegion();
+                }
+        
+                game.chooseRegion(region);
+                if (gui != null)
+                    gui.updateMap();
+            }
         
         if (gui != null) {
             gui.regionsChosen(game.getMap().regions);
         }
-	}
-	
-	private Region getRandomStartingRegion()
-	{
-		return game.pickableRegions.get(game.random.nextInt(game.pickableRegions.size()));
-	}
-	
-	public void sendAllInfo()
-	{
-	    for (int i = 1 ; i <= 2 ; ++i)
-	        sendUpdateMapInfo(i);
-	}
-	
-	public void nextRound() {
-	    for (int i = 1 ; i <= 2 ; ++i) {
+    }
+    
+    private Region getRandomStartingRegion()
+    {
+        return game.pickableRegions.get(game.random.nextInt(game.pickableRegions.size()));
+    }
+    
+    public void sendAllInfo()
+    {
+        for (int i = 1 ; i <= 2 ; ++i)
+            sendUpdateMapInfo(i);
+    }
+    
+    public void nextRound() {
+        for (int i = 1 ; i <= 2 ; ++i) {
             robot(i).writeInfo("next_round");
-	    }
-	}
-		
-	//inform the player about how his visible map looks now
-	private void sendUpdateMapInfo(int player)
-	{
-		ArrayList<RegionData> visibleRegions;
-		if (game.config.fullyObservableGame) {
-			visibleRegions = game.getMap().regions;
-		} else {
-			visibleRegions = game.getMap().visibleRegionsForPlayer(player);
-		}
-		String updateMapString = "update_map";
-		for(RegionData region : visibleRegions)
-		{
-			int id = region.getId();
-			int owner = region.getOwner();
-			int armies = region.getArmies();
-			
-			updateMapString = updateMapString.concat(" " + id + " " + owner + " " + armies);
-		}
-		robot(player).writeInfo(updateMapString);
-	}
+        }
+    }
+        
+    //inform the player about how his visible map looks now
+    private void sendUpdateMapInfo(int player)
+    {
+        ArrayList<RegionData> visibleRegions;
+        if (game.config.fullyObservableGame) {
+            visibleRegions = game.getMap().regions;
+        } else {
+            visibleRegions = game.getMap().visibleRegionsForPlayer(player);
+        }
+        String updateMapString = "update_map";
+        for(RegionData region : visibleRegions)
+        {
+            int id = region.getId();
+            int owner = region.getOwner();
+            int armies = region.getArmies();
+            
+            updateMapString = updateMapString.concat(" " + id + " " + owner + " " + armies);
+        }
+        robot(player).writeInfo(updateMapString);
+    }
 }

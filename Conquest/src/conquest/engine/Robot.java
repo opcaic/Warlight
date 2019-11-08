@@ -11,7 +11,7 @@
 //    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
-//	
+//    
 //    For the full copyright and license information, please view the LICENSE
 //    file that was distributed with this source code.
 
@@ -26,60 +26,60 @@ import conquest.view.GUI;
 import conquest.game.world.Region;
 
 public interface Robot {
-	
-	public static class RobotConfig {
-		
-		public final int player;
-		
-		public final String playerName;
-		
-		public final Team team;
-		
-		public final long timeoutMillis;
-		
-		public final GameLog gameLog;
-		
-		public final boolean logToConsole;
-		
-		public final GUI gui;
+    
+    public static class RobotConfig {
+        
+        public final int player;
+        
+        public final String playerName;
+        
+        public final Team team;
+        
+        public final long timeoutMillis;
+        
+        public final GameLog gameLog;
+        
+        public final boolean logToConsole;
+        
+        public final GUI gui;
 
-		public RobotConfig(int player, String playerName, Team team, long timeoutMillis,
-				           GameLog gameLog, boolean logToConsole, GUI gui) {
-			super();
-			this.player = player;
-			this.playerName = playerName;
-			this.team = team;
-			this.timeoutMillis = timeoutMillis;
-			this.gameLog = gameLog;
-			this.logToConsole = logToConsole;
-			this.gui = gui;
-		}
-		
-	}
-	
-	public int getRobotPlayer();
-	
-	public String getRobotPlayerName();
+        public RobotConfig(int player, String playerName, Team team, long timeoutMillis,
+                           GameLog gameLog, boolean logToConsole, GUI gui) {
+            super();
+            this.player = player;
+            this.playerName = playerName;
+            this.team = team;
+            this.timeoutMillis = timeoutMillis;
+            this.gameLog = gameLog;
+            this.logToConsole = logToConsole;
+            this.gui = gui;
+        }
+        
+    }
+    
+    public int getRobotPlayer();
+    
+    public String getRobotPlayerName();
 
-	public void setup(RobotConfig config);
-	
-	public Region getStartingRegion(long timeOut, ArrayList<Region> pickableRegions);
-	
-	public List<PlaceArmiesMove> getPlaceArmiesMoves(long timeOut);
-	
-	public List<AttackTransferMove> getAttackTransferMoves(long timeOut);
-	
-	public void writeInfo(String info);
+    public void setup(RobotConfig config);
+    
+    public Region getStartingRegion(long timeOut, ArrayList<Region> pickableRegions);
+    
+    public List<PlaceArmiesMove> getPlaceArmiesMoves(long timeOut);
+    
+    public List<AttackTransferMove> getAttackTransferMoves(long timeOut);
+    
+    public void writeInfo(String info);
 
-	/**
-	 * Whether this robot is up and running correctly...
-	 * @return
-	 */
-	public boolean isRunning();
-	
-	/**
-	 * Kills the robot.
-	 */
-	public void finish();
+    /**
+     * Whether this robot is up and running correctly...
+     * @return
+     */
+    public boolean isRunning();
+    
+    /**
+     * Kills the robot.
+     */
+    public void finish();
 
 }

@@ -62,7 +62,7 @@ public class GameState implements Cloneable {
         // than in the original game.
         
         return new GameState(config, map.clone(), playerNames, round, turn, phase,
-        		                new ArrayList<Region>(pickableRegions));
+                                new ArrayList<Region>(pickableRegions));
     }
     
     public GameMap getMap() { return map; }
@@ -88,7 +88,7 @@ public class GameState implements Cloneable {
     }
     
     public Phase getPhase() {
-    	return phase;
+        return phase;
     }
 
     public void setPhase(Phase phase) {
@@ -100,19 +100,19 @@ public class GameState implements Cloneable {
     }
     
     public int winningPlayer() {
-    	if (round == 0) return 0;
-    	
-    	int regions1 = map.numberRegionsOwned(1), regions2 = map.numberRegionsOwned(2);
-    	if (regions1 == 0) return 2;
-    	if (regions2 == 0) return 1;
+        if (round == 0) return 0;
+        
+        int regions1 = map.numberRegionsOwned(1), regions2 = map.numberRegionsOwned(2);
+        if (regions1 == 0) return 2;
+        if (regions2 == 0) return 1;
         
         if (round > config.maxGameRounds) {
-        	if (regions1 > regions2) return 1;
-        	if (regions2 > regions1) return 2;
-        	
-        	int armies1 = map.numberArmiesOwned(1), armies2 = map.numberArmiesOwned(2);
-        	if (armies1 > armies2) return 1;
-        	if (armies2 > armies1) return 2;
+            if (regions1 > regions2) return 1;
+            if (regions2 > regions1) return 2;
+            
+            int armies1 = map.numberArmiesOwned(1), armies2 = map.numberArmiesOwned(2);
+            if (armies1 > armies2) return 1;
+            if (armies2 > armies1) return 2;
         }
         
         return 0;
@@ -123,15 +123,15 @@ public class GameState implements Cloneable {
     }
 
     public RegionData region(Region region) {
-		return getMap().getRegion(region.id);
-	}
+        return getMap().getRegion(region.id);
+    }
 
     public ArrayList<RegionData> regionsOwnedBy(int player) {
-		return getMap().ownedRegionsByPlayer(player);
+        return getMap().ownedRegionsByPlayer(player);
     }
         
     public List<Region> getPickableRegions() {
-    	return pickableRegions;
+        return pickableRegions;
     }
     
     //calculate how many armies a player is able to place on the map each round
@@ -226,9 +226,9 @@ public class GameState implements Cloneable {
     }
     
     public void chooseRegion(Region region) {
-    	if (phase != Phase.STARTING_REGIONS)
-    		throw new Error("cannot choose regions after game has begun");
-    	
+        if (phase != Phase.STARTING_REGIONS)
+            throw new Error("cannot choose regions after game has begun");
+        
         if (!pickableRegions.contains(region))
             throw new Error("starting region is not pickable");
         
@@ -237,15 +237,15 @@ public class GameState implements Cloneable {
         turn = 3 - turn;
         
         if (map.numberRegionsOwned(turn) == nrOfStartingRegions) {
-        	round = 1;
-        	phase = Phase.PLACE_ARMIES;
+            round = 1;
+            phase = Phase.PLACE_ARMIES;
         }
     }
     
     public void placeArmies(List<PlaceArmiesMove> moves)
     {
-    	if (phase != Phase.PLACE_ARMIES)
-    		throw new Error("wrong time to place armies");
+        if (phase != Phase.PLACE_ARMIES)
+            throw new Error("wrong time to place armies");
 
         int left = armiesPerTurn(turn); 
                 
@@ -437,7 +437,7 @@ public class GameState implements Cloneable {
                     AttackTransferMove n = moves.get(j);
                     if (n.getFromRegion() == move.getFromRegion() && n.getToRegion() == move.getToRegion()) {
                         move.setIllegalMove(
-                        	"player has already attacked/transfered from region " +
+                            "player has already attacked/transfered from region " +
                                 fromRegion.getId() + " to region " + toRegion.getId() + " in this turn");
                         break;
                     }
@@ -448,8 +448,8 @@ public class GameState implements Cloneable {
     }
     
     public void attackTransfer(List<AttackTransferMove> moves) {
-    	if (phase != Phase.ATTACK_TRANSFER)
-    		throw new Error("wrong time to attack/transfer");
+        if (phase != Phase.ATTACK_TRANSFER)
+            throw new Error("wrong time to attack/transfer");
 
         validateAttackTransfers(moves);
         

@@ -11,7 +11,7 @@
 //    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
-//	
+//    
 //    For the full copyright and license information, please view the LICENSE
 //    file that was distributed with this source code.
 
@@ -25,45 +25,45 @@ import conquest.game.world.Region;
  */
 
 public class PlaceArmiesMove extends Move {
-	private Region region;
-	private int armies;
-	
-	public PlaceArmiesMove(Region region, int armies)
-	{
-		this.region = region;
-		this.armies = armies;
-	}
-	
-	/**
-	 * @param n Sets the number of armies this move will place on a Region
-	 */
-	public void setArmies(int n) {
-		armies = n;
-	}
-	
-	/**
-	 * @return The Region this Move will be placing armies on
-	 */
-	public Region getRegion() {
-		return region;
-	}
-	
-	/**
-	 * @return The number of armies this move will place
-	 */
-	public int getArmies() {
-		return armies;
-	}
-	
-	/**
-	 * @return A string representation of this Move
-	 */
-	public String getString() {
-		if(getIllegalMove().equals(""))
-			return "place_armies " + region.id + " " + armies;
-		else
-			return "illegal_move " + getIllegalMove();
-				
-	}
-	
+    private Region region;
+    private int armies;
+    
+    public PlaceArmiesMove(Region region, int armies)
+    {
+        this.region = region;
+        this.armies = armies;
+    }
+    
+    /**
+     * @param n Sets the number of armies this move will place on a Region
+     */
+    public void setArmies(int n) {
+        armies = n;
+    }
+    
+    /**
+     * @return The Region this Move will be placing armies on
+     */
+    public Region getRegion() {
+        return region;
+    }
+    
+    /**
+     * @return The number of armies this move will place
+     */
+    public int getArmies() {
+        return armies;
+    }
+    
+    /**
+     * @return A string representation of this Move
+     */
+    public String getString() {
+        if(getIllegalMove().equals(""))
+            return "place_armies " + region.id + " " + armies;
+        else
+            return "illegal_move " + getIllegalMove();
+                
+    }
+    
 }

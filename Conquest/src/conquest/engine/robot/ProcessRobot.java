@@ -11,7 +11,7 @@
 //    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
-//	
+//    
 //    For the full copyright and license information, please view the LICENSE
 //    file that was distributed with this source code.
 
@@ -27,126 +27,126 @@ import conquest.game.world.Region;
 
 public class ProcessRobot implements Robot
 {
-	private Object mutex = new Object();
-	
-	private Process child;
-	private File childDir;
-	private String childCommand;
-	
-	private IORobot robot;
+    private Object mutex = new Object();
+    
+    private Process child;
+    private File childDir;
+    private String childCommand;
+    
+    private IORobot robot;
 
-	public ProcessRobot(int player, String command) throws IOException
-	{
-		this(player, "./", command);
-	}
-	
-	public ProcessRobot(int player, String dir, String command) throws IOException
-	{		
-		childCommand = command;
-		childDir = new File(dir);
-		child = Runtime.getRuntime().exec(childCommand, null, childDir);
-		System.out.println(player + " -> " + command);
-		robot = new IORobot(player, child.getOutputStream(), false, child.getInputStream(), child.getErrorStream());
-	}
-	
-	@Override
-	public void setup(RobotConfig config) {
-		robot.setup(config);
-	}
-		
-//	@Override
-//	public void writeMove(Move move) {
-//		robot.writeMove(move);
-//	}
-	
-	String botDied() {
-	    return "Bot died out. Executed from '" + childDir.getAbsolutePath() + "' with command '" + childCommand + "'.";
-	}
-	
-	@Override
-	public Region getStartingRegion(long timeOut, ArrayList<Region> pickableRegions)
-	{
-		if (!isRunning()) {
-			throw new RuntimeException(botDied());
-		}
-		return robot.getStartingRegion(timeOut, pickableRegions);
-	}
-	
-	@Override
-	public List<PlaceArmiesMove> getPlaceArmiesMoves(long timeOut)
-	{
-		if (!isRunning()) {
-			throw new RuntimeException(botDied());
-		}
-		return robot.getPlaceArmiesMoves(timeOut);
-	}
-	
-	@Override
-	public List<AttackTransferMove> getAttackTransferMoves(long timeOut)
-	{
-		if (!isRunning()) {
-			throw new RuntimeException(botDied());
-		}
-		return robot.getAttackTransferMoves(timeOut);
-	}
-	
-	@Override
-	public void writeInfo(String info){
-		robot.writeInfo(info);
-	}
-	
-	public boolean isRunning() {
-		if (robot == null) return false;
-		if (!robot.isRunning()) {
-			if (child == null) return false;
-			synchronized(mutex) {
-				if (child == null) return false;
-				child.destroy();
-				child = null;
-			}
-			return false;
-		}
-		synchronized(mutex) {
-			if (child == null) return false;
-			try {
-				child.exitValue();
-			} catch (Exception e) {
-				return true;
-			}
-			try {
-				child.destroy();
-			} catch (Exception e) {				
-			}
-			child = null;
-			return false;
-		}		
-	}
+    public ProcessRobot(int player, String command) throws IOException
+    {
+        this(player, "./", command);
+    }
+    
+    public ProcessRobot(int player, String dir, String command) throws IOException
+    {        
+        childCommand = command;
+        childDir = new File(dir);
+        child = Runtime.getRuntime().exec(childCommand, null, childDir);
+        System.out.println(player + " -> " + command);
+        robot = new IORobot(player, child.getOutputStream(), false, child.getInputStream(), child.getErrorStream());
+    }
+    
+    @Override
+    public void setup(RobotConfig config) {
+        robot.setup(config);
+    }
+        
+//    @Override
+//    public void writeMove(Move move) {
+//        robot.writeMove(move);
+//    }
+    
+    String botDied() {
+        return "Bot died out. Executed from '" + childDir.getAbsolutePath() + "' with command '" + childCommand + "'.";
+    }
+    
+    @Override
+    public Region getStartingRegion(long timeOut, ArrayList<Region> pickableRegions)
+    {
+        if (!isRunning()) {
+            throw new RuntimeException(botDied());
+        }
+        return robot.getStartingRegion(timeOut, pickableRegions);
+    }
+    
+    @Override
+    public List<PlaceArmiesMove> getPlaceArmiesMoves(long timeOut)
+    {
+        if (!isRunning()) {
+            throw new RuntimeException(botDied());
+        }
+        return robot.getPlaceArmiesMoves(timeOut);
+    }
+    
+    @Override
+    public List<AttackTransferMove> getAttackTransferMoves(long timeOut)
+    {
+        if (!isRunning()) {
+            throw new RuntimeException(botDied());
+        }
+        return robot.getAttackTransferMoves(timeOut);
+    }
+    
+    @Override
+    public void writeInfo(String info){
+        robot.writeInfo(info);
+    }
+    
+    public boolean isRunning() {
+        if (robot == null) return false;
+        if (!robot.isRunning()) {
+            if (child == null) return false;
+            synchronized(mutex) {
+                if (child == null) return false;
+                child.destroy();
+                child = null;
+            }
+            return false;
+        }
+        synchronized(mutex) {
+            if (child == null) return false;
+            try {
+                child.exitValue();
+            } catch (Exception e) {
+                return true;
+            }
+            try {
+                child.destroy();
+            } catch (Exception e) {                
+            }
+            child = null;
+            return false;
+        }        
+    }
 
-	
-	public void finish() {
-		if (!isRunning()) return;
-		try {
-			robot.finish();
-		} catch (Exception e) {			
-		}
-		synchronized(mutex) {
-			if (child == null) return;
-			try {
-				child.destroy();
-			} catch (Exception e) {				
-			}
-			child = null;
-		}
-	}
-	
-	@Override
-	public int getRobotPlayer() {
-		return robot.getRobotPlayer();
-	}
-	
-	@Override
-	public String getRobotPlayerName() {
-		return robot.getRobotPlayerName();
-	}
+    
+    public void finish() {
+        if (!isRunning()) return;
+        try {
+            robot.finish();
+        } catch (Exception e) {            
+        }
+        synchronized(mutex) {
+            if (child == null) return;
+            try {
+                child.destroy();
+            } catch (Exception e) {                
+            }
+            child = null;
+        }
+    }
+    
+    @Override
+    public int getRobotPlayer() {
+        return robot.getRobotPlayer();
+    }
+    
+    @Override
+    public String getRobotPlayerName() {
+        return robot.getRobotPlayerName();
+    }
 
 }

@@ -17,79 +17,79 @@ import conquest.bot.BotParser;
  */
 public class JavaBot {
 
-	private String botFQCN;
-	private File logFile;
-	
-	public JavaBot(String botFQCN) {
-		this(botFQCN, null);
-	}
-	
-	public JavaBot(String botFQCN, String logFile) {
-		this.botFQCN = botFQCN;
-		if (logFile != null) {
-			this.logFile = new File(logFile);
-		}
-	}
-	
-	public void run() {
-		BotParser parser = new BotParser(constructBot());
-		if (logFile != null) {
-			parser.setLogFile(logFile);
-		}
-		parser.start();
-		
-		try {
-			parser.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
-		
-		System.exit(0);
-	}
+    private String botFQCN;
+    private File logFile;
+    
+    public JavaBot(String botFQCN) {
+        this(botFQCN, null);
+    }
+    
+    public JavaBot(String botFQCN, String logFile) {
+        this.botFQCN = botFQCN;
+        if (logFile != null) {
+            this.logFile = new File(logFile);
+        }
+    }
+    
+    public void run() {
+        BotParser parser = new BotParser(constructBot());
+        if (logFile != null) {
+            parser.setLogFile(logFile);
+        }
+        parser.start();
+        
+        try {
+            parser.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+        
+        System.exit(0);
+    }
 
-	private Bot constructBot() {
-		return BotParser.constructBot(botFQCN);
-	}
-	
-	private static void fail(String msg) {		
-		System.out.println("================");
-		System.out.println("Conquest JavaBot");
-		System.out.println("================");
-		System.out.println();
-		System.out.println(msg);
-		System.out.println();
-		System.out.println("Usage: java ... conquest.bot.external.JavaBot <Bot FQCN> [ <log file ]");
-		System.out.println();
-		
-		System.exit(1);		
-	}
-	
-	public static void test() {
-		exec(new String[]{"conquest.bot.BotStarter"});
-	}
-	
-	public static void exec(String[] args) {
-		String botFQCN = null;
-		String logFile = null;
-		
-		if (args.length > 0) {
-			botFQCN = args[0];
-		}
-		if (args.length > 1) {
-			logFile = args[1];
-		}
-		
-		if (botFQCN == null) {
-			fail("Bot FQCN not specified!");
-		}
-		
-		JavaBot javaBot = new JavaBot(botFQCN, logFile);
-		javaBot.run();
-	}
-	
-	public static void main(String[] args) {
-		exec(args);
-	}
-	
+    private Bot constructBot() {
+        return BotParser.constructBot(botFQCN);
+    }
+    
+    private static void fail(String msg) {        
+        System.out.println("================");
+        System.out.println("Conquest JavaBot");
+        System.out.println("================");
+        System.out.println();
+        System.out.println(msg);
+        System.out.println();
+        System.out.println("Usage: java ... conquest.bot.external.JavaBot <Bot FQCN> [ <log file ]");
+        System.out.println();
+        
+        System.exit(1);        
+    }
+    
+    public static void test() {
+        exec(new String[]{"conquest.bot.BotStarter"});
+    }
+    
+    public static void exec(String[] args) {
+        String botFQCN = null;
+        String logFile = null;
+        
+        if (args.length > 0) {
+            botFQCN = args[0];
+        }
+        if (args.length > 1) {
+            logFile = args[1];
+        }
+        
+        if (botFQCN == null) {
+            fail("Bot FQCN not specified!");
+        }
+        
+        JavaBot javaBot = new JavaBot(botFQCN, logFile);
+        javaBot.run();
+    }
+    
+    public static void main(String[] args) {
+        exec(args);
+    }
+    
 }

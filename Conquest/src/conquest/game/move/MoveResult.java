@@ -11,7 +11,7 @@
 //    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
-//	
+//    
 //    For the full copyright and license information, please view the LICENSE
 //    file that was distributed with this source code.
 
@@ -20,24 +20,24 @@ package conquest.game.move;
 import conquest.game.GameMap;
 
 public class MoveResult {
-	
-	private final Move move;
-	private final GameMap map;
-	
-	public MoveResult(Move move, GameMap resultingMap)
-	{
-		this.move = move;
-		this.map = resultingMap;
-	}
-	
-	public Move getMove()
-	{
-		return this.move;
-	}
-	
-	public GameMap getMap()
-	{
-		return this.map;
-	}
+    
+    private final Move move;
+    private final GameMap map;
+    
+    public MoveResult(Move move, GameMap resultingMap)
+    {
+        this.move = move;
+        this.map = resultingMap;
+    }
+    
+    public Move getMove()
+    {
+        return this.move;
+    }
+    
+    public GameMap getMap()
+    {
+        return this.map;
+    }
 
 }

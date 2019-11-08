@@ -11,7 +11,7 @@
 //    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
-//	
+//    
 //    For the full copyright and license information, please view the LICENSE
 //    file that was distributed with this source code.
 
@@ -29,159 +29,159 @@ import conquest.game.world.Continent;
 import conquest.game.world.Region;
 
 public class BotState {
-	private GameState state;
+    private GameState state;
 
-	// This map is known from the start, contains all the regions and how they are connected,
-	// doesn't change after initialization
-	private final GameMap fullMap = new GameMap(); 
-	
-	// This map represents everything the player can see, updated at the end of each round.
-	private GameMap visibleMap; 
-	
-	//2 randomly chosen regions from each continent are given, which the bot can choose to start with
-	private ArrayList<Region> pickableStartingRegions;
+    // This map is known from the start, contains all the regions and how they are connected,
+    // doesn't change after initialization
+    private final GameMap fullMap = new GameMap(); 
+    
+    // This map represents everything the player can see, updated at the end of each round.
+    private GameMap visibleMap; 
+    
+    //2 randomly chosen regions from each continent are given, which the bot can choose to start with
+    private ArrayList<Region> pickableStartingRegions;
 
-	public BotState()
-	{
+    public BotState()
+    {
     state = new GameState(null, new GameMap(), null);
-		pickableStartingRegions = new ArrayList<Region>();
-	}
-	
-	public void updateSettings(String key, String value)
-	{
-		if (key.equals("your_player_number"))
-		    state.setTurn(Integer.parseInt(value));
-	}
-	
-	public void nextRound() {
-	    state.setRoundNumber(state.getRoundNumber() + 1);
-	}
-	
-	public void setPhase(Phase phase) {
-		state.setPhase(phase);
-	}
-	
-	//initial map is given to the bot with all the information except for player and armies info
-	public void setupMap(String[] mapInput)
-	{
-		int i, regionId, continentId, reward;
-		
-		if(mapInput[1].equals("continents"))
-		{
-			for(i=2; i<mapInput.length; i++)
-			{
-				try {
-					continentId = Integer.parseInt(mapInput[i]);
-					i++;
-					reward = Integer.parseInt(mapInput[i]);
-					fullMap.add(new ContinentData(Continent.forId(continentId), continentId, reward));
-				}
-				catch(Exception e) {
-					System.err.println("Unable to parse Continents");
-				}
-			}
-		}
-		else if(mapInput[1].equals("regions"))
-		{
-			for(i=2; i<mapInput.length; i++)
-			{
-				try {
-					regionId = Integer.parseInt(mapInput[i]);
-					i++;
-					continentId = Integer.parseInt(mapInput[i]);
-					ContinentData continent = fullMap.getContinent(continentId);
-					fullMap.add(new RegionData(Region.forId(regionId), regionId, continent));
-				}
-				catch(Exception e) {
-					System.err.println("Unable to parse Regions " + e.getMessage());
-				}
-			}
-		}
-		else if(mapInput[1].equals("neighbors"))
-		{
-			for(i=2; i<mapInput.length; i++)
-			{
-				try {
-					RegionData region = fullMap.getRegion(Integer.parseInt(mapInput[i]));
-					i++;
-					String[] neighborIds = mapInput[i].split(",");
-					for(int j=0; j<neighborIds.length; j++)
-					{
-						RegionData neighbor = fullMap.getRegion(Integer.parseInt(neighborIds[j]));
-						region.addNeighbor(neighbor);
-					}
-				}
-				catch(Exception e) {
-					System.err.println("Unable to parse Neighbors " + e.getMessage());
-				}
-			}
-		}
-	}
-	
-	//regions from which a player is able to pick his preferred starting regions
-	public void setPickableStartingRegions(String[] mapInput)
-	{
-	    pickableStartingRegions = new ArrayList<Region>();
-	    
-		for(int i=2; i<mapInput.length; i++)
-		{
-			int regionId;
-			try {
-				regionId = Integer.parseInt(mapInput[i]);
-				Region pickableRegion = Region.forId(regionId);
-				pickableStartingRegions.add(pickableRegion);
-			}
-			catch(Exception e) {
-				System.err.println("Unable to parse pickable regions " + e.getMessage());
-			}
-		}
-	}
-	
-	//visible regions are given to the bot with player and armies info
-	public void updateMap(String[] mapInput)
-	{
-		visibleMap = fullMap.clone();
-		for(int i=1; i<mapInput.length; i++)
-		{
-			try {
-				RegionData region = visibleMap.getRegion(Integer.parseInt(mapInput[i]));
-				int owner = Integer.parseInt(mapInput[i+1]);
-				int armies = Integer.parseInt(mapInput[i+2]);
-				
-				region.setOwner(owner);
-				region.setArmies(armies);
-				i += 2;
-			}
-			catch(Exception e) {
-				System.err.println("Unable to parse Map Update " + e.getMessage());
-			}
-		}
-	}
-	
-	public int getRoundNumber(){
-		return state.getRoundNumber();
-	}
-	
-	public int getMyPlayerNumber() {
-	    return state.me();
-	}
-	
-	/**
-	 * Map that is updated via observations.
-	 * @return
-	 */
-	public GameMap getMap(){
-		return visibleMap != null ? visibleMap : fullMap;
-	}
-	
-	public ArrayList<Region> getPickableStartingRegions(){
-		return pickableStartingRegions;
-	}
+        pickableStartingRegions = new ArrayList<Region>();
+    }
+    
+    public void updateSettings(String key, String value)
+    {
+        if (key.equals("your_player_number"))
+            state.setTurn(Integer.parseInt(value));
+    }
+    
+    public void nextRound() {
+        state.setRoundNumber(state.getRoundNumber() + 1);
+    }
+    
+    public void setPhase(Phase phase) {
+        state.setPhase(phase);
+    }
+    
+    //initial map is given to the bot with all the information except for player and armies info
+    public void setupMap(String[] mapInput)
+    {
+        int i, regionId, continentId, reward;
+        
+        if(mapInput[1].equals("continents"))
+        {
+            for(i=2; i<mapInput.length; i++)
+            {
+                try {
+                    continentId = Integer.parseInt(mapInput[i]);
+                    i++;
+                    reward = Integer.parseInt(mapInput[i]);
+                    fullMap.add(new ContinentData(Continent.forId(continentId), continentId, reward));
+                }
+                catch(Exception e) {
+                    System.err.println("Unable to parse Continents");
+                }
+            }
+        }
+        else if(mapInput[1].equals("regions"))
+        {
+            for(i=2; i<mapInput.length; i++)
+            {
+                try {
+                    regionId = Integer.parseInt(mapInput[i]);
+                    i++;
+                    continentId = Integer.parseInt(mapInput[i]);
+                    ContinentData continent = fullMap.getContinent(continentId);
+                    fullMap.add(new RegionData(Region.forId(regionId), regionId, continent));
+                }
+                catch(Exception e) {
+                    System.err.println("Unable to parse Regions " + e.getMessage());
+                }
+            }
+        }
+        else if(mapInput[1].equals("neighbors"))
+        {
+            for(i=2; i<mapInput.length; i++)
+            {
+                try {
+                    RegionData region = fullMap.getRegion(Integer.parseInt(mapInput[i]));
+                    i++;
+                    String[] neighborIds = mapInput[i].split(",");
+                    for(int j=0; j<neighborIds.length; j++)
+                    {
+                        RegionData neighbor = fullMap.getRegion(Integer.parseInt(neighborIds[j]));
+                        region.addNeighbor(neighbor);
+                    }
+                }
+                catch(Exception e) {
+                    System.err.println("Unable to parse Neighbors " + e.getMessage());
+                }
+            }
+        }
+    }
+    
+    //regions from which a player is able to pick his preferred starting regions
+    public void setPickableStartingRegions(String[] mapInput)
+    {
+        pickableStartingRegions = new ArrayList<Region>();
+        
+        for(int i=2; i<mapInput.length; i++)
+        {
+            int regionId;
+            try {
+                regionId = Integer.parseInt(mapInput[i]);
+                Region pickableRegion = Region.forId(regionId);
+                pickableStartingRegions.add(pickableRegion);
+            }
+            catch(Exception e) {
+                System.err.println("Unable to parse pickable regions " + e.getMessage());
+            }
+        }
+    }
+    
+    //visible regions are given to the bot with player and armies info
+    public void updateMap(String[] mapInput)
+    {
+        visibleMap = fullMap.clone();
+        for(int i=1; i<mapInput.length; i++)
+        {
+            try {
+                RegionData region = visibleMap.getRegion(Integer.parseInt(mapInput[i]));
+                int owner = Integer.parseInt(mapInput[i+1]);
+                int armies = Integer.parseInt(mapInput[i+2]);
+                
+                region.setOwner(owner);
+                region.setArmies(armies);
+                i += 2;
+            }
+            catch(Exception e) {
+                System.err.println("Unable to parse Map Update " + e.getMessage());
+            }
+        }
+    }
+    
+    public int getRoundNumber(){
+        return state.getRoundNumber();
+    }
+    
+    public int getMyPlayerNumber() {
+        return state.me();
+    }
+    
+    /**
+     * Map that is updated via observations.
+     * @return
+     */
+    public GameMap getMap(){
+        return visibleMap != null ? visibleMap : fullMap;
+    }
+    
+    public ArrayList<Region> getPickableStartingRegions(){
+        return pickableStartingRegions;
+    }
 
-	public GameState toConquestGame() {
-	    return new GameState(
-	        new GameConfig(), getMap(), null, state.getRoundNumber(), state.me(), state.getPhase(),
-	        pickableStartingRegions);
-	}
-	
+    public GameState toConquestGame() {
+        return new GameState(
+            new GameConfig(), getMap(), null, state.getRoundNumber(), state.me(), state.getPhase(),
+            pickableStartingRegions);
+    }
+    
 }

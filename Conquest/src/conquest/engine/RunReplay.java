@@ -9,11 +9,11 @@ import conquest.Conquest;
  */
 public class RunReplay {
 
-	public static void main(String[] args) {
-		// Configure with with: "path/to/your/replay.log";
-		String replayFile = "./replay.log";
-		
-		Conquest.startReplay(replayFile);
-	}
-	
+    public static void main(String[] args) {
+        // Configure with with: "path/to/your/replay.log";
+        String replayFile = "./replay.log";
+        
+        Conquest.startReplay(replayFile);
+    }
+    
 }
