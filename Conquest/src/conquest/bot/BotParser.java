@@ -21,13 +21,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.util.List;
+import java.util.*;
 
 import conquest.engine.io.BotStreamReader;
-import conquest.game.Phase;
+import conquest.game.*;
 import conquest.game.move.AttackTransferMove;
 import conquest.game.move.PlaceArmiesMove;
-import conquest.game.world.Region;
+import conquest.game.world.*;
 
 public class BotParser extends Thread {
     
@@ -37,7 +37,7 @@ public class BotParser extends Thread {
     
     final Bot bot;    
     
-    BotState currentState;
+    GameState currentState;
 
     FileBotLog log;
     
@@ -59,7 +59,7 @@ public class BotParser extends Thread {
         this.output = output;
         
         this.bot = bot;
-        this.currentState = new BotState();
+        this.currentState = new GameState(null, new GameMap(), null, new ArrayList<Region>());
     }
     
     public static Bot constructBot(String botFQCN) {
@@ -107,6 +107,108 @@ public class BotParser extends Thread {
         return bot;
     }
 
+    //regions from which a player is able to pick his preferred starting regions
+    void setPickableStartingRegions(GameState state, String[] mapInput)
+    {
+        ArrayList<Region> regions = new ArrayList<Region>();
+        
+        for(int i=2; i<mapInput.length; i++)
+        {
+            int regionId;
+            try {
+                regionId = Integer.parseInt(mapInput[i]);
+                Region pickableRegion = Region.forId(regionId);
+                regions.add(pickableRegion);
+            }
+            catch(Exception e) {
+                System.err.println("Unable to parse pickable regions " + e.getMessage());
+            }
+        }
+
+        state.setPickableRegions(regions);
+    }
+
+    //initial map is given to the bot with all the information except for player and armies info
+    void setupMap(GameState state, String[] mapInput)
+    {
+        GameMap map = state.getMap();
+
+        if(mapInput[1].equals("continents"))
+        {
+            for(int i=2; i<mapInput.length; i++)
+            {
+                try {
+                    int continentId = Integer.parseInt(mapInput[i]);
+                    i++;
+                    int reward = Integer.parseInt(mapInput[i]);
+                    map.add(new ContinentData(Continent.forId(continentId), continentId, reward));
+                }
+                catch(Exception e) {
+                    System.err.println("Unable to parse Continents");
+                }
+            }
+        }
+        else if(mapInput[1].equals("regions"))
+        {
+            for(int i=2; i<mapInput.length; i++)
+            {
+                try {
+                    int regionId = Integer.parseInt(mapInput[i]);
+                    i++;
+                    int continentId = Integer.parseInt(mapInput[i]);
+                    ContinentData continent = map.getContinent(continentId);
+                    map.add(new RegionData(Region.forId(regionId), regionId, continent));
+                }
+                catch(Exception e) {
+                    System.err.println("Unable to parse Regions " + e.getMessage());
+                }
+            }
+        }
+        else if(mapInput[1].equals("neighbors"))
+        {
+            for(int i=2; i<mapInput.length; i++)
+            {
+                try {
+                    RegionData region = map.getRegion(Integer.parseInt(mapInput[i]));
+                    i++;
+                    String[] neighborIds = mapInput[i].split(",");
+                    for(int j=0; j<neighborIds.length; j++)
+                    {
+                        RegionData neighbor = map.getRegion(Integer.parseInt(neighborIds[j]));
+                        region.addNeighbor(neighbor);
+                    }
+                }
+                catch(Exception e) {
+                    System.err.println("Unable to parse Neighbors " + e.getMessage());
+                }
+            }
+        }
+    }
+
+    //visible regions are given to the bot with player and armies info
+    void updateMap(GameState state, String[] mapInput)
+    {
+        for(int i=1; i<mapInput.length; i++)
+        {
+            try {
+                RegionData region = state.getMap().getRegion(Integer.parseInt(mapInput[i]));
+                int owner = Integer.parseInt(mapInput[i+1]);
+                int armies = Integer.parseInt(mapInput[i+2]);
+                
+                region.setOwner(owner);
+                region.setArmies(armies);
+                i += 2;
+            }
+            catch(Exception e) {
+                System.err.println("Unable to parse Map Update " + e.getMessage());
+            }
+        }
+    }
+
+    public void nextRound(GameState state) {
+        state.setRoundNumber(state.getRoundNumber() + 1);
+    }
+    
     @Override
     public void run()
     {
@@ -138,7 +240,7 @@ public class BotParser extends Thread {
             if(parts[0].equals("pick_starting_region")) {
                 //pick a region you want to start with
                 currentState.setPhase(Phase.STARTING_REGIONS);
-                currentState.setPickableStartingRegions(parts);
+                setPickableStartingRegions(currentState, parts);
                 Region startingRegion = bot.getStartingRegion(currentState, Long.valueOf(parts[1]));
                 String output = startingRegion.id + "";
                 
@@ -165,16 +267,16 @@ public class BotParser extends Thread {
                 log("OUT: " + output);
                 this.output.println(output);
             } else if(parts.length == 3 && parts[0].equals("settings")) {
-                //update settings
-                currentState.updateSettings(parts[1], parts[2]);
+                if (parts[1].equals("your_player_number"))
+                    currentState.setTurn(Integer.parseInt(parts[2]));
             } else if(parts[0].equals("setup_map")) {
                 //initial full map is given
-                currentState.setupMap(parts);
+                setupMap(currentState, parts);
             } else if(parts[0].equals("update_map")) {
                 //all visible regions are given
-                currentState.updateMap(parts);
+                updateMap(currentState, parts);
             } else if (parts[0].equals("next_round"))
-                currentState.nextRound();
+                nextRound(currentState);
             else {
                 log("Unable to parse line: " + line);
             }

@@ -20,6 +20,7 @@ package conquest.bot;
 import java.util.List;
 
 import conquest.engine.robot.InternalRobot;
+import conquest.game.GameState;
 import conquest.game.move.AttackTransferMove;
 import conquest.game.move.PlaceArmiesMove;
 import conquest.game.world.Region;
@@ -33,7 +34,7 @@ public interface Bot {
      * @param timeoutMillis in milliseconds
      * @return
      */
-    public Region getStartingRegion(BotState state, Long timeoutMillis);
+    public Region getStartingRegion(GameState state, Long timeoutMillis);
     
     /**
      * PLACE ARMIES - distribute armies between your regions.
@@ -41,7 +42,7 @@ public interface Bot {
      * @param timeoutMillis in milliseconds
      * @return
      */
-    public List<PlaceArmiesMove> getPlaceArmiesMoves(BotState state, Long timeoutMillis);
+    public List<PlaceArmiesMove> getPlaceArmiesMoves(GameState state, Long timeoutMillis);
     
     /**
      * MOVE ARMIES - attack opponents' regions or neutral ones ... or transfer armies between your regions.
@@ -49,7 +50,7 @@ public interface Bot {
      * @param timeoutMillis in milliseconds
      * @return
      */
-    public List<AttackTransferMove> getAttackTransferMoves(BotState state, Long timeoutMillis);
+    public List<AttackTransferMove> getAttackTransferMoves(GameState state, Long timeoutMillis);
 
     /**
      * Callback that is invoked only for {@link InternalRobot}s and games with {@link GUI}.

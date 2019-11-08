@@ -38,8 +38,8 @@ public class MyBot extends GameBot
     // Choose a starting region.
     
     @Override
-    public ChooseCommand chooseRegion(List<Region> choosable, long timeout) {
-        return new ChooseCommand(choosable.get(rand.nextInt(choosable.size())));
+    public Region chooseRegion(List<Region> choosable, long timeout) {
+        return choosable.get(rand.nextInt(choosable.size()));
     }
 
     // Decide where to place armies this turn.

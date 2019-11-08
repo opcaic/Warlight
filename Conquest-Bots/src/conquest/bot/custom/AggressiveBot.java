@@ -38,7 +38,7 @@ public class AggressiveBot extends GameBot
     // ================
     
     @Override
-    public ChooseCommand chooseRegion(List<Region> choosable, long timeout) {
+    public Region chooseRegion(List<Region> choosable, long timeout) {
         int min = Integer.MAX_VALUE;
         Region best = null;
         
@@ -50,7 +50,7 @@ public class AggressiveBot extends GameBot
             }
         }
         
-        return new ChooseCommand(best);
+        return best;
     }
     
     public int getPreferredContinentPriority(Continent continent) {
