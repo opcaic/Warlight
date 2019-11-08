@@ -489,7 +489,7 @@ public class ConquestFightConsole {
         // -----------
         // FOR TESTING
         // -----------
-        //args = getTestArgs_1v1();        
+        args = getTestArgs_1v1();        
         //args = getTestArgs_Batch();
         
         // --------------
