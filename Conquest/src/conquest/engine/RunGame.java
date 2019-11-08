@@ -98,7 +98,7 @@ public class RunGame
 	}
 
 	private GameResult go(GameLog log, String[] playerNames, Robot[] robots) throws InterruptedException {
-        game = new GameState(config.game, playerNames);
+        game = new GameState(config.game, null, playerNames);
 
         GUI gui;
 		if (config.visualize) {

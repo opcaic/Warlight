@@ -29,6 +29,8 @@ import conquest.game.world.Continent;
 import conquest.game.world.Region;
 
 public class BotState {
+	private GameState state;
+
 	// This map is known from the start, contains all the regions and how they are connected,
 	// doesn't change after initialization
 	private final GameMap fullMap = new GameMap(); 
@@ -39,29 +41,24 @@ public class BotState {
 	//2 randomly chosen regions from each continent are given, which the bot can choose to start with
 	private ArrayList<Region> pickableStartingRegions;
 
-	private int roundNumber;
-	private int playerNumber;
-	private Phase phase;
-	
 	public BotState()
 	{
+    state = new GameState(null, new GameMap(), null);
 		pickableStartingRegions = new ArrayList<Region>();
-		roundNumber = 0;
-		phase = Phase.STARTING_REGIONS;
 	}
 	
 	public void updateSettings(String key, String value)
 	{
 		if (key.equals("your_player_number"))
-		    playerNumber = Integer.parseInt(value);
+		    state.setTurn(Integer.parseInt(value));
 	}
 	
 	public void nextRound() {
-	    roundNumber++;
+	    state.setRoundNumber(state.getRoundNumber() + 1);
 	}
 	
 	public void setPhase(Phase phase) {
-		this.phase = phase;
+		state.setPhase(phase);
 	}
 	
 	//initial map is given to the bot with all the information except for player and armies info
@@ -121,7 +118,7 @@ public class BotState {
 		}
 	}
 	
-	//regions from wich a player is able to pick his preferred starting regions
+	//regions from which a player is able to pick his preferred starting regions
 	public void setPickableStartingRegions(String[] mapInput)
 	{
 	    pickableStartingRegions = new ArrayList<Region>();
@@ -162,11 +159,11 @@ public class BotState {
 	}
 	
 	public int getRoundNumber(){
-		return roundNumber;
+		return state.getRoundNumber();
 	}
 	
 	public int getMyPlayerNumber() {
-	    return playerNumber;
+	    return state.me();
 	}
 	
 	/**
@@ -177,17 +174,13 @@ public class BotState {
 		return visibleMap != null ? visibleMap : fullMap;
 	}
 	
-	public GameMap getFullMap(){
-		return fullMap;
-	}
-	
 	public ArrayList<Region> getPickableStartingRegions(){
 		return pickableStartingRegions;
 	}
 
 	public GameState toConquestGame() {
 	    return new GameState(
-	        new GameConfig(), getMap(), null, roundNumber, playerNumber, phase,
+	        new GameConfig(), getMap(), null, state.getRoundNumber(), state.me(), state.getPhase(),
 	        pickableStartingRegions);
 	}
 	

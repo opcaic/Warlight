@@ -14,7 +14,7 @@ public class PlaceMoveAction implements Action {
 	}
 
 	public void apply(GameState state) {
-		state.placeArmies(placeCommands, null);
-		state.attackTransfer(moveCommands, null);
+		state.placeArmies(placeCommands);
+		state.attackTransfer(moveCommands);
 	}
 }

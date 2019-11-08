@@ -23,7 +23,6 @@ import java.util.List;
 import conquest.engine.robot.HumanRobot;
 import conquest.game.*;
 import conquest.game.move.AttackTransferMove;
-import conquest.game.move.Move;
 import conquest.game.move.PlaceArmiesMove;
 import conquest.game.world.Region;
 import conquest.view.GUI;
@@ -57,11 +56,9 @@ public class Engine {
 		}
 		
 		for (int i = 1 ; i <= 2 ; ++i) {
-			ArrayList<Move> opponentMoves = new ArrayList<Move>();
-			
     		List<PlaceArmiesMove> placeMoves = robot(i).getPlaceArmiesMoves(timeoutMillis);
     		
-    		game.placeArmies(placeMoves, opponentMoves);
+    		game.placeArmies(placeMoves);
     
     		sendUpdateMapInfo(i);
     		
@@ -77,11 +74,9 @@ public class Engine {
     		
     		List<AttackTransferMove> moves = robot(i).getAttackTransferMoves(timeoutMillis);
     		
-    		game.attackTransfer(moves, opponentMoves);
+    		game.attackTransfer(moves);
     		
     		sendAllInfo();
-    		
-	        sendOpponentMovesInfo(3 - i, opponentMoves);    		
     		
     		if (game.isDone())
     		    break;
@@ -158,27 +153,5 @@ public class Engine {
 			updateMapString = updateMapString.concat(" " + id + " " + owner + " " + armies);
 		}
 		robot(player).writeInfo(updateMapString);
-	}
-
-	private void sendOpponentMovesInfo(int player, ArrayList<Move> moves)
-	{
-		String opponentMovesString = "opponent_moves ";
-
-		for(Move move : moves)
-		    if (move.getIllegalMove().equals(""))
-			{
-				if (move instanceof PlaceArmiesMove) {
-					PlaceArmiesMove plm = (PlaceArmiesMove) move;
-					opponentMovesString = opponentMovesString.concat(plm.getString() + " ");
-				}
-				else {
-					AttackTransferMove atm = (AttackTransferMove) move;
-					opponentMovesString = opponentMovesString.concat(atm.getString() + " ");					
-				}
-			}
-		
-		opponentMovesString = opponentMovesString.substring(0, opponentMovesString.length()-1);
-
-		robot(player).writeInfo(opponentMovesString);
 	}
 }

@@ -19,12 +19,11 @@ public class GameState implements Cloneable {
     
     public static final int nrOfStartingRegions = 3;
     
-    // Create a game that is already in progress.
     public GameState(GameConfig config, GameMap map, String[] playerNames,
-                        int round, int turn, Phase phase, ArrayList<Region> pickableRegions) {
+                     int round, int turn, Phase phase, ArrayList<Region> pickableRegions) {
         this.config = config;
         this.map = map;
-        this.playerNames = playerNames != null ? playerNames : new String[] { "Player 1", "Player 2" };
+        this.playerNames = playerNames; 
         this.round = round;
         this.turn = turn;
         this.phase = phase;
@@ -32,21 +31,24 @@ public class GameState implements Cloneable {
         
         if (config.seed < 0) {
             config.seed = new Random().nextInt();
+            while (config.seed < 0)
+                config.seed += Integer.MAX_VALUE;
         }
-        while (config.seed < 0)
-            config.seed += Integer.MAX_VALUE;
         this.random = new Random(config.seed);
     }
     
-    // Create a new game with the given configuration.
-    public GameState(GameConfig config, String[] playerNames) {
-        this(config, makeInitMap(), playerNames, 0, 1, Phase.STARTING_REGIONS, null);
+    public GameState(GameConfig config, GameMap map, String[] playerNames) {
+        this(
+            config != null ? config : new GameConfig(),
+            map != null ? map : makeInitMap(),
+            playerNames != null ? playerNames : new String[] { "Player 1", "Player 2" },
+            0, 1, Phase.STARTING_REGIONS, null);
+
         initStartingRegions();
     }
     
-    // Create a new game with default parameters.
     public GameState() {
-        this(new GameConfig(), null);
+        this(null, null, null);
     }
     
     public void setGUI(GUI gui) {
@@ -68,9 +70,17 @@ public class GameState implements Cloneable {
     public int getRoundNumber() {
         return round;
     }
+
+    public void setRoundNumber(int round) {
+        this.round = round;
+    }
     
     public int me() {
         return turn;
+    }
+
+    public void setTurn(int turn) {
+        this.turn = turn;
     }
 
     public int opp() {
@@ -79,6 +89,10 @@ public class GameState implements Cloneable {
     
     public Phase getPhase() {
     	return phase;
+    }
+
+    public void setPhase(Phase phase) {
+        this.phase = phase;
     }
     
     public String playerName(int i) {
@@ -134,7 +148,7 @@ public class GameState implements Cloneable {
         return armies;
     }
     
-    static GameMap makeInitMap()
+    public static GameMap makeInitMap()
     {
         GameMap map = new GameMap();
         
@@ -228,7 +242,7 @@ public class GameState implements Cloneable {
         }
     }
     
-    public void placeArmies(List<PlaceArmiesMove> moves, List<Move> opponentMoves)
+    public void placeArmies(List<PlaceArmiesMove> moves)
     {
     	if (phase != Phase.PLACE_ARMIES)
     		throw new Error("wrong time to place armies");
@@ -254,9 +268,6 @@ public class GameState implements Cloneable {
                 
                 left -= armies;
                 region.setArmies(region.getArmies() + armies);
-
-                if (opponentMoves != null && region.isVisible(3 - turn))
-                    opponentMoves.add(move);
             }
         }
         
@@ -436,7 +447,7 @@ public class GameState implements Cloneable {
         }
     }
     
-    public void attackTransfer(List<AttackTransferMove> moves, List<Move> opponentMoves) {
+    public void attackTransfer(List<AttackTransferMove> moves) {
     	if (phase != Phase.ATTACK_TRANSFER)
     		throw new Error("wrong time to attack/transfer");
 
@@ -451,10 +462,6 @@ public class GameState implements Cloneable {
             
             move.setArmies(Math.min(move.getArmies(), fromRegion.getArmies() - 1));
 
-            int other = 3 - turn;
-            if (opponentMoves != null && (fromRegion.isVisible(other) || toRegion.isVisible(other)) )
-                opponentMoves.add(move);
-           
             if(toRegion.isOwnedBy(turn)) //transfer
             {
                 if (gui != null) {

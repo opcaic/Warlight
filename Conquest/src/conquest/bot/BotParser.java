@@ -173,8 +173,6 @@ public class BotParser extends Thread {
 			} else if(parts[0].equals("update_map")) {
 				//all visible regions are given
 				currentState.updateMap(parts);
-			} else if(parts[0].equals("opponent_moves")) {
-				// TODO: finish implementation
 			} else if (parts[0].equals("next_round"))
 			    currentState.nextRound();
 			else {
