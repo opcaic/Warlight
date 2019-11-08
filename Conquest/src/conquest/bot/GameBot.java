@@ -7,7 +7,6 @@ import conquest.game.GameState;
 import conquest.game.move.AttackTransferMove;
 import conquest.game.move.PlaceArmiesMove;
 import conquest.game.world.Region;
-import conquest.view.GUI;
 
 public abstract class GameBot implements Bot {
     protected GameState state;
@@ -43,8 +42,4 @@ public abstract class GameBot implements Bot {
     }
     
     public abstract List<AttackTransferMove> moveArmies(long timeout);
-
-    @Override
-    public void setGUI(GUI gui) {
-    }
 }

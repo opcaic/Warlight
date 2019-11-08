@@ -12,7 +12,6 @@ import conquest.game.*;
 import conquest.game.move.*;
 import conquest.game.world.Region;
 import conquest.utils.Util;
-import conquest.view.GUI;
 
 public class MyBot extends GameBot
 {
@@ -25,10 +24,6 @@ public class MyBot extends GameBot
                 "Conquest-Bots/FightSimulation-Attackers-A200-D200.obj"));
     }
     
-    @Override
-    public void setGUI(GUI gui) {
-    }
-        
     // Code your bot here.
     
     //

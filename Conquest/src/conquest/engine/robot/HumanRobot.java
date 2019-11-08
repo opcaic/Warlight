@@ -1,9 +1,9 @@
 package conquest.engine.robot;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import conquest.engine.Robot;
+import conquest.game.GameState;
 import conquest.game.move.AttackTransferMove;
 import conquest.game.move.PlaceArmiesMove;
 import conquest.game.world.Region;
@@ -18,17 +18,17 @@ public class HumanRobot implements Robot {
     }
 
     @Override
-    public Region getStartingRegion(long timeOut, ArrayList<Region> pickableRegions) {
+    public Region getStartingRegion(GameState state, long timeOut) {
         return config.gui.chooseRegionHuman();
     }
 
     @Override
-    public List<PlaceArmiesMove> getPlaceArmiesMoves(long timeOut) {
+    public List<PlaceArmiesMove> getPlaceArmiesMoves(GameState state, long timeOut) {
         return config.gui.placeArmiesHuman(config.team);
     }
 
     @Override
-    public List<AttackTransferMove> getAttackTransferMoves(long timeOut) {
+    public List<AttackTransferMove> getAttackTransferMoves(GameState state, long timeOut) {
         return config.gui.moveArmiesHuman(config.team);
     }
 

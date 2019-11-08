@@ -3,13 +3,11 @@ package conquest.engine.robot;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.*;
 
-import conquest.bot.BotParser;
+import conquest.bot.*;
 import conquest.engine.Robot;
-import conquest.engine.io.InputOutputStream;
-import conquest.game.Team;
+import conquest.game.*;
 import conquest.game.move.*;
 import conquest.game.world.Region;
 
@@ -47,14 +45,7 @@ public class InternalRobot implements Robot {
         }
     }
     
-    private Object mutex = new Object();
-    
-    private InputOutputStream botInput;
-    private InputOutputStream botOutput;
-    
-    private BotParser bot;
-
-    private IORobot robot;
+    private Bot bot;
 
     private RobotConfig config;
     
@@ -69,13 +60,8 @@ public class InternalRobot implements Robot {
     public InternalRobot(int player, String botFQCN) throws IOException {
         this.botFQCN = botFQCN;
         
-        botInput = new InputOutputStream();
-        botOutput = new InputOutputStream();
-        
-        bot = BotParser.runInternal(botFQCN, botInput.getInputStream(), new PrintStream(botOutput.getOutputStream()));
+        bot = BotParser.constructBot(botFQCN);
         System.out.println(player + " -> " + botFQCN);
-        
-        robot = new IORobot(player, botInput.getOutputStream(), true, botOutput.getInputStream(), null);
         
         humanHijack = new HumanRobot();
     }
@@ -84,87 +70,55 @@ public class InternalRobot implements Robot {
     public void setup(RobotConfig config) {
         this.config = config;
         
-        robot.setup(config);
         humanHijack.setup(config);
         
         if (config.gui != null) {
             myKeyListener = new MyKeyListener();
             config.gui.addKeyListener(myKeyListener);
-            
-            bot.getBot().setGUI(config.gui);
         }
     }
     
     @Override
-    public Region getStartingRegion(long timeOut, ArrayList<Region> pickableRegions)
+    public Region getStartingRegion(GameState state, long timeOut)
     {
         if (hijacked) {
-            return humanHijack.getStartingRegion(timeOut, pickableRegions);            
+            return humanHijack.getStartingRegion(state, timeOut);            
         }
-        return robot.getStartingRegion(timeOut, pickableRegions);
+        return bot.getStartingRegion(state, timeOut);
     }
     
     @Override
-    public List<PlaceArmiesMove> getPlaceArmiesMoves(long timeOut)
+    public List<PlaceArmiesMove> getPlaceArmiesMoves(GameState state, long timeOut)
     {
         if (hijacked) {
-            return humanHijack.getPlaceArmiesMoves(timeOut);        
+            return humanHijack.getPlaceArmiesMoves(state, timeOut);        
         }
-        return robot.getPlaceArmiesMoves(timeOut);
+        return bot.getPlaceArmiesMoves(state, timeOut);
     }
     
     @Override
-    public List<AttackTransferMove> getAttackTransferMoves(long timeOut)
+    public List<AttackTransferMove> getAttackTransferMoves(GameState state, long timeOut)
     {
         if (hijacked) {
-            return humanHijack.getAttackTransferMoves(timeOut);    
+            return humanHijack.getAttackTransferMoves(state, timeOut);    
         }
-        return robot.getAttackTransferMoves(timeOut);
+        return bot.getAttackTransferMoves(state, timeOut);
     }
     
     @Override
     public void writeInfo(String info){
-        robot.writeInfo(info);
         humanHijack.writeInfo(info);
     }
 
     public boolean isRunning() {
-        if (robot == null || bot == null) return false;
-        synchronized(mutex) {
-            // BOT & ROBOT RUNNING?
-            if (robot != null && robot.isRunning() && bot != null && bot.isAlive()) return true;
-            
-            // SOMEONE DIED OFF...
-            finishInternal();
-        }        
-        return false;
+        return bot != null;
     }
     
     public void finish() {
-        if (!isRunning()) return;
-        synchronized(mutex) {            
-            finishInternal();
-        }
-    }
-    
-    private void finishInternal() {
         if (config.gui != null) {
             config.gui.removeKeyListener(myKeyListener);
         }
-        if (bot != null) {
-            try {
-                bot.interrupt();
-            } catch (Exception e) {                
-            }
-            bot = null;            
-        }
-        if (robot != null) {
-            try {
-                robot.finish();
-            } catch (Exception e) {            
-            }
-            robot = null;
-        }        
+        bot = null;
         if (humanHijack != null) {
             try {
                 humanHijack.finish();

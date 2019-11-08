@@ -19,12 +19,10 @@ package conquest.bot;
 
 import java.util.List;
 
-import conquest.engine.robot.InternalRobot;
 import conquest.game.GameState;
 import conquest.game.move.AttackTransferMove;
 import conquest.game.move.PlaceArmiesMove;
 import conquest.game.world.Region;
-import conquest.view.GUI;
 
 public interface Bot {
     
@@ -52,10 +50,4 @@ public interface Bot {
      */
     public List<AttackTransferMove> getAttackTransferMoves(GameState state, Long timeoutMillis);
 
-    /**
-     * Callback that is invoked only for {@link InternalRobot}s and games with {@link GUI}.
-     * @param gui
-     */
-    public void setGUI(GUI gui);
-    
 }

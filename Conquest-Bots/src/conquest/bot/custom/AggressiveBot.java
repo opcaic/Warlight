@@ -16,7 +16,6 @@ import conquest.game.move.*;
 import conquest.game.world.Continent;
 import conquest.game.world.Region;
 import conquest.utils.Util;
-import conquest.view.GUI;
 
 public class AggressiveBot extends GameBot 
 {
@@ -27,10 +26,6 @@ public class AggressiveBot extends GameBot
         aRes = FightAttackersResults.loadFromFile(Util.findFile("Conquest-Bots/FightSimulation-Attackers-A200-D200.obj"));
         dRes = FightDefendersResults.loadFromFile(Util.findFile("Conquest-Bots/FightSimulation-Defenders-A200-D200.obj"));
         System.err.println("---==[ AGGRESSIVE BOT INITIALIZED ]==---");
-    }
-    
-    @Override
-    public void setGUI(GUI gui) {
     }
     
     // ================

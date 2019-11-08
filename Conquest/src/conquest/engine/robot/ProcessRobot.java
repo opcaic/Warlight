@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.*;
 
 import conquest.engine.Robot;
+import conquest.game.GameState;
 import conquest.game.move.*;
 import conquest.game.world.Region;
 
@@ -54,40 +55,35 @@ public class ProcessRobot implements Robot
         robot.setup(config);
     }
         
-//    @Override
-//    public void writeMove(Move move) {
-//        robot.writeMove(move);
-//    }
-    
     String botDied() {
         return "Bot died out. Executed from '" + childDir.getAbsolutePath() + "' with command '" + childCommand + "'.";
     }
     
     @Override
-    public Region getStartingRegion(long timeOut, ArrayList<Region> pickableRegions)
+    public Region getStartingRegion(GameState state, long timeOut)
     {
         if (!isRunning()) {
             throw new RuntimeException(botDied());
         }
-        return robot.getStartingRegion(timeOut, pickableRegions);
+        return robot.getStartingRegion(state, timeOut);
     }
     
     @Override
-    public List<PlaceArmiesMove> getPlaceArmiesMoves(long timeOut)
+    public List<PlaceArmiesMove> getPlaceArmiesMoves(GameState state, long timeOut)
     {
         if (!isRunning()) {
             throw new RuntimeException(botDied());
         }
-        return robot.getPlaceArmiesMoves(timeOut);
+        return robot.getPlaceArmiesMoves(state, timeOut);
     }
     
     @Override
-    public List<AttackTransferMove> getAttackTransferMoves(long timeOut)
+    public List<AttackTransferMove> getAttackTransferMoves(GameState state, long timeOut)
     {
         if (!isRunning()) {
             throw new RuntimeException(botDied());
         }
-        return robot.getAttackTransferMoves(timeOut);
+        return robot.getAttackTransferMoves(state, timeOut);
     }
     
     @Override

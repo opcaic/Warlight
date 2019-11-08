@@ -20,7 +20,7 @@ package conquest.engine;
 import java.util.*;
 
 import conquest.engine.replay.GameLog;
-import conquest.game.Team;
+import conquest.game.*;
 import conquest.game.move.*;
 import conquest.view.GUI;
 import conquest.game.world.Region;
@@ -63,11 +63,11 @@ public interface Robot {
 
     public void setup(RobotConfig config);
     
-    public Region getStartingRegion(long timeOut, ArrayList<Region> pickableRegions);
+    public Region getStartingRegion(GameState state, long timeOut);
     
-    public List<PlaceArmiesMove> getPlaceArmiesMoves(long timeOut);
+    public List<PlaceArmiesMove> getPlaceArmiesMoves(GameState state, long timeOut);
     
-    public List<AttackTransferMove> getAttackTransferMoves(long timeOut);
+    public List<AttackTransferMove> getAttackTransferMoves(GameState state, long timeOut);
     
     public void writeInfo(String info);
 

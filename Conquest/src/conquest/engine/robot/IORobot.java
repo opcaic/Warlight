@@ -26,6 +26,7 @@ import conquest.engine.Robot;
 import conquest.engine.io.handler.Handler;
 import conquest.engine.io.handler.IHandler;
 import conquest.engine.replay.GameLog;
+import conquest.game.GameState;
 import conquest.game.move.*;
 import conquest.game.world.Region;
 
@@ -66,10 +67,10 @@ public class IORobot implements Robot
     }
         
     @Override
-    public Region getStartingRegion(long timeOut, ArrayList<Region> pickableRegions)
+    public Region getStartingRegion(GameState state, long timeOut)
     {
         String output = "pick_starting_region " + timeOut;
-        for(Region region : pickableRegions)
+        for(Region region : state.getPickableRegions())
             output = output.concat(" " + region.id);
         
         handler.writeLine(output);
@@ -90,7 +91,7 @@ public class IORobot implements Robot
   }
     
     @Override
-    public List<PlaceArmiesMove> getPlaceArmiesMoves(long timeOut)
+    public List<PlaceArmiesMove> getPlaceArmiesMoves(GameState state, long timeOut)
     {
         return placeArmiesMoves(getMoves("place_armies", timeOut));
     }
@@ -108,7 +109,7 @@ public class IORobot implements Robot
   }
     
     @Override
-    public List<AttackTransferMove> getAttackTransferMoves(long timeOut)
+    public List<AttackTransferMove> getAttackTransferMoves(GameState state, long timeOut)
     {
         return attackTransferMoves(getMoves("attack/transfer", timeOut));
     }

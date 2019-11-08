@@ -56,7 +56,7 @@ public class Engine {
         }
         
         for (int i = 1 ; i <= 2 ; ++i) {
-            List<PlaceArmiesMove> placeMoves = robot(i).getPlaceArmiesMoves(timeoutMillis);
+            List<PlaceArmiesMove> placeMoves = robot(i).getPlaceArmiesMoves(game, timeoutMillis);
             
             game.placeArmies(placeMoves);
     
@@ -72,7 +72,7 @@ public class Engine {
                 gui.placeArmies(i, game.getMap().regions, legalMoves);
             }
             
-            List<AttackTransferMove> moves = robot(i).getAttackTransferMoves(timeoutMillis);
+            List<AttackTransferMove> moves = robot(i).getAttackTransferMoves(game, timeoutMillis);
             
             game.attackTransfer(moves);
             
@@ -90,8 +90,6 @@ public class Engine {
     
     public void distributeStartingRegions()
     {
-        ArrayList<Region> pickableRegions = game.pickableRegions;
-        
         if (gui != null) {
             gui.pickableRegions();
         }
@@ -99,7 +97,7 @@ public class Engine {
         for (int i = 1 ; i <= GameState.nrOfStartingRegions ; ++i)
             for (int p = 1 ; p <= 2 ; ++p) {
                 sendUpdateMapInfo(p);
-                Region region = robot(p).getStartingRegion(timeoutMillis, pickableRegions);
+                Region region = robot(p).getStartingRegion(game, timeoutMillis);
                 
                 //if the bot did not correctly return a starting region, get some random ones
                 if (!game.pickableRegions.contains(region)) {
