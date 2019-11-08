@@ -24,27 +24,15 @@ import conquest.game.Phase;
 import conquest.game.RegionData;
 import conquest.game.GameState;
 import conquest.game.ContinentData;
-import conquest.game.GameConfig;
 import conquest.game.world.Continent;
 import conquest.game.world.Region;
 
 public class BotState {
     private GameState state;
 
-    // This map is known from the start, contains all the regions and how they are connected,
-    // doesn't change after initialization
-    private final GameMap fullMap = new GameMap(); 
-    
-    // This map represents everything the player can see, updated at the end of each round.
-    private GameMap visibleMap; 
-    
-    //2 randomly chosen regions from each continent are given, which the bot can choose to start with
-    private ArrayList<Region> pickableStartingRegions;
-
     public BotState()
     {
-    state = new GameState(null, new GameMap(), null);
-        pickableStartingRegions = new ArrayList<Region>();
+        state = new GameState(null, new GameMap(), null, new ArrayList<Region>());
     }
     
     public void updateSettings(String key, String value)
@@ -64,17 +52,17 @@ public class BotState {
     //initial map is given to the bot with all the information except for player and armies info
     public void setupMap(String[] mapInput)
     {
-        int i, regionId, continentId, reward;
-        
+        GameMap map = state.getMap();
+
         if(mapInput[1].equals("continents"))
         {
-            for(i=2; i<mapInput.length; i++)
+            for(int i=2; i<mapInput.length; i++)
             {
                 try {
-                    continentId = Integer.parseInt(mapInput[i]);
+                    int continentId = Integer.parseInt(mapInput[i]);
                     i++;
-                    reward = Integer.parseInt(mapInput[i]);
-                    fullMap.add(new ContinentData(Continent.forId(continentId), continentId, reward));
+                    int reward = Integer.parseInt(mapInput[i]);
+                    map.add(new ContinentData(Continent.forId(continentId), continentId, reward));
                 }
                 catch(Exception e) {
                     System.err.println("Unable to parse Continents");
@@ -83,14 +71,14 @@ public class BotState {
         }
         else if(mapInput[1].equals("regions"))
         {
-            for(i=2; i<mapInput.length; i++)
+            for(int i=2; i<mapInput.length; i++)
             {
                 try {
-                    regionId = Integer.parseInt(mapInput[i]);
+                    int regionId = Integer.parseInt(mapInput[i]);
                     i++;
-                    continentId = Integer.parseInt(mapInput[i]);
-                    ContinentData continent = fullMap.getContinent(continentId);
-                    fullMap.add(new RegionData(Region.forId(regionId), regionId, continent));
+                    int continentId = Integer.parseInt(mapInput[i]);
+                    ContinentData continent = map.getContinent(continentId);
+                    map.add(new RegionData(Region.forId(regionId), regionId, continent));
                 }
                 catch(Exception e) {
                     System.err.println("Unable to parse Regions " + e.getMessage());
@@ -99,15 +87,15 @@ public class BotState {
         }
         else if(mapInput[1].equals("neighbors"))
         {
-            for(i=2; i<mapInput.length; i++)
+            for(int i=2; i<mapInput.length; i++)
             {
                 try {
-                    RegionData region = fullMap.getRegion(Integer.parseInt(mapInput[i]));
+                    RegionData region = map.getRegion(Integer.parseInt(mapInput[i]));
                     i++;
                     String[] neighborIds = mapInput[i].split(",");
                     for(int j=0; j<neighborIds.length; j++)
                     {
-                        RegionData neighbor = fullMap.getRegion(Integer.parseInt(neighborIds[j]));
+                        RegionData neighbor = map.getRegion(Integer.parseInt(neighborIds[j]));
                         region.addNeighbor(neighbor);
                     }
                 }
@@ -121,7 +109,7 @@ public class BotState {
     //regions from which a player is able to pick his preferred starting regions
     public void setPickableStartingRegions(String[] mapInput)
     {
-        pickableStartingRegions = new ArrayList<Region>();
+        ArrayList<Region> regions = new ArrayList<Region>();
         
         for(int i=2; i<mapInput.length; i++)
         {
@@ -129,22 +117,23 @@ public class BotState {
             try {
                 regionId = Integer.parseInt(mapInput[i]);
                 Region pickableRegion = Region.forId(regionId);
-                pickableStartingRegions.add(pickableRegion);
+                regions.add(pickableRegion);
             }
             catch(Exception e) {
                 System.err.println("Unable to parse pickable regions " + e.getMessage());
             }
         }
+
+        state.setPickableRegions(regions);
     }
     
     //visible regions are given to the bot with player and armies info
     public void updateMap(String[] mapInput)
     {
-        visibleMap = fullMap.clone();
         for(int i=1; i<mapInput.length; i++)
         {
             try {
-                RegionData region = visibleMap.getRegion(Integer.parseInt(mapInput[i]));
+                RegionData region = state.getMap().getRegion(Integer.parseInt(mapInput[i]));
                 int owner = Integer.parseInt(mapInput[i+1]);
                 int armies = Integer.parseInt(mapInput[i+2]);
                 
@@ -171,17 +160,15 @@ public class BotState {
      * @return
      */
     public GameMap getMap(){
-        return visibleMap != null ? visibleMap : fullMap;
+        return state.getMap();
     }
     
     public ArrayList<Region> getPickableStartingRegions(){
-        return pickableStartingRegions;
+        return state.getPickableRegions();
     }
 
     public GameState toConquestGame() {
-        return new GameState(
-            new GameConfig(), getMap(), null, state.getRoundNumber(), state.me(), state.getPhase(),
-            pickableStartingRegions);
+        return state;
     }
     
 }

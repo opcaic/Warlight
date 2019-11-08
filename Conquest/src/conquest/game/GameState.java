@@ -37,18 +37,20 @@ public class GameState implements Cloneable {
         this.random = new Random(config.seed);
     }
     
-    public GameState(GameConfig config, GameMap map, String[] playerNames) {
+    public GameState(GameConfig config, GameMap map, String[] playerNames,
+                     ArrayList<Region> pickableRegions) {
         this(
             config != null ? config : new GameConfig(),
             map != null ? map : makeInitMap(),
             playerNames != null ? playerNames : new String[] { "Player 1", "Player 2" },
-            0, 1, Phase.STARTING_REGIONS, null);
+            0, 1, Phase.STARTING_REGIONS, pickableRegions);
 
-        initStartingRegions();
+        if (pickableRegions == null)
+            initStartingRegions();
     }
     
     public GameState() {
-        this(null, null, null);
+        this(null, null, null, null);
     }
     
     public void setGUI(GUI gui) {
@@ -130,8 +132,12 @@ public class GameState implements Cloneable {
         return getMap().ownedRegionsByPlayer(player);
     }
         
-    public List<Region> getPickableRegions() {
+    public ArrayList<Region> getPickableRegions() {
         return pickableRegions;
+    }
+
+    public void setPickableRegions(ArrayList<Region> regions) {
+        this.pickableRegions = regions;
     }
     
     //calculate how many armies a player is able to place on the map each round
