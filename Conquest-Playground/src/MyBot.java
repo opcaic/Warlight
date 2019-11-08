@@ -1,5 +1,3 @@
-package conquest.bot.playground;
-
 import java.io.File;
 import java.util.*;
 
