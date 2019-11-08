@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_conquest-checker" default="compile.module.conquest-checker">
+  <dirname property="module.conquest-checker.basedir" file="${ant.file.module_conquest-checker}"/>
+  
+  <property name="module.jdk.home.conquest-checker" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.conquest-checker" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.conquest-checker" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.conquest-checker" value="-encoding UTF-8 -source 8 -target 8 ${compiler.args}"/>
+  
+  <property name="conquest-checker.output.dir" value="${module.conquest-checker.basedir}/../out/production/Conquest-Checker"/>
+  <property name="conquest-checker.testoutput.dir" value="${module.conquest-checker.basedir}/../out/test/Conquest-Checker"/>
+  
+  <path id="conquest-checker.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="conquest-checker.module.production.classpath">
+    <path refid="${module.jdk.classpath.conquest-checker}"/>
+  </path>
+  
+  <path id="conquest-checker.runtime.production.module.classpath">
+    <pathelement location="${conquest-checker.output.dir}"/>
+  </path>
+  
+  <path id="conquest-checker.module.classpath">
+    <path refid="${module.jdk.classpath.conquest-checker}"/>
+    <pathelement location="${conquest-checker.output.dir}"/>
+  </path>
+  
+  <path id="conquest-checker.runtime.module.classpath">
+    <pathelement location="${conquest-checker.testoutput.dir}"/>
+    <pathelement location="${conquest-checker.output.dir}"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.conquest-checker">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.conquest-checker">
+    <patternset refid="excluded.from.module.conquest-checker"/>
+  </patternset>
+  
+  <path id="conquest-checker.module.sourcepath">
+    <dirset dir="${module.conquest-checker.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.conquest-checker" depends="compile.module.conquest-checker.production,compile.module.conquest-checker.tests" description="Compile module Conquest-Checker"/>
+  
+  <target name="compile.module.conquest-checker.production" depends="register.custom.compilers" description="Compile module Conquest-Checker; production classes">
+    <mkdir dir="${conquest-checker.output.dir}"/>
+    <javac2 destdir="${conquest-checker.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.conquest-checker}/javac">
+      <compilerarg line="${compiler.args.conquest-checker}"/>
+      <bootclasspath refid="conquest-checker.module.bootclasspath"/>
+      <classpath refid="conquest-checker.module.production.classpath"/>
+      <src refid="conquest-checker.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.conquest-checker"/>
+    </javac2>
+    
+    <copy todir="${conquest-checker.output.dir}">
+      <fileset dir="${module.conquest-checker.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.conquest-checker.tests" depends="register.custom.compilers,compile.module.conquest-checker.production" description="compile module Conquest-Checker; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.conquest-checker" description="cleanup module">
+    <delete dir="${conquest-checker.output.dir}"/>
+    <delete dir="${conquest-checker.testoutput.dir}"/>
+  </target>
+</project>

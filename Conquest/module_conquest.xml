@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_conquest" default="compile.module.conquest">
+  <dirname property="module.conquest.basedir" file="${ant.file.module_conquest}"/>
+  
+  <property name="module.jdk.home.conquest" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.conquest" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.conquest" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.conquest" value="-encoding UTF-8 -source 8 -target 8 ${compiler.args}"/>
+  
+  <property name="conquest.output.dir" value="${module.conquest.basedir}/bin"/>
+  <property name="conquest.testoutput.dir" value="${module.conquest.basedir}/bin"/>
+  
+  <path id="conquest.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="conquest.module.production.classpath">
+    <path refid="${module.jdk.classpath.conquest}"/>
+  </path>
+  
+  <path id="conquest.runtime.production.module.classpath">
+    <pathelement location="${conquest.output.dir}"/>
+  </path>
+  
+  <path id="conquest.module.classpath">
+    <pathelement location="${conquest.output.dir}"/>
+    <path refid="${module.jdk.classpath.conquest}"/>
+  </path>
+  
+  <path id="conquest.runtime.module.classpath">
+    <pathelement location="${conquest.output.dir}"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.conquest">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.conquest">
+    <patternset refid="excluded.from.module.conquest"/>
+  </patternset>
+  
+  <path id="conquest.module.sourcepath">
+    <dirset dir="${module.conquest.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.conquest" depends="compile.module.conquest.production,compile.module.conquest.tests" description="Compile module Conquest"/>
+  
+  <target name="compile.module.conquest.production" depends="register.custom.compilers" description="Compile module Conquest; production classes">
+    <mkdir dir="${conquest.output.dir}"/>
+    <javac2 destdir="${conquest.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.conquest}/javac">
+      <compilerarg line="${compiler.args.conquest}"/>
+      <bootclasspath refid="conquest.module.bootclasspath"/>
+      <classpath refid="conquest.module.production.classpath"/>
+      <src refid="conquest.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.conquest"/>
+    </javac2>
+    
+    <copy todir="${conquest.output.dir}">
+      <fileset dir="${module.conquest.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.conquest.tests" depends="register.custom.compilers,compile.module.conquest.production" description="compile module Conquest; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.conquest" description="cleanup module">
+    <delete dir="${conquest.output.dir}"/>
+    <delete dir="${conquest.testoutput.dir}"/>
+  </target>
+</project>

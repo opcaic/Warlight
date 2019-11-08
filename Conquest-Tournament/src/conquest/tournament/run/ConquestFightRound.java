@@ -3,28 +3,29 @@ package conquest.tournament.run;
 import conquest.engine.Config;
 import conquest.engine.GameResult;
 import conquest.engine.RunGame;
+import conquest.game.Team;
 
 
 public class ConquestFightRound {
-    
-    private Config config;
-    
-    public ConquestFightRound(Config config) {
-        this.config = config;
-    }
-    
-    public synchronized GameResult run() {
-        RunGame game = new RunGame(config);
-        
-        GameResult result = game.go();
-            
-        System.out.println("GAME FINISHED - Winner: " + result.winner);
-        
-        return result;        
-    }
+	
+	private Config config;
+	
+	public ConquestFightRound(Config config) {
+		this.config = config;
+	}
+	
+	public synchronized GameResult run() {
+		RunGame game = new RunGame(config);
+		
+		GameResult result = game.go();
+			
+		System.out.println("GAME FINISHED - Winner: " + result.winner);
+		
+		return result;		
+	}
 
-    public Config getConfig() {
-        return config;
-    }
-        
+	public Config getConfig() {
+		return config;
+	}
+		
 }

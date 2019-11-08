@@ -11,27 +11,27 @@
 //    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
-//    
+//	
 //    For the full copyright and license information, please view the LICENSE
 //    file that was distributed with this source code.
 
 package conquest.game.move;
 
 public class Move {
-    private String illegalMove = ""; //gets the value of the error message if move is illegal, else remains empty
-    
-    /**
-     * @param illegalMove Sets the error message of this move. Only set this if the Move is illegal.
-     */
-    public void setIllegalMove(String illegalMove) {
-        this.illegalMove = illegalMove;
-        System.err.println(illegalMove);
-    }
-    
-    /**
-     * @return The error message of this Move
-     */
-    public String getIllegalMove() {
-        return illegalMove;
-    }
+	private String illegalMove = ""; //gets the value of the error message if move is illegal, else remains empty
+	
+	/**
+	 * @param illegalMove Sets the error message of this move. Only set this if the Move is illegal.
+	 */
+	public void setIllegalMove(String illegalMove) {
+		this.illegalMove = illegalMove;
+		System.err.println(illegalMove);
+	}
+	
+	/**
+	 * @return The error message of this Move
+	 */
+	public String getIllegalMove() {
+		return illegalMove;
+	}
 }

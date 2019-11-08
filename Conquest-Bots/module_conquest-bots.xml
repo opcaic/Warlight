@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_conquest-bots" default="compile.module.conquest-bots">
+  <dirname property="module.conquest-bots.basedir" file="${ant.file.module_conquest-bots}"/>
+  
+  <property name="module.jdk.home.conquest-bots" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.conquest-bots" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.conquest-bots" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.conquest-bots" value="-encoding UTF-8 -source 8 -target 8 ${compiler.args}"/>
+  
+  <property name="conquest-bots.output.dir" value="${module.conquest-bots.basedir}/bin"/>
+  <property name="conquest-bots.testoutput.dir" value="${module.conquest-bots.basedir}/bin"/>
+  
+  <path id="conquest-bots.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="conquest-bots.module.production.classpath">
+    <path refid="${module.jdk.classpath.conquest-bots}"/>
+    <pathelement location="${conquest.output.dir}"/>
+  </path>
+  
+  <path id="conquest-bots.runtime.production.module.classpath">
+    <pathelement location="${conquest-bots.output.dir}"/>
+    <path refid="conquest.runtime.production.module.classpath"/>
+  </path>
+  
+  <path id="conquest-bots.module.classpath">
+    <pathelement location="${conquest-bots.output.dir}"/>
+    <path refid="${module.jdk.classpath.conquest-bots}"/>
+    <pathelement location="${conquest.output.dir}"/>
+  </path>
+  
+  <path id="conquest-bots.runtime.module.classpath">
+    <pathelement location="${conquest-bots.output.dir}"/>
+    <path refid="conquest.runtime.module.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.conquest-bots">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.conquest-bots">
+    <patternset refid="excluded.from.module.conquest-bots"/>
+  </patternset>
+  
+  <path id="conquest-bots.module.sourcepath">
+    <dirset dir="${module.conquest-bots.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.conquest-bots" depends="compile.module.conquest-bots.production,compile.module.conquest-bots.tests" description="Compile module Conquest-Bots"/>
+  
+  <target name="compile.module.conquest-bots.production" depends="register.custom.compilers,compile.module.conquest" description="Compile module Conquest-Bots; production classes">
+    <mkdir dir="${conquest-bots.output.dir}"/>
+    <javac2 destdir="${conquest-bots.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.conquest-bots}/javac">
+      <compilerarg line="${compiler.args.conquest-bots}"/>
+      <bootclasspath refid="conquest-bots.module.bootclasspath"/>
+      <classpath refid="conquest-bots.module.production.classpath"/>
+      <src refid="conquest-bots.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.conquest-bots"/>
+    </javac2>
+    
+    <copy todir="${conquest-bots.output.dir}">
+      <fileset dir="${module.conquest-bots.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.conquest-bots.tests" depends="register.custom.compilers,compile.module.conquest-bots.production" description="compile module Conquest-Bots; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.conquest-bots" description="cleanup module">
+    <delete dir="${conquest-bots.output.dir}"/>
+    <delete dir="${conquest-bots.testoutput.dir}"/>
+  </target>
+</project>

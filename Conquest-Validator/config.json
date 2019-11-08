@@ -1,0 +1,9 @@
+{
+  "seed": "42",
+  "game-config": "GAME;x;x;5000;false;false;200;false;-1;false;5;100;CONTINUAL_1_1_A60_D70",
+  "games-count": "1",
+  "reverse-games": "false",
+  "result-dir": "./results/fights",
+  "replay-dir": "./results/replays",
+  "table-file": "./results/all-results.csv" 
+}

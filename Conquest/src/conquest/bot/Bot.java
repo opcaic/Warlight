@@ -11,43 +11,50 @@
 //    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
-//    
+//	
 //    For the full copyright and license information, please view the LICENSE
 //    file that was distributed with this source code.
 
 package conquest.bot;
 
-import java.util.List;
+import java.util.ArrayList;
 
-import conquest.game.GameState;
+import conquest.engine.robot.InternalRobot;
 import conquest.game.move.AttackTransferMove;
 import conquest.game.move.PlaceArmiesMove;
 import conquest.game.world.Region;
+import conquest.view.GUI;
 
 public interface Bot {
-    
-    /**
-     * CHOOSE REGIONS - called only at the beginning.
-     * @param state
-     * @param timeoutMillis in milliseconds
-     * @return
-     */
-    public Region getStartingRegion(GameState state, Long timeoutMillis);
-    
-    /**
-     * PLACE ARMIES - distribute armies between your regions.
-     * @param state
-     * @param timeoutMillis in milliseconds
-     * @return
-     */
-    public List<PlaceArmiesMove> getPlaceArmiesMoves(GameState state, Long timeoutMillis);
-    
-    /**
-     * MOVE ARMIES - attack opponents' regions or neutral ones ... or transfer armies between your regions.
-     * @param state
-     * @param timeoutMillis in milliseconds
-     * @return
-     */
-    public List<AttackTransferMove> getAttackTransferMoves(GameState state, Long timeoutMillis);
+	
+	/**
+	 * CHOOSE REGIONS - called only at the beginning.
+	 * @param state
+	 * @param timeoutMillis in milliseconds
+	 * @return
+	 */
+	public Region getStartingRegion(BotState state, Long timeoutMillis);
+	
+	/**
+	 * PLACE ARMIES - distribute armies between your regions.
+	 * @param state
+	 * @param timeoutMillis in milliseconds
+	 * @return
+	 */
+	public ArrayList<PlaceArmiesMove> getPlaceArmiesMoves(BotState state, Long timeoutMillis);
+	
+	/**
+	 * MOVE ARMIES - attack opponents' regions or neutral ones ... or transfer armies between your regions.
+	 * @param state
+	 * @param timeoutMillis in milliseconds
+	 * @return
+	 */
+	public ArrayList<AttackTransferMove> getAttackTransferMoves(BotState state, Long timeoutMillis);
 
+	/**
+	 * Callback that is invoked only for {@link InternalRobot}s and games with {@link GUI}.
+	 * @param gui
+	 */
+	public void setGUI(GUI gui);
+	
 }

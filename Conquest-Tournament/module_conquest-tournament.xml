@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_conquest-tournament" default="compile.module.conquest-tournament">
+  <dirname property="module.conquest-tournament.basedir" file="${ant.file.module_conquest-tournament}"/>
+  
+  <property name="module.jdk.home.conquest-tournament" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.conquest-tournament" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.conquest-tournament" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.conquest-tournament" value="-encoding UTF-8 -source 8 -target 8 ${compiler.args}"/>
+  
+  <property name="conquest-tournament.output.dir" value="${module.conquest-tournament.basedir}/bin"/>
+  <property name="conquest-tournament.testoutput.dir" value="${module.conquest-tournament.basedir}/bin"/>
+  
+  <path id="conquest-tournament.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="conquest-tournament.module.production.classpath">
+    <path refid="${module.jdk.classpath.conquest-tournament}"/>
+    <pathelement location="${basedir}/Conquest-Tournament/lib/jsap-2.1.jar"/>
+    <pathelement location="${conquest.output.dir}"/>
+    <pathelement location="${conquest-playground.output.dir}"/>
+  </path>
+  
+  <path id="conquest-tournament.runtime.production.module.classpath">
+    <pathelement location="${conquest-tournament.output.dir}"/>
+    <pathelement location="${basedir}/Conquest-Tournament/lib/jsap-2.1.jar"/>
+    <path refid="conquest.runtime.production.module.classpath"/>
+    <path refid="conquest-playground.runtime.production.module.classpath"/>
+  </path>
+  
+  <path id="conquest-tournament.module.classpath">
+    <pathelement location="${conquest-tournament.output.dir}"/>
+    <path refid="${module.jdk.classpath.conquest-tournament}"/>
+    <pathelement location="${basedir}/Conquest-Tournament/lib/jsap-2.1.jar"/>
+    <pathelement location="${conquest.output.dir}"/>
+    <pathelement location="${conquest-playground.output.dir}"/>
+  </path>
+  
+  <path id="conquest-tournament.runtime.module.classpath">
+    <pathelement location="${conquest-tournament.output.dir}"/>
+    <pathelement location="${basedir}/Conquest-Tournament/lib/jsap-2.1.jar"/>
+    <path refid="conquest.runtime.module.classpath"/>
+    <path refid="conquest-playground.runtime.module.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.conquest-tournament">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.conquest-tournament">
+    <patternset refid="excluded.from.module.conquest-tournament"/>
+  </patternset>
+  
+  <path id="conquest-tournament.module.sourcepath">
+    <dirset dir="${module.conquest-tournament.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.conquest-tournament" depends="compile.module.conquest-tournament.production,compile.module.conquest-tournament.tests" description="Compile module Conquest-Tournament"/>
+  
+  <target name="compile.module.conquest-tournament.production" depends="register.custom.compilers,compile.module.conquest,compile.module.conquest-playground" description="Compile module Conquest-Tournament; production classes">
+    <mkdir dir="${conquest-tournament.output.dir}"/>
+    <javac2 destdir="${conquest-tournament.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.conquest-tournament}/javac">
+      <compilerarg line="${compiler.args.conquest-tournament}"/>
+      <bootclasspath refid="conquest-tournament.module.bootclasspath"/>
+      <classpath refid="conquest-tournament.module.production.classpath"/>
+      <src refid="conquest-tournament.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.conquest-tournament"/>
+    </javac2>
+    
+    <copy todir="${conquest-tournament.output.dir}">
+      <fileset dir="${module.conquest-tournament.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.conquest-tournament.tests" depends="register.custom.compilers,compile.module.conquest-tournament.production" description="compile module Conquest-Tournament; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.conquest-tournament" description="cleanup module">
+    <delete dir="${conquest-tournament.output.dir}"/>
+    <delete dir="${conquest-tournament.testoutput.dir}"/>
+  </target>
+</project>

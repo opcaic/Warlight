@@ -11,13 +11,11 @@
 //    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
-//    
+//	
 //    For the full copyright and license information, please view the LICENSE
 //    file that was distributed with this source code.
 
 package conquest.game.move;
-
-import conquest.game.RegionData;
 import conquest.game.world.Region;
 
 /**
@@ -27,57 +25,53 @@ import conquest.game.world.Region;
  */
 
 public class AttackTransferMove extends Move {
-    
-    private Region fromRegion;
-    private Region toRegion;
-    private int armies;
-    
-    public AttackTransferMove(Region fromRegion, Region toRegion, int armies)
-    {
-        this.fromRegion = fromRegion;
-        this.toRegion = toRegion;
-        this.armies = armies;
-    }
-
-    public AttackTransferMove(RegionData from, RegionData to, int armies) {
-        this(from.getRegion(), to.getRegion(), armies);
-    }
-    
-    /**
-     * @param n Sets the number of armies of this Move
-     */
-    public void setArmies(int n) {
-        armies = n;
-    }
-    
-    /**
-     * @return The Region this Move is attacking or transferring from
-     */
-    public Region getFromRegion() {
-        return fromRegion;
-    }
-    
-    /**
-     * @return The Region this Move is attacking or transferring to
-     */
-    public Region getToRegion() {
-        return toRegion;
-    }
-    
-    /**
-     * @return The number of armies this Move is attacking or transferring with
-     */
-    public int getArmies() {
-        return armies;
-    }
-    
-    /**
-     * @return A string representation of this Move
-     */
-    public String getString() {
-        if(getIllegalMove().equals(""))
-            return "attack/transfer " + fromRegion.id + " " + toRegion.id + " " + armies;
-        else
-            return "illegal_move " + getIllegalMove();
-    }
+	
+	private Region fromRegion;
+	private Region toRegion;
+	private int armies;
+	
+	public AttackTransferMove(Region fromRegion, Region toRegion, int armies)
+	{
+		this.fromRegion = fromRegion;
+		this.toRegion = toRegion;
+		this.armies = armies;
+	}
+	
+	/**
+	 * @param n Sets the number of armies of this Move
+	 */
+	public void setArmies(int n) {
+		armies = n;
+	}
+	
+	/**
+	 * @return The Region this Move is attacking or transferring from
+	 */
+	public Region getFromRegion() {
+		return fromRegion;
+	}
+	
+	/**
+	 * @return The Region this Move is attacking or transferring to
+	 */
+	public Region getToRegion() {
+		return toRegion;
+	}
+	
+	/**
+	 * @return The number of armies this Move is attacking or transferring with
+	 */
+	public int getArmies() {
+		return armies;
+	}
+	
+	/**
+	 * @return A string representation of this Move
+	 */
+	public String getString() {
+		if(getIllegalMove().equals(""))
+			return "attack/transfer " + fromRegion.id + " " + toRegion.id + " " + armies;
+		else
+			return "illegal_move " + getIllegalMove();
+	}
 }

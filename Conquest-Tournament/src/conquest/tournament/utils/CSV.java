@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,15 @@ import java.util.Map;
  */
 public class CSV {
 
+	private static class StringComparator implements Comparator<String> {
+
+		@Override
+		public int compare(String o1, String o2) {
+			return o1.compareTo(o2);
+		}
+		
+	}
+	    
     private String delimiter;
     
     public List<String> keys;
@@ -39,54 +49,54 @@ public class CSV {
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
         
         try {
-            String[] line = nextLine(reader);
-            
-            if (line == null) {
-                throw new RuntimeException("File '" + file.getAbsolutePath() + "' does not contain any line!");
-            }
-            
-            if (containsHeaderRow) {
-                keys = new ArrayList<String>();
-                for (String item : line) {
-                    keys.add(item);
-                }
-            } else {
-                keys = new ArrayList<String>();
-                for (int i = 0; i < line.length; ++i) {
-                    keys.add(String.valueOf(i));
-                }
-                processLine(line);
-            }
-            
-            while (reader.ready()) {
-                processLine(nextLine(reader));
-            }
+	        String[] line = nextLine(reader);
+	        
+	        if (line == null) {
+	        	throw new RuntimeException("File '" + file.getAbsolutePath() + "' does not contain any line!");
+	        }
+	        
+	        if (containsHeaderRow) {
+	        	keys = new ArrayList<String>();
+	        	for (String item : line) {
+	        		keys.add(item);
+	        	}
+	        } else {
+	        	keys = new ArrayList<String>();
+	        	for (int i = 0; i < line.length; ++i) {
+	        		keys.add(String.valueOf(i));
+	        	}
+	        	processLine(line);
+	        }
+	        
+	        while (reader.ready()) {
+	        	processLine(nextLine(reader));
+	        }
         } finally {
-            reader.close();
+        	reader.close();
         }
     }
     
     private String[] nextLine(BufferedReader reader) throws IOException {
-        if (reader.ready()) {
-            String line = reader.readLine();
-            return line.split(delimiter);
-        }
-        return null;
+    	if (reader.ready()) {
+    		String line = reader.readLine();
+    		return line.split(delimiter);
+    	}
+    	return null;
     }
     
     private CSVRow processLine(String[] line) {
-        CSVRow result = new CSVRow();
-        for (int i = 0; i < line.length; ++i) {
-            if (i >= keys.size()) {
-                keys.add(String.valueOf(i));
-            }
-            String key = keys.get(i);
-            String value = line[i];
-            result.add(key, value);
-        }
-        rows.add(result);
-        return result;
-    }
+    	CSVRow result = new CSVRow();
+    	for (int i = 0; i < line.length; ++i) {
+    		if (i >= keys.size()) {
+    			keys.add(String.valueOf(i));
+    		}
+    		String key = keys.get(i);
+    		String value = line[i];
+    		result.add(key, value);
+    	}
+    	rows.add(result);
+    	return result;
+	}
 
     public static class CSVRow {
 
@@ -101,7 +111,7 @@ public class CSV {
         }
         
         protected void add(String key, String value) {
-            row.put(key, value);
+        	row.put(key, value);
         }
 
         public String getString(String name) {
