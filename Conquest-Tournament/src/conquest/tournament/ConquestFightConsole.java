@@ -1,6 +1,8 @@
 package conquest.tournament;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -149,7 +151,7 @@ public class ConquestFightConsole {
 		headerOutput = true;
 	}
 		
-	private static void readConfigFromJson(String jsonFileName) throws Exception
+	private static void readConfigFromJson(String jsonFileName) throws FileNotFoundException
 	{
 		System.out.println(jsonFileName);
 		String content = new Scanner(new File(jsonFileName)).useDelimiter("\\Z").next();
@@ -277,7 +279,7 @@ public class ConquestFightConsole {
 	    System.out.println("Sanity checks OK!");
 	}
 	
-	private static void fight() throws Exception {
+	private static void fight(){
 		
 		if (batchFight) {
 			batchFight();
@@ -286,7 +288,7 @@ public class ConquestFightConsole {
 		}
 	}
 	
-	private static void fight1v1() throws Exception {
+	private static void fight1v1() {
 	
 		System.out.println("EXECUTING 1v1 FIGHT!");
 		
@@ -308,7 +310,7 @@ public class ConquestFightConsole {
 		}
 	}
 	
-	private static void batchFight() throws Exception {
+	private static void batchFight() {
 		System.out.println("EXECUTING BATCH FIGHTS!");
 		
 		ConquestFightConfig config = new ConquestFightConfig();
@@ -426,39 +428,37 @@ public class ConquestFightConsole {
 			ExitError("At least three args expected.");
 		}
 
+		header();
+
 		try
 		{
-			header();
-
 			readConfigFromJson(args[0] + System.getProperty("file.separator") + "config.json");
-
-			File source1Directory = new File(args[1]);
-			File jarBot1File = FirstOrDefaultJarFileFromDirectory(source1Directory);
-			bot1JarPath = args[1];
-			File source2Directory = new File(args[2]);
-			File jarBot2File = FirstOrDefaultJarFileFromDirectory(source2Directory);
-			bot2JarPath = args[2];
-
-			InitBotsFromJar(jarBot1File, jarBot2File);
-			if (args.length > 3)
-			{
-				resultJsonFile = new File(args[3] + System.getProperty("file.separator") + "match-results.json");
-				replayDir = args[3];
-				resultDir = args[3];
-			}
-
-			sanityChecks();
-
-			fight();
-
-			System.out.println("---// FINISHED //---");
-
-			ExitOk();
 		}
-		catch (Exception e)
+		catch (IOException exception)
 		{
-			ExitError(e.toString());
+			System.out.println("Error when reading the game config.");
+			System.exit(1000);
 		}
+
+		File source1Directory = new File(args[1]);
+		File jarBot1File = FirstOrDefaultJarFileFromDirectory(source1Directory);
+		bot1JarPath = args[1];
+		File source2Directory = new File(args[2]);
+		File jarBot2File = FirstOrDefaultJarFileFromDirectory(source2Directory);
+		bot2JarPath = args[2];
+
+		InitBotsFromJar(jarBot1File, jarBot2File);
+		if (args.length > 3)
+		{
+			resultJsonFile = new File(args[3] + System.getProperty("file.separator") + "match-results.json");
+			replayDir = args[3];
+			resultDir = args[3];
+		}
+
+		sanityChecks();
+		fight();
+		System.out.println("---// FINISHED //---");
+		ExitOk();
 	}
 
 }

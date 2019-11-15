@@ -36,7 +36,7 @@ public class ConquestFightBatch {
 		this.fightConfig = fightConfig;
 	}
 	
-	public void fight(String botId1, String botId2, boolean reverseGames, File tableFile, File resultDirFile, File replayDirFile, File resultJsonFile) throws Exception {
+	public void fight(String botId1, String botId2, boolean reverseGames, File tableFile, File resultDirFile, File replayDirFile, File resultJsonFile) {
 		System.out.println("------");
 		System.out.println("------");
 		System.out.println("CONQUEST FIGHT BATCH: " + botId1 + " vs. " + botId2);
@@ -52,7 +52,7 @@ public class ConquestFightBatch {
 		}
 	}
 	
-	public void fight(String botId, boolean reverseGames, File tableFile, File resultDirFile, File replayDirFile, File resultJsonFile) throws Exception {
+	public void fight(String botId, boolean reverseGames, File tableFile, File resultDirFile, File replayDirFile, File resultJsonFile) {
 		Object[] keys = bots.keySet().toArray();
 		Arrays.sort(keys);
 		

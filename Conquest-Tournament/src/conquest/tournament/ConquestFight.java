@@ -1,9 +1,6 @@
 package conquest.tournament;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.Random;
 
 import conquest.engine.GameResult;
@@ -39,7 +36,7 @@ public class ConquestFight {
 		System.out.println("[" + name + "] " + msg);
 	}
 	
-	public void fight(String bot1Name, String bot1Init, String bot2Name, String bot2Init) throws Exception {
+	public void fight(String bot1Name, String bot1Init, String bot2Name, String bot2Init) {
 		bot1Name = Sanitize.idify(bot1Name);
 		bot2Name = Sanitize.idify(bot2Name);
 		
@@ -91,11 +88,19 @@ public class ConquestFight {
 		if (resultJsonFile != null && resultDirFile != null && replayDirFile != null)
 		{
 			outputResults(rounds, results);
-			generateJsonOutput(results, resultJsonFile);
+			try
+			{
+				generateJsonOutput(results, resultJsonFile);
+			}
+			catch (IOException exception)
+			{
+				System.out.println("Error when writing outputs of the match.");
+				System.exit(1100);
+			}
 		}
 	}
 
-	private void generateJsonOutput(GameResult[] result, File outputFile) throws Exception
+	private void generateJsonOutput(GameResult[] result, File outputFile) throws IOException
 	{
 		int totalScore1 = 0;
 		int totalScore2 = 0;
