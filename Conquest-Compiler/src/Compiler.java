@@ -88,12 +88,22 @@ public class Compiler
             Process p = builder.start();
             p.waitFor();
 
+            if (p.exitValue() != 0)
+            {
+                ExitError("There was an error while compiling the classes.");
+            }
+
             System.out.println("Building bot jar...");
             builder = new ProcessBuilder("jar", "cvf", botName + ".jar", "conquest");
             builder.inheritIO();
             builder.redirectErrorStream(true);
             p = builder.start();
             p.waitFor();
+
+            if (p.exitValue() != 0)
+            {
+                ExitError("There was an error while building the jar.");
+            }
 
             System.out.println("Moving compiled jar...");
             File botJar = new File(botName + ".jar");
