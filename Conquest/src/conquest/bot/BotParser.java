@@ -87,13 +87,11 @@ public class BotParser extends Thread {
 		{
 			System.out.println("Could not find bot in package conquest.bot.custom");
 			e.printStackTrace();
+			System.exit(200);
 		}
 		catch (MalformedURLException e)
 		{
 			e.printStackTrace();
-		}
-		finally
-		{
 			System.exit(200);
 		}
 		return constructBot(botClass);

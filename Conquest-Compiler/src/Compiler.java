@@ -79,8 +79,6 @@ public class Compiler
             String jarClasspath = String.format(classpath, System.getProperty("path.separator"));
             String outputDirPath = outputDir.getPath();
 
-            System.out.println(jarClasspath);
-
             System.out.println("Compiling classes...");
             ProcessBuilder builder = new ProcessBuilder("javac", "-d", ".","-classpath", jarClasspath, sourceFile.getPath());
             builder.inheritIO();
