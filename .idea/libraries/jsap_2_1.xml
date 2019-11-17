@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="jsap-2.1">
+    <CLASSES>
+      <root url="jar://D:/mff/sw_projekt/conquest-engine-gui-master/lib/jsap-2.1.jar!/" />
+      <root url="jar://D:/mff/sw_projekt/conquest-engine-gui-master/lib/json.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
