@@ -25,11 +25,17 @@ public class Executor
             Process p = builder.start();
             p.waitFor();
 
+            if (p.exitValue() != 0)
+            {
+                ExitError("Match was not executed correctly.");
+            }
+
             ExitOk();
         }
         catch (Exception e)
         {
-            ExitError(e.toString());
+            // platform error
+            System.exit(42);
         }
     }
 }

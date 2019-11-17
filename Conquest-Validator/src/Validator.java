@@ -27,11 +27,17 @@ public class Validator
             Process p = builder.start();
             p.waitFor();
 
+            if (p.exitValue() != 0)
+            {
+                ExitError("Submission was not validated correctly.");
+            }
+
             ExitOk();
         }
         catch (Exception e)
         {
-            ExitError(e.toString());
+            // platform error
+            System.exit(42);
         }
     }
 }

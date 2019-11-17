@@ -20,101 +20,101 @@ import com.martiansoftware.jsap.JSAPResult;
 import conquest.engine.Config;
 
 public class ConquestFightConsole {
-
+	
 	private static final char ARG_SEED_SHORT = 's';
-
+	
 	private static final String ARG_SEED_LONG = "seed";
-
+	
 	private static final char ARG_GAME_CONFIG_SHORT = 'o';
-
+	
 	private static final String ARG_GAME_CONFIG_LONG = "game-config";
-
+	
 	private static final char ARG_GAMES_COUNT_SHORT = 'g';
-
+	
 	private static final String ARG_GAMES_COUNT_LONG = "games-count";
-
+	
 	private static final char ARG_REVERSE_GAMES_SHORT = 'r';
-
+	
 	private static final String ARG_REVERSE_GAMES_LONG = "reverse-games";
-
+	
 	private static final char ARG_BOT1_NAME_SHORT = 'a';
-
+	
 	private static final String ARG_BOT1_NAME_LONG = "bot1-name";
-
+	
 	private static final char ARG_BOT1_INIT_SHORT = 'b';
-
+	
 	private static final String ARG_BOT1_INIT_LONG = "bot1-init";
-
+	
 	private static final char ARG_BOT2_NAME_SHORT = 'c';
-
+	
 	private static final String ARG_BOT2_NAME_LONG = "bot2-name";
-
+	
 	private static final char ARG_BOT2_INIT_SHORT = 'd';
-
+	
 	private static final String ARG_BOT2_INIT_LONG = "bot2-init";
-
+	
 	private static final char ARG_BOT_ID_BATCH_SHORT = 'e';
-
+	
 	private static final String ARG_BOT_ID_BATCH_LONG = "bot-id-batch";
-
+	
 	private static final char ARG_BOTS_BATCH_PROPERTIES_SHORT = 'f';
-
+	
 	private static final String ARG_BOTS_BATCH_PROPERTIES_LONG = "bots-property-file-batch";
-
+	
 	private static final char ARG_RESULT_DIR_SHORT = 'u';
-
+	
 	private static final String ARG_RESULT_DIR_LONG = "result-dir";
-
+	
 	private static final char ARG_REPLAY_DIR_SHORT = 'y';
-
+	
 	private static final String ARG_REPLAY_DIR_LONG = "replay-dir";
-
+	
 	private static final char ARG_TABLE_FILE_SHORT = 't';
-
+	
 	private static final String ARG_TABLE_FILE_LONG = "table-file";
-
+	
 	private static JSAP jsap;
 
 	private static int seed = 0;
 
 	private static String roundConfig;
-
+	
 	private static int gamesCount;
-
+	
 	private static boolean reverseGames;
-
+	
 	private static String bot1Name;
-
+	
 	private static String bot1Init;
 
 	private static String bot1JarPath;
-
+	
 	private static String bot2Name;
-
+	
 	private static String bot2Init;
 
 	private static String bot2JarPath;
-
+	
 	private static String botIdBatch;
-
+	
 	private static String botsBatchPropertyFileName;
-
+	
 	private static File botsBatchPropertyFile;
-
+		
 	private static String resultDir;
-
+	
 	private static File resultDirFile;
-
+	
 	private static String replayDir;
-
+	
 	private static File replayDirFile;
 
 	private static File resultJsonFile;
 
 	private static String tableFileName;
-
+	
 	private static File tableFile;
-
+	
 	private static boolean batchFight;
 
 	private static boolean headerOutput = false;
@@ -132,13 +132,13 @@ public class ConquestFightConsole {
 		if (e != null) {
 			e.printStackTrace();
 			System.out.println("");
-		}
-		System.out.println("Usage: java -jar conquest-tournament.jar ");
-		System.out.println("                " + jsap.getUsage());
-		System.out.println();
-		System.out.println(jsap.getHelp());
-		System.out.println();
-		throw new RuntimeException("FAILURE: " + errorMessage);
+		}		
+        System.out.println("Usage: java -jar conquest-tournament.jar ");
+        System.out.println("                " + jsap.getUsage());
+        System.out.println();
+        System.out.println(jsap.getHelp());
+        System.out.println();
+        throw new RuntimeException("FAILURE: " + errorMessage);
 	}
 
 	private static void header() {
@@ -150,7 +150,7 @@ public class ConquestFightConsole {
 		System.out.println();
 		headerOutput = true;
 	}
-
+		
 	private static void readConfigFromJson(String jsonFileName) throws FileNotFoundException
 	{
 		String content = new Scanner(new File(jsonFileName)).useDelimiter("\\Z").next();
@@ -193,7 +193,7 @@ public class ConquestFightConsole {
 
 	private static void sanityChecks() {
 		System.out.println("Sanity checks...");
-
+		
 		System.out.println("-- seed: " + seed);
 		System.out.println("-- game config: " + roundConfig);
 		System.out.println("-- #games: " + gamesCount);
@@ -252,16 +252,16 @@ public class ConquestFightConsole {
 			System.out.println("-- Bot 1 & 2 ids / inits specified, will execute 1v1 fights");
 			System.out.println("---- bot1: " + bot1Name + " / " + bot1Init);
 			System.out.println("---- bot2: " + bot2Name + " / " + bot2Init);
-		} else
+		} else 
 		if (botIdBatch != null && botsBatchPropertyFileName != null) {
-			batchFight = true;
+			batchFight = true;				
 			System.out.println("-- Bot batch ID + Bots batch property file name specified, will execute batch fights");
-
+			
 			System.out.println("---- Bot ID for batch fights: " + botIdBatch);
-
+			
 			botsBatchPropertyFile = new File(botsBatchPropertyFileName);
 			System.out.println("---- Bots property file for batch fights: " + botsBatchPropertyFileName + " --> " + botsBatchPropertyFile.getAbsolutePath());
-
+			
 			if (!botsBatchPropertyFile.exists()) {
 				fail("------ File does not exist: " + botsBatchPropertyFileName + " --> " + botsBatchPropertyFile.getAbsolutePath());
 			}
@@ -269,29 +269,29 @@ public class ConquestFightConsole {
 				fail("------ File is not a file: " + botsBatchPropertyFileName + " --> " + botsBatchPropertyFile.getAbsolutePath());
 			}
 			System.out.println("------ Bots property file exists, ok");
-
+			
 		} else {
 			fail("Invalid specification, you either have to specify Bot 1 Id+Init and Bot 2 Id+Init for 1v1 fights, or Bot Id for batch fights together with property files with botId=botInit pairs.");
 		}
 
-		System.out.println("Sanity checks OK!");
+	    System.out.println("Sanity checks OK!");
 	}
-
+	
 	private static void fight(){
-
+		
 		if (batchFight) {
 			batchFight();
 		} else {
 			fight1v1();
 		}
 	}
-
+	
 	private static void fight1v1() {
-
+	
 		System.out.println("EXECUTING 1v1 FIGHT!");
-
+		
 		ConquestFightConfig config = new ConquestFightConfig();
-
+		
 		config.config = Config.fromString(roundConfig);
 		config.seed = seed;
 		config.games = gamesCount;
@@ -299,26 +299,26 @@ public class ConquestFightConsole {
 		config.config.bot2JarPath = bot2JarPath;
 		config.config.bot1Init = bot1Init;
 		config.config.bot2Init = bot2Init;
-
+		
 		ConquestFight fight = new ConquestFight(config, tableFile, resultDirFile, replayDirFile, resultJsonFile);
 		fight.fight(bot1Name, bot1Init, bot2Name, bot2Init);
-
+		
 		if (reverseGames) {
 			fight.fight(bot2Name, bot2Init, bot1Name, bot1Init);
 		}
 	}
-
+	
 	private static void batchFight() {
 		System.out.println("EXECUTING BATCH FIGHTS!");
-
+		
 		ConquestFightConfig config = new ConquestFightConfig();
-
+		
 		config.config = Config.fromString(roundConfig);
 		config.seed = seed;
 		config.games = gamesCount;
-
+		
 		ConquestFightBatch batch = new ConquestFightBatch(botsBatchPropertyFile, config);
-
+		
 		batch.fight(botIdBatch, reverseGames, tableFile, resultDirFile, replayDirFile, resultJsonFile);
 	}
 
@@ -363,9 +363,9 @@ public class ConquestFightConsole {
 		// -----------
 		// FOR TESTING
 		// -----------
-		//args = getTestArgs_1v1();
+		//args = getTestArgs_1v1();		
 		//args = getTestArgs_Batch();
-
+		
 		// --------------
 		// IMPLEMENTATION
 		// --------------

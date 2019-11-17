@@ -24,7 +24,6 @@
       </library>
     </orderEntry>
     <orderEntry type="module" module-name="Conquest" />
-    <orderEntry type="module" module-name="Conquest-Playground" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
@@ -34,5 +33,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="module" module-name="Conquest" />
+    <orderEntry type="library" name="jsap-2.1" level="project" />
   </component>
 </module>

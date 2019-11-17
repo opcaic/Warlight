@@ -20,6 +20,7 @@ package conquest.bot;
 
 import java.io.*;
 import java.lang.instrument.Instrumentation;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -81,11 +82,19 @@ public class BotParser extends Thread {
 				URLClassLoader cl = URLClassLoader.newInstance(urls, BotParser.class.getClassLoader());
 				botClass = Class.forName(botFQCN, true, cl);
 			}
-		} catch (Exception e) {
+		}
+		catch (ClassNotFoundException e)
+		{
+			System.out.println("Could not find bot in package conquest.bot.custom");
 			e.printStackTrace();
-			System.out.println(botFQCN);
-			Runtime.getRuntime().halt(200);
-			throw new RuntimeException("Failed to locate bot class: " + botFQCN, e);
+		}
+		catch (MalformedURLException e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			System.exit(200);
 		}
 		return constructBot(botClass);
 	}

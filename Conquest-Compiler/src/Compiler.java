@@ -102,7 +102,7 @@ public class Compiler
 
             if (p.exitValue() != 0)
             {
-                ExitError("There was an error while building the jar.");
+                ExitError("There was an error while building the bot jar.");
             }
 
             System.out.println("Moving compiled jar...");
@@ -118,7 +118,8 @@ public class Compiler
         }
         catch (Exception e)
         {
-            ExitError(e.toString());
+            // platform error
+            System.exit(42);
         }
     }
 }

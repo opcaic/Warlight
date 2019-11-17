@@ -94,8 +94,7 @@ public class RunGame
 			return go(log, playerNames, robots);
 		} catch (Exception e) {
 			System.out.println(e.toString());
-			System.exit(200);
-			throw new RuntimeException("Failed to run the gamne", e);
+			throw new RuntimeException("Failed to run/finish the game.", e);
 		}
 	}
 

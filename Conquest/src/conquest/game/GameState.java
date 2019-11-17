@@ -260,7 +260,7 @@ public class GameState implements Cloneable {
             RegionData region = map.getRegionData(move.getRegion());
             int armies = move.getArmies();
             
-            if (!region.isOwnedBy(turn))
+            if (!region.ownedByPlayer(turn))
                 move.setIllegalMove(region.getId() + " not owned");
             else if (armies < 1)
                 move.setIllegalMove("cannot place less than 1 army");
@@ -429,7 +429,7 @@ public class GameState implements Cloneable {
             RegionData fromRegion = map.getRegionData(move.getFromRegion());
             RegionData toRegion = map.getRegionData(move.getToRegion());
 
-            if (!fromRegion.isOwnedBy(turn))
+            if (!fromRegion.ownedByPlayer(turn))
                 move.setIllegalMove(fromRegion.getId() + " attack/transfer not owned");
             else if (!fromRegion.isNeighbor(toRegion))
                 move.setIllegalMove(toRegion.getId() + " attack/transfer not a neighbor");
@@ -468,7 +468,7 @@ public class GameState implements Cloneable {
             
             move.setArmies(Math.min(move.getArmies(), fromRegion.getArmies() - 1));
 
-            if(toRegion.isOwnedBy(turn)) //transfer
+            if(toRegion.ownedByPlayer(turn)) //transfer
             {
                 if (gui != null) {
                     gui.transfer(move);

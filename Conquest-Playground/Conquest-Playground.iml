@@ -9,6 +9,8 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="module" module-name="Conquest" />
+    <orderEntry type="module" module-name="Conquest-Bots" />
     <orderEntry type="module" module-name="Conquest" />
+    <orderEntry type="module" module-name="Conquest-Bots" />
   </component>
 </module>
