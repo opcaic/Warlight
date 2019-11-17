@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/Conquest/Conquest.iml" filepath="$PROJECT_DIR$/Conquest/Conquest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Conquest-Bots/Conquest-Bots.iml" filepath="$PROJECT_DIR$/Conquest-Bots/Conquest-Bots.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Conquest-Checker/Conquest-Checker.iml" filepath="$PROJECT_DIR$/Conquest-Checker/Conquest-Checker.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Conquest-Compiler/Conquest-Compiler.iml" filepath="$PROJECT_DIR$/Conquest-Compiler/Conquest-Compiler.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Conquest-Executor/Conquest-Executor.iml" filepath="$PROJECT_DIR$/Conquest-Executor/Conquest-Executor.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Conquest-Tournament/Conquest-Tournament.iml" filepath="$PROJECT_DIR$/Conquest-Tournament/Conquest-Tournament.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Conquest-Validator/Conquest-Validator.iml" filepath="$PROJECT_DIR$/Conquest-Validator/Conquest-Validator.iml" />
+    </modules>
+  </component>
+</project>
