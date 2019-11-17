@@ -1,0 +1,36 @@
+{
+    "Checker": {
+        "Executable": "java",
+        "Arguments": [
+            "-jar",
+            "./checker/Conquest-Checker.jar"
+        ]
+    },
+    "Compiler": {
+        "Executable": "java",
+        "Arguments": [
+            "-jar",
+            "./compiler/Conquest-Compiler.jar"
+        ]
+    },
+    "Validator": {
+        "Executable": "java",
+        "Arguments": [
+            "-jar",
+            "./validator/Conquest-Validator.jar"
+        ]
+    },
+    "Executor": {
+        "Executable": "java",
+        "Arguments": [
+            "-jar",
+            "./executor/Conquest-Executor.jar"
+        ]
+    },
+    "Cleanup": {
+        "Executable": "bash",
+        "Arguments": [
+            ""
+        ]
+    }
+}
