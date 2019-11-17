@@ -81,15 +81,11 @@ public class BotParser extends Thread {
 				URLClassLoader cl = URLClassLoader.newInstance(urls, BotParser.class.getClassLoader());
 				botClass = Class.forName(botFQCN, true, cl);
 			}
-		}
-		catch (ClassNotFoundException e)
-		{
-			System.out.println("Could not locate bot class in package conquest.bot.custom");
-			System.exit(200);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
-			throw new RuntimeException("There was an unexpected error when loading the bot class: " + botFQCN, e);
+			System.out.println(botFQCN);
+			Runtime.getRuntime().halt(200);
+			throw new RuntimeException("Failed to locate bot class: " + botFQCN, e);
 		}
 		return constructBot(botClass);
 	}

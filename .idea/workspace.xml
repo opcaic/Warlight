@@ -1,30 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="ArtifactsWorkspaceSettings">
+    <artifacts-to-build>
+      <artifact name="Conquest-Tournament:jar" />
+    </artifacts-to-build>
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="ae386ec0-86d8-4516-b4b8-62b7733a8ee4" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/jsap_2_1.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Conquest-Tournament/.classpath" beforeDir="false" afterPath="$PROJECT_DIR$/Conquest-Tournament/.classpath" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Conquest-Tournament/.project" beforeDir="false" afterPath="$PROJECT_DIR$/Conquest-Tournament/.project" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Conquest-Tournament/Conquest-Tournament.iml" beforeDir="false" afterPath="$PROJECT_DIR$/Conquest-Tournament/Conquest-Tournament.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Conquest-Tournament/batch-fight" beforeDir="false" afterPath="$PROJECT_DIR$/Conquest-Tournament/batch-fight" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Conquest-Tournament/batch-fight.properties" beforeDir="false" afterPath="$PROJECT_DIR$/Conquest-Tournament/batch-fight.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Conquest-Tournament/compile.bat" beforeDir="false" afterPath="$PROJECT_DIR$/Conquest-Tournament/compile.bat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Conquest-Tournament/compile.sh" beforeDir="false" afterPath="$PROJECT_DIR$/Conquest-Tournament/compile.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Conquest-Tournament/config.json" beforeDir="false" afterPath="$PROJECT_DIR$/Conquest-Tournament/config.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Conquest-Tournament/src/conquest/tournament/ConquestFight.java" beforeDir="false" afterPath="$PROJECT_DIR$/Conquest-Tournament/src/conquest/tournament/ConquestFight.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Conquest-Tournament/src/conquest/tournament/ConquestFightBatch.java" beforeDir="false" afterPath="$PROJECT_DIR$/Conquest-Tournament/src/conquest/tournament/ConquestFightBatch.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Conquest-Tournament/src/conquest/tournament/ConquestFightConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/Conquest-Tournament/src/conquest/tournament/ConquestFightConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Conquest-Tournament/src/conquest/tournament/ConquestFightConsole.java" beforeDir="false" afterPath="$PROJECT_DIR$/Conquest-Tournament/src/conquest/tournament/ConquestFightConsole.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Conquest-Tournament/src/conquest/tournament/ConquestTable.java" beforeDir="false" afterPath="$PROJECT_DIR$/Conquest-Tournament/src/conquest/tournament/ConquestTable.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Conquest-Tournament/src/conquest/tournament/ConquestTableConsole.java" beforeDir="false" afterPath="$PROJECT_DIR$/Conquest-Tournament/src/conquest/tournament/ConquestTableConsole.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Conquest-Tournament/src/conquest/tournament/Summarize.java" beforeDir="false" afterPath="$PROJECT_DIR$/Conquest-Tournament/src/conquest/tournament/Summarize.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Conquest-Tournament/src/conquest/tournament/manifest.MF" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Conquest-Tournament/src/conquest/tournament/run/ConquestFightRound.java" beforeDir="false" afterPath="$PROJECT_DIR$/Conquest-Tournament/src/conquest/tournament/run/ConquestFightRound.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Conquest-Tournament/src/conquest/tournament/run/ConquestFightRoundGenerator.java" beforeDir="false" afterPath="$PROJECT_DIR$/Conquest-Tournament/src/conquest/tournament/run/ConquestFightRoundGenerator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Conquest-Tournament/src/conquest/tournament/utils/CSV.java" beforeDir="false" afterPath="$PROJECT_DIR$/Conquest-Tournament/src/conquest/tournament/utils/CSV.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Conquest-Tournament/src/conquest/tournament/utils/Sanitize.java" beforeDir="false" afterPath="$PROJECT_DIR$/Conquest-Tournament/src/conquest/tournament/utils/Sanitize.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Conquest/src/conquest/bot/BotParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/Conquest/src/conquest/bot/BotParser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Conquest-Tournament/src/META-INF/MANIFEST.MF" beforeDir="false" afterPath="$PROJECT_DIR$/Conquest-Tournament/src/META-INF/MANIFEST.MF" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -37,13 +22,14 @@
     <session id="621272316">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
+          <entry key="project.closed" value="1" />
           <entry key="project.open.time.1" value="1" />
           <entry key="project.opened" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="JAVA" value="13" />
+          <entry key="JAVA" value="15" />
           <entry key="Manifest" value="1" />
         </counts>
       </usages-collector>
@@ -60,7 +46,7 @@
         <entry file="file://$PROJECT_DIR$/Conquest-Tournament/src/conquest/tournament/ConquestTableConsole.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="576">
-              <caret line="168" column="17" lean-forward="true" selection-start-line="168" selection-start-column="17" selection-end-line="168" selection-end-column="17" />
+              <caret line="168" column="17" selection-start-line="168" selection-start-column="17" selection-end-line="168" selection-end-column="17" />
             </state>
           </provider>
         </entry>
@@ -115,16 +101,34 @@
         <entry file="file://$PROJECT_DIR$/Conquest/src/conquest/engine/robot/InternalRobot.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="481">
-              <caret line="88" column="29" lean-forward="true" selection-start-line="88" selection-start-column="29" selection-end-line="88" selection-end-column="29" />
+              <caret line="88" column="29" selection-start-line="88" selection-start-column="29" selection-end-line="88" selection-end-column="29" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Conquest/src/conquest/bot/BotParser.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="72">
+              <caret line="81" column="36" selection-start-line="81" selection-start-column="36" selection-end-line="81" selection-end-column="36" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Conquest/src/conquest/game/GameState.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="97">
+              <caret line="258" column="9" lean-forward="true" selection-start-line="258" selection-start-column="9" selection-end-line="258" selection-end-column="9" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/Conquest/src/conquest/bot/BotParser.java">
+        <entry file="file://$PROJECT_DIR$/Conquest/src/conquest/bot/GameBot.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="72">
-              <caret line="81" column="36" selection-start-line="81" selection-start-column="36" selection-end-line="81" selection-end-column="36" />
+            <state relative-caret-position="-166">
+              <caret line="15" column="5" lean-forward="true" selection-start-line="15" selection-start-column="5" selection-end-line="15" selection-end-column="5" />
             </state>
           </provider>
         </entry>
@@ -167,12 +171,32 @@
           <expand>
             <path>
               <item name="Warlight" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Conquest-Tournament" type="462c0819:PsiDirectoryNode" />
+              <item name="Conquest" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="Warlight" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Conquest-Tournament" type="462c0819:PsiDirectoryNode" />
+              <item name="Conquest" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Warlight" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Conquest" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="conquest" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Warlight" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Conquest" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="conquest" type="462c0819:PsiDirectoryNode" />
+              <item name="bot" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Warlight" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Conquest" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="conquest" type="462c0819:PsiDirectoryNode" />
+              <item name="game" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="Warlight" type="b2602c69:ProjectViewProjectNode" />
@@ -192,9 +216,9 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1573993407909" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1573993581377" />
     <property name="last_opened_file_path" value="D:/mff/sw_projekt/conquest-engine-gui-master/lib/json.jar!/" />
-    <property name="project.structure.last.edited" value="Libraries" />
+    <property name="project.structure.last.edited" value="Artifacts" />
     <property name="project.structure.proportion" value="0.15136719" />
     <property name="project.structure.side.proportion" value="0.2" />
   </component>
@@ -225,18 +249,18 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="252" y="157" width="1558" height="911" extended-state="0" />
-    <editor active="true" />
     <layout>
       <window_info id="Image Layers" />
       <window_info id="Designer" />
       <window_info id="UI Designer" />
       <window_info id="Capture Tool" />
       <window_info id="Favorites" side_tool="true" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24966623" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24966623" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Version Control" show_stripe_button="false" />
       <window_info anchor="bottom" id="Terminal" />
       <window_info anchor="bottom" id="Event Log" side_tool="true" />
+      <window_info active="true" anchor="bottom" id="Messages" visible="true" weight="0.32947233" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
       <window_info anchor="bottom" id="Run" order="2" />
@@ -264,7 +288,7 @@
     <entry file="file://$PROJECT_DIR$/Conquest-Tournament/src/conquest/tournament/ConquestTableConsole.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="576">
-          <caret line="168" column="17" lean-forward="true" selection-start-line="168" selection-start-column="17" selection-end-line="168" selection-end-column="17" />
+          <caret line="168" column="17" selection-start-line="168" selection-start-column="17" selection-end-line="168" selection-end-column="17" />
         </state>
       </provider>
     </entry>
@@ -316,7 +340,7 @@
     <entry file="file://$PROJECT_DIR$/Conquest/src/conquest/engine/robot/InternalRobot.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="481">
-          <caret line="88" column="29" lean-forward="true" selection-start-line="88" selection-start-column="29" selection-end-line="88" selection-end-column="29" />
+          <caret line="88" column="29" selection-start-line="88" selection-start-column="29" selection-end-line="88" selection-end-column="29" />
         </state>
       </provider>
     </entry>
@@ -327,16 +351,32 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Conquest/src/conquest/game/GameState.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="97">
+          <caret line="258" column="9" lean-forward="true" selection-start-line="258" selection-start-column="9" selection-end-line="258" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Conquest/src/conquest/bot/GameBot.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-166">
+          <caret line="15" column="5" lean-forward="true" selection-start-line="15" selection-start-column="5" selection-end-line="15" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
   </component>
   <component name="masterDetails">
     <states>
       <state key="ArtifactsStructureConfigurable.UI">
         <settings>
           <artifact-editor />
+          <last-edited>Conquest-Tournament:jar</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
                 <option value="0.2" />
+                <option value="0.5" />
               </list>
             </option>
           </splitter-proportions>

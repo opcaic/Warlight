@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Conquest-Tournament:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Conquest_Tournament_jar</output-path>
+    <root id="archive" name="Conquest-Tournament.jar">
+      <element id="module-output" name="Conquest-Tournament" />
+      <element id="module-output" name="Conquest" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/Conquest-Tournament/lib/jsap-2.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/Conquest-Tournament/lib/json.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
