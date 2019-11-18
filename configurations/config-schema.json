@@ -1,0 +1,76 @@
+{
+  definitions: {},
+  '$schema': 'http://json-schema.org/draft-07/schema#',
+  '$id': 'http://example.com/root.json',
+  type: 'object',
+  required: [
+    'seed',
+    'botCommandTimeoutMillis',
+    'startingArmies',
+    'maxGameRounds',
+    'fightMode',
+    'games-count'
+  ],
+  properties: {
+    seed: {
+      '$id': '#/properties/seed',
+      type: 'number',
+      title: 'Seed',
+      examples: [
+        42
+      ],
+      default: 42,
+      minimum: 1
+    },
+    botCommandTimeoutMillis: {
+      '$id': '#/properties/botCommandTimeoutMillis',
+      type: 'number',
+      title: 'Bot command timeout (ms)',
+      default: 5000,
+      examples: [
+        5000
+      ],
+      minimum: 1
+    },
+    startingArmies: {
+      '$id': '#/properties/startingArmies',
+      type: 'number',
+      title: 'Starting armies',
+      default: 5,
+      examples: [
+        5
+      ],
+      minimum: 1
+    },
+    maxGameRounds: {
+      '$id': '#/properties/maxGameRounds',
+      type: 'number',
+      title: 'Max game rounds',
+      default: 100,
+      examples: [
+        100
+      ],
+      minimum: 1
+    },
+    fightMode: {
+      '$id': '#/properties/fightMode',
+      type: 'string',
+      title: 'Fight mode',
+      enum: [
+        'ORIGINAL_A60_D70',
+        'CONTINUAL_1_1_A60_D70'
+      ],
+      default: 'CONTINUAL_1_1_A60_D70'
+    },
+    'games-count': {
+      '$id': '#/properties/games-count',
+      type: 'number',
+      title: 'Games count',
+      default: 1,
+      examples: [
+        1
+      ],
+      minimum: 1
+    }
+  }
+}
